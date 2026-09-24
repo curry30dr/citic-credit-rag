@@ -1,72 +1,37 @@
 ﻿# -*- coding: utf-8 -*-
-"""Streamlit Cloud 部署版：中信银行信用卡智能咨询助手（纯API，无本地模型）"""
-import os, json, numpy as np, urllib.request
+"""Streamlit Cloud 部署版：中信银行信用卡智能咨询助手（纯BM25+LLM）"""
+import os, json, urllib.request
 from rank_bm25 import BM25Okapi
 import streamlit as st
 
 DASHSCOPE_KEY = os.environ.get("DASHSCOPE_API_KEY", "")
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-def api_call(path, body):
+def llm_chat(messages):
+    body = json.dumps({"model": "qwen-plus", "messages": messages, "temperature": 0}).encode()
     req = urllib.request.Request(
-        f"https://dashscope.aliyuncs.com/compatible-mode/v1/{path}",
-        data=json.dumps(body).encode(),
+        "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+        data=body,
         headers={"Authorization": "Bearer " + DASHSCOPE_KEY, "Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=30) as r:
-        return json.loads(r.read())
+    with urllib.request.urlopen(req, timeout=60) as r:
+        resp = json.loads(r.read())
+    return resp["choices"][0]["message"]["content"]
 
-@st.cache_data
-def load_chunks():
+@st.cache_resource
+def load_bm25():
     chunks = []
     with open(os.path.join(BASE_DIR, "knowledge_base.jsonl"), encoding="utf-8") as f:
         for line in f:
             chunks.append(json.loads(line))
-    return chunks
-
-@st.cache_resource
-def load_bm25():
-    chunks = load_chunks()
     texts = [c["text"] for c in chunks]
     bm25 = BM25Okapi([t.split() for t in texts])
     return chunks, bm25
 
 def retrieve(q):
     chunks, bm25 = load_bm25()
-    # 向量召回（在线API）
-    qv = api_call("embeddings", {"model": "text-embedding-v3", "input": [q]})["data"][0]["embedding"]
-    all_vecs = []
-    for c in chunks:
-        if "emb" not in c:
-            c["emb"] = api_call("embeddings", {"model": "text-embedding-v3", "input": [c["text"]]})["data"][0]["embedding"]
-        all_vecs.append(c["emb"])
-    all_vecs = np.array(all_vecs, dtype="float32")
-    qv = np.array(qv, dtype="float32")
-    scores = all_vecs @ qv / (np.linalg.norm(all_vecs, axis=1) * np.linalg.norm(qv) + 1e-9)
-    vi = np.argsort(scores)[::-1][:10]
-    # BM25召回
-    bv = bm25.get_scores(q.split())
-    br = np.argsort(bv)[::-1][:10]
-    # RRF融合
-    rrf = {}
-    for rank, i in enumerate(vi):
-        rrf[i] = rrf.get(i, 0) + 1/(60+rank)
-    for rank, i in enumerate(br):
-        rrf[i] = rrf.get(i, 0) + 1/(60+rank)
-    cands = sorted(rrf.items(), key=lambda x: -x[1])[:10]
-    return [chunks[i] for i, _ in cands[:4]]
-
-def llm(q, ctx):
-    ctx_text = "\n\n".join([f"[资料{i+1}] {c['text']}" for i, c in enumerate(ctx)])
-    sys_prompt = "你是中信银行信用卡智能咨询助手。只依据提供的业务资料回答，数字必须原样引用，资料没有就说不清楚并引导拨打4008895558。"
-    resp = api_call("chat/completions", {
-        "model": "qwen-plus",
-        "messages": [
-            {"role": "system", "content": sys_prompt},
-            {"role": "user", "content": f"【业务资料】\n{ctx_text}\n\n【用户问题】{q}"}
-        ],
-        "temperature": 0
-    })
-    return resp["choices"][0]["message"]["content"]
+    scores = bm25.get_scores(q.split())
+    top = sorted(range(len(scores)), key=lambda i: -scores[i])[:4]
+    return [chunks[i] for i in top]
 
 st.set_page_config(page_title="中信信用卡智能咨询", page_icon="💳", layout="centered")
 
@@ -93,19 +58,31 @@ for i, qq in enumerate(quick):
     if cols[i%3].button(qq, key=f"q{i}"):
         st.session_state["quick"] = qq
 
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = []
+for msg in st.session_state.chat_history:
+    with st.chat_message(msg["role"], avatar="👤" if msg["role"]=="user" else "🤖"):
+        st.write(msg["content"])
 q = st.chat_input("请输入您的问题")
 if "quick" in st.session_state:
     q = st.session_state.pop("quick")
 if q:
+    st.session_state.chat_history.append({"role": "user", "content": q})
     with st.chat_message("user", avatar="👤"):
         st.write(q)
     with st.chat_message("assistant", avatar="🤖"):
         ctx = retrieve(q)
-        ans = llm(q, ctx)
+        ctx_text = "\n\n".join([f"[资料{i+1}] {c['text']}" for i, c in enumerate(ctx)])
+        ans = llm_chat([
+            {"role": "system", "content": "你是中信银行信用卡智能咨询助手。只依据提供的业务资料回答，数字必须原样引用，资料没有就说不清楚并引导拨打4008895558。"},
+            {"role": "user", "content": f"【业务资料】\n{ctx_text}\n\n【用户问题】{q}"}
+        ])
         st.write(ans)
         with st.expander("查看召回来源"):
             for i, c in enumerate(ctx):
                 st.write(f"{i+1}. [{c.get('topic','')}] {c['text'][:100]}...")
+        st.session_state.chat_history.append({"role": "assistant", "content": ans})
 
 st.markdown("---")
 st.caption("如需人工服务，请拨打中信银行信用卡客服热线 4008895558")
+
