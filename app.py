@@ -65,17 +65,48 @@ def llm(q, ctx):
     return resp["choices"][0]["message"]["content"]
 
 st.set_page_config(page_title="中信信用卡智能咨询", page_icon="💳", layout="centered")
-st.title("💳 中信银行信用卡智能咨询助手")
-st.caption("仅依据《领用合约》《收费价格表》等业务资料回答，数字有据可查")
 
-q = st.chat_input("请输入您的问题，如：信用卡挂失手续费多少？")
+# 中信红品牌风格
+st.markdown("""
+<style>
+:root { --brand: #e60012; }
+.stApp { background: #fafafa; }
+h1 { color: #e60012 !important; }
+.stChatInput > div > div > input:focus { border-color: #e60012 !important; }
+.stButton > button { background: #e60012; color: white; border: none; }
+</style>
+""", unsafe_allow_html=True)
+
+st.markdown("""
+<div style="background:linear-gradient(135deg,#e60012,#ff4444);padding:24px;border-radius:12px;color:white;margin-bottom:16px">
+<h2 style="color:white;margin:0">中信银行信用卡智能咨询助手</h2>
+<p style="opacity:0.9;margin:8px 0 0">智能客服 · 数字有据可查 · 7×24小时服务</p>
+</div>
+""", unsafe_allow_html=True)
+
+st.caption("仅依据《领用合约》《收费价格表》等业务资料整理，具体以中信银行官方公告为准")
+
+# 快捷问题
+st.markdown("**常见问题：**")
+quick = ["信用卡挂失手续费多少？", "境外取现限额多少？", "最低还款有利息吗？", "违约金怎么收？", "溢缴款领回收费吗？"]
+cols = st.columns(3)
+for i, qq in enumerate(quick):
+    if cols[i%3].button(qq, key=f"q{i}"):
+        st.session_state["quick"] = qq
+
+q = st.chat_input("请输入您的问题")
+if "quick" in st.session_state:
+    q = st.session_state.pop("quick")
 if q:
-    with st.chat_message("user"):
+    with st.chat_message("user", avatar="👤"):
         st.write(q)
-    with st.chat_message("assistant"):
+    with st.chat_message("assistant", avatar="🤖"):
         ctx = retrieve(q)
         ans = llm(q, ctx)
         st.write(ans)
         with st.expander("查看召回来源"):
             for i, c in enumerate(ctx):
                 st.write(f"{i+1}. [{c.get('topic','')}] {c['text'][:100]}...")
+
+st.markdown("---")
+st.caption("如需人工服务，请拨打中信银行信用卡客服热线 4008895558")
