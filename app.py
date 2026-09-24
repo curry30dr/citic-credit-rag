@@ -54,18 +54,17 @@ st.caption("仅依据《领用合约》《收费价格表》等业务资料整�
 st.markdown("**常见问题：**")
 quick = ["信用卡挂失手续费多少？", "境外取现限额多少？", "最低还款有利息吗？", "违约金怎么收？", "溢缴款领回收费吗？"]
 cols = st.columns(3)
+q = None
 for i, qq in enumerate(quick):
     if cols[i%3].button(qq, key=f"q{i}"):
-        st.session_state["quick"] = qq
-
+        q = qq
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 for msg in st.session_state.chat_history:
     with st.chat_message(msg["role"], avatar="👤" if msg["role"]=="user" else "🤖"):
         st.write(msg["content"])
-q = st.chat_input("请输入您的问题")
-if "quick" in st.session_state:
-    q = st.session_state.pop("quick")
+if not q:
+    q = st.chat_input("请输入您的问题")
 if q:
     st.session_state.chat_history.append({"role": "user", "content": q})
     with st.chat_message("user", avatar="👤"):
@@ -85,4 +84,5 @@ if q:
 
 st.markdown("---")
 st.caption("如需人工服务，请拨打中信银行信用卡客服热线 4008895558")
+
 
