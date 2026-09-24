@@ -1,0 +1,100 @@
+<slide>
+  <style><fill><fillColor color="rgb(255,255,255)"/></fill></style>
+  <data>
+    <shape type="text" topLeftX="60" topLeftY="40" width="840" height="40">
+      <content textType="headline" fontSize="28" fontFamily="微软雅黑" bold="true" color="rgb(43,47,54)">
+        <p>RAG 整体架构</p>
+      </content>
+    </shape>
+    <line startX="60" startY="90" endX="900" endY="90">
+      <border color="rgb(232,234,239)" width="1"/>
+    </line>
+
+    <shape type="rect" topLeftX="60" topLeftY="130" width="130" height="50" presetHandlers="8">
+      <fill><fillColor color="rgb(253,236,236)"/></fill>
+      <border color="rgb(230,0,18)" width="1"/>
+    </shape>
+    <shape type="text" topLeftX="60" topLeftY="130" width="130" height="50">
+      <content textType="body" fontSize="13" fontFamily="微软雅黑" textAlign="center" color="rgb(43,47,54)"><p>用户提问</p></content>
+    </shape>
+
+    <line startX="190" startY="155" endX="230" endY="155">
+      <border color="rgb(138,144,156)" width="2"/>
+      <endArrow type="arrow"/>
+    </line>
+
+    <shape type="rect" topLeftX="230" topLeftY="120" width="150" height="70" presetHandlers="8">
+      <fill><fillColor color="rgb(255,255,255)"/></fill>
+      <border color="rgb(230,0,18)" width="1"/>
+    </shape>
+    <shape type="text" topLeftX="230" topLeftY="125" width="150" height="65">
+      <content textType="body" fontSize="12" fontFamily="微软雅黑" textAlign="center" color="rgb(43,47,54)" lineSpacing="multiple:1.5">
+        <p><strong>混合检索</strong></p>
+        <p>向量召回 + BM25</p>
+        <p>RRF 融合</p>
+      </content>
+    </shape>
+
+    <line startX="380" startY="155" endX="420" endY="155">
+      <border color="rgb(138,144,156)" width="2"/>
+      <endArrow type="arrow"/>
+    </line>
+
+    <shape type="rect" topLeftX="420" topLeftY="120" width="150" height="70" presetHandlers="8">
+      <fill><fillColor color="rgb(255,255,255)"/></fill>
+      <border color="rgb(230,0,18)" width="1"/>
+    </shape>
+    <shape type="text" topLeftX="420" topLeftY="125" width="150" height="65">
+      <content textType="body" fontSize="12" fontFamily="微软雅黑" textAlign="center" color="rgb(43,47,54)" lineSpacing="multiple:1.5">
+        <p><strong>Rerank 精排</strong></p>
+        <p>CrossEncoder 打分</p>
+        <p>阈值过滤 &lt;0.3</p>
+      </content>
+    </shape>
+
+    <line startX="570" startY="155" endX="610" endY="155">
+      <border color="rgb(138,144,156)" width="2"/>
+      <endArrow type="arrow"/>
+    </line>
+
+    <shape type="rect" topLeftX="610" topLeftY="120" width="150" height="70" presetHandlers="8">
+      <fill><fillColor color="rgb(230,0,18)"/></fill>
+    </shape>
+    <shape type="text" topLeftX="610" topLeftY="125" width="150" height="65">
+      <content textType="body" fontSize="12" fontFamily="微软雅黑" textAlign="center" color="rgb(255,255,255)" lineSpacing="multiple:1.5">
+        <p><strong>LLM 生成</strong></p>
+        <p>qwen-plus</p>
+        <p>流式输出</p>
+      </content>
+    </shape>
+
+    <line startX="760" startY="155" endX="800" endY="155">
+      <border color="rgb(138,144,156)" width="2"/>
+      <endArrow type="arrow"/>
+    </line>
+
+    <shape type="rect" topLeftX="800" topLeftY="130" width="100" height="50" presetHandlers="8">
+      <fill><fillColor color="rgb(253,236,236)"/></fill>
+      <border color="rgb(230,0,18)" width="1"/>
+    </shape>
+    <shape type="text" topLeftX="800" topLeftY="130" width="100" height="50">
+      <content textType="body" fontSize="12" fontFamily="微软雅黑" textAlign="center" color="rgb(43,47,54)"><p>回答+来源</p></content>
+    </shape>
+
+    <shape type="text" topLeftX="60" topLeftY="240" width="840" height="28">
+      <content textType="body" fontSize="14" fontFamily="微软雅黑" bold="true" color="rgb(230,0,18)">
+        <p>工程优化层</p>
+      </content>
+    </shape>
+    <shape type="text" topLeftX="60" topLeftY="275" width="840" height="200">
+      <content textType="body" fontSize="13" fontFamily="微软雅黑" color="rgb(43,47,54)" lineSpacing="multiple:2">
+        <p>· 多轮对话：保留最近 3 轮上下文，支持追问「那最低还款呢」</p>
+        <p>· 结果缓存：相同问题第二次 0 秒返回，减少 API 调用</p>
+        <p>· 反馈闭环：前端赞/踩按钮落库 CSV，便于后续优化</p>
+        <p>· 问答日志：JSONL 记录召回块、回答、是否缓存，可回溯排查</p>
+        <p>· 流式输出：SSE 逐 token 推送，前端实时打字</p>
+      </content>
+    </shape>
+  </data>
+  <note><content textType="body" fontSize="14"><p>整体链路：用户提问先过混合检索（向量+BM25+RRF融合），再用Rerank精排并做阈值过滤，最后把相关资料拼进prompt交给qwen-plus生成回答。下面是工程优化层：多轮对话、缓存、反馈、日志、流式。</p></content></note>
+</slide>

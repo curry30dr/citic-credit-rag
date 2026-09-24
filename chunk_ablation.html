@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>切块参数消融实验</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+</head><body>
+<div id="chart1" style="width:900px;height:400px;margin:30px auto"></div>
+<div id="chart2" style="width:900px;height:400px;margin:30px auto"></div>
+<script>
+// 图1：chunk-size消融
+const c1 = echarts.init(document.getElementById('chart1'));
+c1.setOption({
+  title: {text: 'chunk-size 消融（overlap固定80）', left: 'center', textStyle: {fontSize: 18}},
+  tooltip: {trigger: 'axis'},
+  xAxis: {type: 'category', name: 'chunk_size（字）', data: [200,300,400,500,600,700,800]},
+  yAxis: {type: 'value', name: 'Recall@4', min: 70, max: 95, axisLabel: {formatter: '{value}%'}},
+  series: [{
+    type: 'line', smooth: true,
+    data: [75,78,84,88,88,81,81],
+    itemStyle: {color: '#e60012'},
+    label: {show: true, formatter: '{c}%'},
+    markPoint: {data: [{type: 'max', name: '最优'}]}
+  }]
+});
+
+// 图2：overlap消融
+const c2 = echarts.init(document.getElementById('chart2'));
+c2.setOption({
+  title: {text: 'overlap 消融（chunk_size固定500）', left: 'center', textStyle: {fontSize: 18}},
+  tooltip: {trigger: 'axis'},
+  xAxis: {type: 'category', name: 'overlap（字）', data: [0,20,40,60,80,100,120,140,160]},
+  yAxis: {type: 'value', name: 'Recall@4', min: 70, max: 95, axisLabel: {formatter: '{value}%'}},
+  series: [{
+    type: 'line', smooth: true,
+    data: [84,88,84,84,88,84,78,84,88],
+    itemStyle: {color: '#e60012'},
+    label: {show: true, formatter: '{c}%'}
+  }]
+});
+</script></body></html>

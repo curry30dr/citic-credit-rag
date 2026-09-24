@@ -1,0 +1,27 @@
+<slide>
+  <style><fill><fillColor color="rgb(255,255,255)"/></fill></style>
+  <data>
+    <shape type="rect" topLeftX="0" topLeftY="0" width="8" height="540">
+      <fill><fillColor color="rgb(230,0,18)"/></fill>
+    </shape>
+    <shape type="text" topLeftX="80" topLeftY="160" width="700" height="60">
+      <content textType="title" fontSize="40" fontFamily="微软雅黑" bold="true" color="rgb(43,47,54)">
+        <p>中信银行信用卡智能咨询助手</p>
+      </content>
+    </shape>
+    <shape type="text" topLeftX="80" topLeftY="230" width="700" height="40">
+      <content textType="body" fontSize="20" fontFamily="微软雅黑" color="rgb(138,144,156)">
+        <p>基于 RAG 的双栈检索增强问答系统</p>
+      </content>
+    </shape>
+    <line startX="80" startY="290" endX="200" endY="290">
+      <border color="rgb(230,0,18)" width="3"/>
+    </line>
+    <shape type="text" topLeftX="80" topLeftY="320" width="700" height="30">
+      <content textType="body" fontSize="14" fontFamily="微软雅黑" color="rgb(138,144,156)">
+        <p>本地开源栈 + 百炼在线 API 栈 ｜ 混合检索 + Rerank ｜ 流式多轮对话</p>
+      </content>
+    </shape>
+  </data>
+  <note><content textType="body" fontSize="14"><p>大家好，今天介绍我做的中信银行信用卡智能咨询助手。这个项目完整实现了RAG链路，包括知识库构建、双栈检索、Rerank精排、流式多轮对话，并做了消融实验验证各环节效果。</p></content></note>
+</slide>

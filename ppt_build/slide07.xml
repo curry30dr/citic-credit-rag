@@ -1,0 +1,53 @@
+<slide>
+  <style><fill><fillColor color="rgb(255,255,255)"/></fill></style>
+  <data>
+    <shape type="rect" topLeftX="0" topLeftY="0" width="960" height="8">
+      <fill><fillColor color="rgb(230,0,18)"/></fill>
+    </shape>
+    <shape type="text" topLeftX="70" topLeftY="60" width="700" height="40">
+      <content textType="headline" fontSize="26" bold="true" color="rgba(20,20,20,1)" fontFamily="微软雅黑">
+        <p>总结与展望</p>
+      </content>
+    </shape>
+    <line startX="70" startY="110" endX="130" endY="110"><border color="rgb(230,0,18)" width="3"/></line>
+
+    <shape type="text" topLeftX="70" topLeftY="140" width="400" height="28">
+      <content textType="body" fontSize="15" bold="true" color="rgba(230,0,18,1)" fontFamily="微软雅黑"><p>项目交付了什么</p></content>
+    </shape>
+    <shape type="text" topLeftX="70" topLeftY="175" width="400" height="220">
+      <content textType="body" fontSize="13.5" color="rgba(60,65,75,1)" fontFamily="微软雅黑" lineSpacing="multiple:1.8">
+        <ul>
+          <li><p>86 块结构化知识库 + 切片策略</p></li>
+          <li><p>双栈 RAG：本地开源 + 在线 API</p></li>
+          <li><p>向量+BM25+RRF+Rerank 两段式检索</p></li>
+          <li><p>消融实验验证 Rerank 价值，Recall@4 达 95%</p></li>
+          <li><p>可对话网页 + 公网永久部署</p></li>
+        </ul>
+      </content>
+    </shape>
+
+    <shape type="text" topLeftX="510" topLeftY="140" width="380" height="28">
+      <content textType="body" fontSize="15" bold="true" color="rgba(230,0,18,1)" fontFamily="微软雅黑"><p>学到了什么</p></content>
+    </shape>
+    <shape type="text" topLeftX="510" topLeftY="175" width="380" height="220">
+      <content textType="body" fontSize="13.5" color="rgba(60,65,75,1)" fontFamily="微软雅黑" lineSpacing="multiple:1.8">
+        <ul>
+          <li><p>数据清洗比调模型更影响效果</p></li>
+          <li><p>RAG 是工程问题，不是算法调参</p></li>
+          <li><p>检索质量决定生成质量上限</p></li>
+          <li><p>双栈切换体现成本与隐私的权衡</p></li>
+        </ul>
+      </content>
+    </shape>
+
+    <shape type="rect" topLeftX="70" topLeftY="420" width="820" height="70" presetHandlers="8">
+      <fill><fillColor color="rgba(245,246,248,1)"/></fill>
+    </shape>
+    <shape type="text" topLeftX="95" topLeftY="435" width="770" height="45">
+      <content textType="body" fontSize="13" color="rgba(60,65,75,1)" fontFamily="微软雅黑" lineSpacing="multiple:1.5">
+        <p><span bold="true" color="rgba(230,0,18,1)">下一步：</span>接入银行真实全量知识库 · 增加多轮对话与意图澄清 · 引入问答对错的自动评测与线上反馈闭环</p>
+      </content>
+    </shape>
+  </data>
+  <note><content textType="body"><p>总结：交付了完整的RAG系统，从数据到部署跑通全链路。</p><p>最大收获：RAG核心是工程，数据清洗和检索质量比模型本身更重要。</p><p>下一步：扩知识库、多轮对话、自动评测。</p><p>谢谢老师，请提问。</p></content></note>
+</slide>

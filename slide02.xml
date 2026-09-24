@@ -1,0 +1,46 @@
+<slide>
+  <style><fill><fillColor color="rgb(255,255,255)"/></fill></style>
+  <data>
+    <shape type="text" topLeftX="60" topLeftY="40" width="840" height="40">
+      <content textType="headline" fontSize="28" fontFamily="微软雅黑" bold="true" color="rgb(43,47,54)">
+        <p>项目背景：信用卡业务资料分散，客户咨询效率低</p>
+      </content>
+    </shape>
+    <line startX="60" startY="90" endX="900" endY="90">
+      <border color="rgb(232,234,239)" width="1"/>
+    </line>
+    <shape type="text" topLeftX="60" topLeftY="120" width="400" height="30">
+      <content textType="body" fontSize="15" fontFamily="微软雅黑" bold="true" color="rgb(230,0,18)">
+        <p>业务痛点</p>
+      </content>
+    </shape>
+    <shape type="text" topLeftX="60" topLeftY="160" width="400" height="200">
+      <content textType="body" fontSize="14" fontFamily="微软雅黑" color="rgb(43,47,54)" lineSpacing="multiple:1.8">
+        <p>· 领用合约、收费价格表、活动海报分散在不同文档</p>
+        <p>· 人工客服排队等待，常见问题重复解答</p>
+        <p>· 大模型直接回答会编造资料里没有的卡种和数字</p>
+      </content>
+    </shape>
+    <shape type="text" topLeftX="500" topLeftY="120" width="400" height="30">
+      <content textType="body" fontSize="15" fontFamily="微软雅黑" bold="true" color="rgb(230,0,18)">
+        <p>项目目标</p>
+      </content>
+    </shape>
+    <shape type="text" topLeftX="500" topLeftY="160" width="400" height="200">
+      <content textType="body" fontSize="14" fontFamily="微软雅黑" color="rgb(43,47,54)" lineSpacing="multiple:1.8">
+        <p>· 基于RAG，只依据业务资料回答，数字有据可查</p>
+        <p>· 实现本地开源与在线API双栈对比</p>
+        <p>· 通过消融实验验证检索与重排各环节效果</p>
+      </content>
+    </shape>
+    <shape type="rect" topLeftX="60" topLeftY="400" width="840" height="80" presetHandlers="8">
+      <fill><fillColor color="rgb(253,236,236)"/></fill>
+    </shape>
+    <shape type="text" topLeftX="80" topLeftY="415" width="800" height="50">
+      <content textType="body" fontSize="14" fontFamily="微软雅黑" color="rgb(43,47,54)">
+        <p>知识库覆盖：领用合约、信用卡章程、收费价格表、三张返现活动海报，共 <strong>89 个知识块</strong>，平均 281 字/块</p>
+      </content>
+    </shape>
+  </data>
+  <note><content textType="body" fontSize="14"><p>信用卡业务资料分散在领用合约、价格表和活动海报里，客户问常见问题需要转人工。直接用大模型会编造数字。我们用RAG方案，让模型只根据业务资料回答，数字有据可查。</p></content></note>
+</slide>

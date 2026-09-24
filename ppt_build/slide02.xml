@@ -1,0 +1,47 @@
+<slide>
+  <style><fill><fillColor color="rgb(255,255,255)"/></fill></style>
+  <data>
+    <shape type="text" topLeftX="70" topLeftY="40" width="600" height="40">
+      <content textType="headline" fontSize="26" bold="true" color="rgba(20,20,20,1)" fontFamily="微软雅黑">
+        <p>项目背景：为什么需要 RAG</p>
+      </content>
+    </shape>
+    <line startX="70" startY="90" endX="130" endY="90"><border color="rgb(230,0,18)" width="3"/></line>
+
+    <shape type="text" topLeftX="70" topLeftY="120" width="380" height="30">
+      <content textType="body" fontSize="15" bold="true" color="rgba(230,0,18,1)" fontFamily="微软雅黑"><p>业务痛点</p></content>
+    </shape>
+    <shape type="text" topLeftX="70" topLeftY="155" width="380" height="180">
+      <content textType="body" fontSize="14" color="rgba(60,65,75,1)" fontFamily="微软雅黑" lineSpacing="multiple:1.7">
+        <ul>
+          <li><p>信用卡咨询量大：取现、账单、年费、激活、还款规则</p></li>
+          <li><p>业务资料分散在领用合约、价格表、章程中</p></li>
+          <li><p>客户问法千变万化，人工客服成本高</p></li>
+        </ul>
+      </content>
+    </shape>
+
+    <shape type="text" topLeftX="500" topLeftY="120" width="390" height="30">
+      <content textType="body" fontSize="15" bold="true" color="rgba(230,0,18,1)" fontFamily="微软雅黑"><p>核心矛盾</p></content>
+    </shape>
+    <shape type="text" topLeftX="500" topLeftY="155" width="390" height="180">
+      <content textType="body" fontSize="14" color="rgba(60,65,75,1)" fontFamily="微软雅黑" lineSpacing="multiple:1.7">
+        <ul>
+          <li><p>通用大模型不懂本行规则，容易<span color="rgba(230,0,18,1)">编造数字（幻觉）</span></p></li>
+          <li><p>纯关键词检索不懂"忘记还款≈逾期"</p></li>
+          <li><p>重新训练模型成本高、更新慢</p></li>
+        </ul>
+      </content>
+    </shape>
+
+    <shape type="rect" topLeftX="70" topLeftY="370" width="820" height="110" presetHandlers="8">
+      <fill><fillColor color="rgba(253,236,236,1)"/></fill>
+    </shape>
+    <shape type="text" topLeftX="95" topLeftY="385" width="770" height="90">
+      <content textType="body" fontSize="15" color="rgba(40,45,55,1)" fontFamily="微软雅黑" lineSpacing="multiple:1.6">
+        <p><span bold="true" color="rgba(230,0,18,1)">RAG 的价值：</span>不重新训练模型，把企业可信知识"外挂"给大模型——检索到哪块资料，就只依据那块资料回答，数字有据可查、每句回答都能溯源。</p>
+      </content>
+    </shape>
+  </data>
+  <note><content textType="body"><p>银行信用卡业务规则多、数字敏感，大模型直接问会瞎编。</p><p>我们的思路是：不训模型，把业务资料做成知识库，先检索再让大模型基于资料回答。</p><p>重点是学会用企业知识做出可靠的大模型应用，而不是调个 API 套壳。</p></content></note>
+</slide>

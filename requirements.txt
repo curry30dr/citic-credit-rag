@@ -1,0 +1,5 @@
+flask
+numpy
+faiss-cpu
+sentence-transformers
+rank_bm25

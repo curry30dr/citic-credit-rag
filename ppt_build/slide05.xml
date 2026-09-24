@@ -1,0 +1,73 @@
+<slide>
+  <style><fill><fillColor color="rgb(255,255,255)"/></fill></style>
+  <data>
+    <shape type="text" topLeftX="70" topLeftY="35" width="700" height="40">
+      <content textType="headline" fontSize="26" bold="true" color="rgba(20,20,20,1)" fontFamily="微软雅黑">
+        <p>消融实验：混合检索 + Rerank 把准确率提到 95%</p>
+      </content>
+    </shape>
+    <line startX="70" startY="85" endX="130" endY="85"><border color="rgb(230,0,18)" width="3"/></line>
+
+    <shape type="text" topLeftX="70" topLeftY="100" width="820" height="25">
+      <content textType="body" fontSize="13" color="rgba(110,115,125,1)" fontFamily="微软雅黑">
+        <p>自构 20 道真实业务问题（取现/账单/年费/激活等），对比四种检索配置在 Top-4 的命中率 Recall@4</p>
+      </content>
+    </shape>
+
+    <table topLeftX="70" topLeftY="140" width="560" height="240">
+      <colgroup>
+        <col width="200"/><col width="130"/><col width="130"/><col width="100"/>
+      </colgroup>
+      <tr height="36">
+        <td><fill><fillColor color="rgba(230,0,18,1)"/></fill><content textType="body" fontSize="13" bold="true" textAlign="center" color="rgba(255,255,255,1)" fontFamily="微软雅黑"><p>检索配置</p></content></td>
+        <td><fill><fillColor color="rgba(230,0,18,1)"/></fill><content textType="body" fontSize="13" bold="true" textAlign="center" color="rgba(255,255,255,1)" fontFamily="微软雅黑"><p>命中题数</p></content></td>
+        <td><fill><fillColor color="rgba(230,0,18,1)"/></fill><content textType="body" fontSize="13" bold="true" textAlign="center" color="rgba(255,255,255,1)" fontFamily="微软雅黑"><p>Recall@4</p></content></td>
+        <td><fill><fillColor color="rgba(230,0,18,1)"/></fill><content textType="body" fontSize="13" bold="true" textAlign="center" color="rgba(255,255,255,1)" fontFamily="微软雅黑"><p>趋势</p></content></td>
+      </tr>
+      <tr height="42">
+        <td><content textType="body" fontSize="12.5" textAlign="center" color="rgba(60,65,75,1)" fontFamily="微软雅黑"><p>纯向量</p></content></td>
+        <td><content textType="body" fontSize="12.5" textAlign="center" color="rgba(60,65,75,1)" fontFamily="微软雅黑"><p>17 / 20</p></content></td>
+        <td><content textType="body" fontSize="12.5" textAlign="center" color="rgba(60,65,75,1)" fontFamily="微软雅黑"><p>85%</p></content></td>
+        <td><content textType="body" fontSize="12.5" textAlign="center" color="rgba(60,65,75,1)" fontFamily="微软雅黑"><p>基线</p></content></td>
+      </tr>
+      <tr height="42">
+        <td><content textType="body" fontSize="12.5" textAlign="center" color="rgba(60,65,75,1)" fontFamily="微软雅黑"><p>纯 BM25</p></content></td>
+        <td><content textType="body" fontSize="12.5" textAlign="center" color="rgba(60,65,75,1)" fontFamily="微软雅黑"><p>18 / 20</p></content></td>
+        <td><content textType="body" fontSize="12.5" textAlign="center" color="rgba(60,65,75,1)" fontFamily="微软雅黑"><p>90%</p></content></td>
+        <td><content textType="body" fontSize="12.5" textAlign="center" color="rgba(60,65,75,1)" fontFamily="微软雅黑"><p>+5%</p></content></td>
+      </tr>
+      <tr height="42">
+        <td><content textType="body" fontSize="12.5" textAlign="center" color="rgba(60,65,75,1)" fontFamily="微软雅黑"><p>混合 RRF</p></content></td>
+        <td><content textType="body" fontSize="12.5" textAlign="center" color="rgba(60,65,75,1)" fontFamily="微软雅黑"><p>18 / 20</p></content></td>
+        <td><content textType="body" fontSize="12.5" textAlign="center" color="rgba(60,65,75,1)" fontFamily="微软雅黑"><p>90%</p></content></td>
+        <td><content textType="body" fontSize="12.5" textAlign="center" color="rgba(60,65,75,1)" fontFamily="微软雅黑"><p>持平</p></content></td>
+      </tr>
+      <tr height="42">
+        <td><fill><fillColor color="rgba(253,236,236,1)"/></fill><content textType="body" fontSize="12.5" bold="true" textAlign="center" color="rgba(230,0,18,1)" fontFamily="微软雅黑"><p>混合 + Rerank</p></content></td>
+        <td><fill><fillColor color="rgba(253,236,236,1)"/></fill><content textType="body" fontSize="12.5" bold="true" textAlign="center" color="rgba(230,0,18,1)" fontFamily="微软雅黑"><p>19 / 20</p></content></td>
+        <td><fill><fillColor color="rgba(253,236,236,1)"/></fill><content textType="body" fontSize="12.5" bold="true" textAlign="center" color="rgba(230,0,18,1)" fontFamily="微软雅黑"><p>95%</p></content></td>
+        <td><fill><fillColor color="rgba(253,236,236,1)"/></fill><content textType="body" fontSize="12.5" bold="true" textAlign="center" color="rgba(230,0,18,1)" fontFamily="微软雅黑"><p>+5%</p></content></td>
+      </tr>
+    </table>
+
+    <shape type="text" topLeftX="670" topLeftY="140" width="230" height="28">
+      <content textType="body" fontSize="14" bold="true" color="rgba(230,0,18,1)" fontFamily="微软雅黑"><p>结论</p></content>
+    </shape>
+    <shape type="text" topLeftX="670" topLeftY="175" width="230" height="200">
+      <content textType="body" fontSize="12.5" color="rgba(60,65,75,1)" fontFamily="微软雅黑" lineSpacing="multiple:1.7">
+        <ul>
+          <li><p>BM25 在术语匹配上略强于向量</p></li>
+          <li><p>RRF 融合未跌点，稳定</p></li>
+          <li><p><span bold="true" color="rgba(230,0,18,1)">Rerank 是效果跃升关键</span>，把最相关块顶到 Top4</p></li>
+        </ul>
+      </content>
+    </shape>
+
+    <shape type="text" topLeftX="70" topLeftY="430" width="820" height="40">
+      <content textType="body" fontSize="12" color="rgba(120,125,135,1)" fontFamily="微软雅黑" lineSpacing="multiple:1.5">
+        <p>实验中修过两个 bug：① for r, r 笔误导致变量未定义；② RRF 公式括号优先级 1/60+vr[c] 改为 1/(60+vr[c])，后者直接影响融合排序正确性。</p>
+      </content>
+    </shape>
+  </data>
+  <note><content textType="body"><p>这页是效果证据页。</p><p>自出20道真实业务问题，跑四个版本。</p><p>纯向量85%，BM25 90%，混合RRF 90%，混合+Rerank 95%。</p><p>关键洞察：Rerank才是真正拉开差距的那一步。</p><p>3道老师正式测试题后续会补进PPT。</p></content></note>
+</slide>

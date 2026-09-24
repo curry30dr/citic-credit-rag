@@ -1,0 +1,18 @@
+# 密钥文件，不上传
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# 索引文件（可重新生成）
+*.pkl
+*.index
+
+# 模型文件
+models/
+
+# OS
+.DS_Store
+Thumbs.db

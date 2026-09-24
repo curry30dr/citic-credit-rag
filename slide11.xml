@@ -1,0 +1,45 @@
+<slide>
+  <style><fill><fillColor color="rgb(255,255,255)"/></fill></style>
+  <data>
+    <shape type="rect" topLeftX="0" topLeftY="0" width="8" height="540">
+      <fill><fillColor color="rgb(230,0,18)"/></fill>
+    </shape>
+    <shape type="text" topLeftX="80" topLeftY="100" width="700" height="50">
+      <content textType="title" fontSize="36" fontFamily="微软雅黑" bold="true" color="rgb(43,47,54)">
+        <p>总结与展望</p>
+      </content>
+    </shape>
+    <line startX="80" startY="170" endX="200" endY="170">
+      <border color="rgb(230,0,18)" width="3"/>
+    </line>
+
+    <shape type="text" topLeftX="80" topLeftY="210" width="400" height="28">
+      <content textType="body" fontSize="15" fontFamily="微软雅黑" bold="true" color="rgb(230,0,18)">
+        <p>项目成果</p>
+      </content>
+    </shape>
+    <shape type="text" topLeftX="80" topLeftY="245" width="400" height="200">
+      <content textType="body" fontSize="13" fontFamily="微软雅黑" color="rgb(43,47,54)" lineSpacing="multiple:2">
+        <p>· 完整 RAG 链路：检索→融合→重排→生成</p>
+        <p>· 双栈对比：本地开源 vs 在线 API</p>
+        <p>· 消融实验 Recall@4 从 85% 提升至 95%</p>
+        <p>· 三道统一测试题全部答对</p>
+      </content>
+    </shape>
+
+    <shape type="text" topLeftX="500" topLeftY="210" width="400" height="28">
+      <content textType="body" fontSize="15" fontFamily="微软雅黑" bold="true" color="rgb(230,0,18)">
+        <p>后续优化方向</p>
+      </content>
+    </shape>
+    <shape type="text" topLeftX="500" topLeftY="245" width="400" height="200">
+      <content textType="body" fontSize="13" fontFamily="微软雅黑" color="rgb(43,47,54)" lineSpacing="multiple:2">
+        <p>· 向量数据库（FAISS → Milvus）</p>
+        <p>· 多模态：海报直接用视觉模型理解</p>
+        <p>· chunk-size 消融实验</p>
+        <p>· 自动评估 pipeline</p>
+      </content>
+    </shape>
+  </data>
+  <note><content textType="body" fontSize="14"><p>这个项目完整实现了RAG链路，做了双栈对比和消融实验，Recall@4从85%提到95%，三道测试题全对。后续可以换向量数据库、加多模态理解、做chunk-size消融和自动评估。谢谢大家。</p></content></note>
+</slide>

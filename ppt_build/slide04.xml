@@ -1,0 +1,88 @@
+<slide>
+  <style><fill><fillColor color="rgb(255,255,255)"/></fill></style>
+  <data>
+    <shape type="text" topLeftX="70" topLeftY="35" width="700" height="40">
+      <content textType="headline" fontSize="26" bold="true" color="rgba(20,20,20,1)" fontFamily="微软雅黑">
+        <p>技术方案：混合检索 + Rerank 两段式架构</p>
+      </content>
+    </shape>
+    <line startX="70" startY="85" endX="130" endY="85"><border color="rgb(230,0,18)" width="3"/></line>
+
+    <!-- 流程节点 -->
+    <shape type="round-rect" topLeftX="60" topLeftY="150" width="110" height="56" presetHandlers="10">
+      <fill><fillColor color="rgba(245,246,248,1)"/></fill><border color="rgb(200,205,215)" width="1"/>
+      <content textType="body" fontSize="13" textAlign="center" color="rgba(40,45,55,1)" fontFamily="微软雅黑"><p>用户问题</p></content>
+    </shape>
+    <line startX="170" startY="178" endX="205" endY="178"><border color="rgb(150,155,165)" width="1"/><endArrow type="arrow"/></line>
+
+    <shape type="round-rect" topLeftX="205" topLeftY="150" width="110" height="56" presetHandlers="10">
+      <fill><fillColor color="rgba(245,246,248,1)"/></fill><border color="rgb(200,205,215)" width="1"/>
+      <content textType="body" fontSize="12.5" textAlign="center" color="rgba(40,45,55,1)" fontFamily="微软雅黑"><p>Embedding<br/>向量化</p></content>
+    </shape>
+    <line startX="315" startY="178" endX="350" endY="178"><border color="rgb(150,155,165)" width="1"/><endArrow type="arrow"/></line>
+
+    <shape type="round-rect" topLeftX="350" topLeftY="120" width="130" height="46" presetHandlers="10">
+      <fill><fillColor color="rgba(253,236,236,1)"/></fill><border color="rgb(230,0,18)" width="1"/>
+      <content textType="body" fontSize="12.5" textAlign="center" color="rgba(230,0,18,1)" fontFamily="微软雅黑"><p>向量召回<br/>(语义)</p></content>
+    </shape>
+    <shape type="round-rect" topLeftX="350" topLeftY="195" width="130" height="46" presetHandlers="10">
+      <fill><fillColor color="rgba(253,236,236,1)"/></fill><border color="rgb(230,0,18)" width="1"/>
+      <content textType="body" fontSize="12.5" textAlign="center" color="rgba(230,0,18,1)" fontFamily="微软雅黑"><p>BM25<br/>(关键词)</p></content>
+    </shape>
+
+    <line startX="480" startY="143" endX="520" endY="178"><border color="rgb(150,155,165)" width="1"/><endArrow type="arrow"/></line>
+    <line startX="480" startY="218" endX="520" endY="178"><border color="rgb(150,155,165)" width="1"/><endArrow type="arrow"/></line>
+
+    <shape type="round-rect" topLeftX="520" topLeftY="150" width="100" height="56" presetHandlers="10">
+      <fill><fillColor color="rgba(245,246,248,1)"/></fill><border color="rgb(200,205,215)" width="1"/>
+      <content textType="body" fontSize="12.5" textAlign="center" color="rgba(40,45,55,1)" fontFamily="微软雅黑"><p>RRF<br/>融合</p></content>
+    </shape>
+    <line startX="620" startY="178" endX="655" endY="178"><border color="rgb(150,155,165)" width="1"/><endArrow type="arrow"/></line>
+
+    <shape type="round-rect" topLeftX="655" topLeftY="150" width="100" height="56" presetHandlers="10">
+      <fill><fillColor color="rgba(230,0,18,1)"/></fill>
+      <content textType="body" fontSize="12.5" bold="true" textAlign="center" color="rgba(255,255,255,1)" fontFamily="微软雅黑"><p>Rerank<br/>精排</p></content>
+    </shape>
+    <line startX="755" startY="178" endX="790" endY="178"><border color="rgb(150,155,165)" width="1"/><endArrow type="arrow"/></line>
+
+    <shape type="round-rect" topLeftX="790" topLeftY="150" width="110" height="56" presetHandlers="10">
+      <fill><fillColor color="rgba(245,246,248,1)"/></fill><border color="rgb(200,205,215)" width="1"/>
+      <content textType="body" fontSize="12.5" textAlign="center" color="rgba(40,45,55,1)" fontFamily="微软雅黑"><p>qwen-plus<br/>生成回答</p></content>
+    </shape>
+
+    <!-- 三个关键决策点 -->
+    <shape type="text" topLeftX="70" topLeftY="290" width="270" height="28">
+      <content textType="body" fontSize="14" bold="true" color="rgba(230,0,18,1)" fontFamily="微软雅黑"><p>为什么混合检索</p></content>
+    </shape>
+    <shape type="text" topLeftX="70" topLeftY="322" width="270" height="140">
+      <content textType="body" fontSize="12.5" color="rgba(70,75,85,1)" fontFamily="微软雅黑" lineSpacing="multiple:1.6">
+        <p>向量懂"忘记还款≈逾期"，BM25 抓"年费""取现"这类专有名词，两路互补。</p>
+      </content>
+    </shape>
+
+    <shape type="text" topLeftX="360" topLeftY="290" width="250" height="28">
+      <content textType="body" fontSize="14" bold="true" color="rgba(230,0,18,1)" fontFamily="微软雅黑"><p>RRF 融合</p></content>
+    </shape>
+    <shape type="text" topLeftX="360" topLeftY="322" width="250" height="140">
+      <content textType="body" fontSize="12.5" color="rgba(70,75,85,1)" fontFamily="微软雅黑" lineSpacing="multiple:1.6">
+        <p>两路分数量纲不同，用倒数排名融合 k=60，无需调权、鲁棒性好。</p>
+      </content>
+    </shape>
+
+    <shape type="text" topLeftX="630" topLeftY="290" width="270" height="28">
+      <content textType="body" fontSize="14" bold="true" color="rgba(230,0,18,1)" fontFamily="微软雅黑"><p>Rerank 为什么必要</p></content>
+    </shape>
+    <shape type="text" topLeftX="630" topLeftY="322" width="270" height="140">
+      <content textType="body" fontSize="12.5" color="rgba(70,75,85,1)" fontFamily="微软雅黑" lineSpacing="multiple:1.6">
+        <p>粗排只看"可能相关"，精排模型逐对判断 query 与文档相关性，比直接用 LLM 排序更快更准。</p>
+      </content>
+    </shape>
+
+    <shape type="text" topLeftX="70" topLeftY="480" width="820" height="25">
+      <content textType="caption" fontSize="11.5" color="rgba(140,145,155,1)" fontFamily="微软雅黑">
+        <p>双栈：本地 BGE-small-zh + bge-reranker-base ｜ 在线 text-embedding-v3 + gte-rerank-v2 ｜ 生成统一 qwen-plus</p>
+      </content>
+    </shape>
+  </data>
+  <note><content textType="body"><p>这是技术核心页。</p><p>整体是两段式：先粗排召回10个候选，再用Rerank精排取4个。</p><p>为什么混合：向量懂语义但不懂专有名词，BM25相反，两路互补。</p><p>RRF是融合公式，k=60是论文默认值。</p><p>Rerank是单独一步，把粗排结果精排，这是效果提升的关键。</p></content></note>
+</slide>

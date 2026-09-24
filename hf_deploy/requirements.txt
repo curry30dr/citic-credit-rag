@@ -1,0 +1,5 @@
+flask
+faiss-cpu
+numpy
+jieba
+rank_bm25

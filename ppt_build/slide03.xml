@@ -1,0 +1,75 @@
+<slide>
+  <style><fill><fillColor color="rgb(255,255,255)"/></fill></style>
+  <data>
+    <shape type="text" topLeftX="70" topLeftY="40" width="700" height="40">
+      <content textType="headline" fontSize="26" bold="true" color="rgba(20,20,20,1)" fontFamily="微软雅黑">
+        <p>数据处理：把两万字业务资料切成 89 块知识库</p>
+      </content>
+    </shape>
+    <line startX="70" startY="90" endX="130" endY="90"><border color="rgb(230,0,18)" width="3"/></line>
+
+    <shape type="text" topLeftX="70" topLeftY="115" width="820" height="28">
+      <content textType="body" fontSize="14" color="rgba(90,95,105,1)" fontFamily="微软雅黑">
+        <p>流水线：原始文档 → 解析 → 清洗 → 切片 → 向量化 → 知识库</p>
+      </content>
+    </shape>
+
+    <shape type="text" topLeftX="70" topLeftY="160" width="400" height="28">
+      <content textType="body" fontSize="15" bold="true" color="rgba(230,0,18,1)" fontFamily="微软雅黑"><p>切片策略（关键决策）</p></content>
+    </shape>
+    <shape type="text" topLeftX="70" topLeftY="195" width="400" height="150">
+      <content textType="body" fontSize="13.5" color="rgba(60,65,75,1)" fontFamily="微软雅黑" lineSpacing="multiple:1.7">
+        <ul>
+          <li><p>每块约 500 字，相邻重叠 80 字</p></li>
+          <li><p>按句子边界切，不把一句话切断</p></li>
+          <li><p>价格表中<span bold="true">每个费用项独立成块</span>，避免多条规则混在一起</p></li>
+          <li><p>每块带来源、业务主题元数据</p></li>
+        </ul>
+      </content>
+    </shape>
+
+    <shape type="text" topLeftX="510" topLeftY="160" width="380" height="28">
+      <content textType="body" fontSize="15" bold="true" color="rgba(230,0,18,1)" fontFamily="微软雅黑"><p>踩过的坑与修复</p></content>
+    </shape>
+    <shape type="text" topLeftX="510" topLeftY="195" width="380" height="150">
+      <content textType="body" fontSize="13.5" color="rgba(60,65,75,1)" fontFamily="微软雅黑" lineSpacing="multiple:1.7">
+        <ul>
+          <li><p>python-docx 把表格单独遍历，价格表错位</p></li>
+          <li><p>合并单元格内容被重复 4 次，稀释关键词</p></li>
+          <li><p>修复：按文档真实顺序交错提取段落与表格行</p></li>
+        </ul>
+      </content>
+    </shape>
+
+    <shape type="rect" topLeftX="70" topLeftY="380" width="250" height="90" presetHandlers="8">
+      <fill><fillColor color="rgba(253,236,236,1)"/></fill>
+    </shape>
+    <shape type="text" topLeftX="70" topLeftY="392" width="250" height="38">
+      <content textType="title" fontSize="30" bold="true" textAlign="center" color="rgba(230,0,18,1)" fontFamily="微软雅黑"><p>89 块</p></content>
+    </shape>
+    <shape type="text" topLeftX="70" topLeftY="436" width="250" height="25">
+      <content textType="caption" fontSize="12" textAlign="center" color="rgba(120,125,135,1)" fontFamily="微软雅黑"><p>知识块数量</p></content>
+    </shape>
+
+    <shape type="rect" topLeftX="355" topLeftY="380" width="250" height="90" presetHandlers="8">
+      <fill><fillColor color="rgba(253,236,236,1)"/></fill>
+    </shape>
+    <shape type="text" topLeftX="355" topLeftY="392" width="250" height="38">
+      <content textType="title" fontSize="30" bold="true" textAlign="center" color="rgba(230,0,18,1)" fontFamily="微软雅黑"><p>281 字</p></content>
+    </shape>
+    <shape type="text" topLeftX="355" topLeftY="436" width="250" height="25">
+      <content textType="caption" fontSize="12" textAlign="center" color="rgba(120,125,135,1)" fontFamily="微软雅黑"><p>平均每块长度</p></content>
+    </shape>
+
+    <shape type="rect" topLeftX="640" topLeftY="380" width="250" height="90" presetHandlers="8">
+      <fill><fillColor color="rgba(253,236,236,1)"/></fill>
+    </shape>
+    <shape type="text" topLeftX="640" topLeftY="392" width="250" height="38">
+      <content textType="title" fontSize="30" bold="true" textAlign="center" color="rgba(230,0,18,1)" fontFamily="微软雅黑"><p>2 万字</p></content>
+    </shape>
+    <shape type="text" topLeftX="640" topLeftY="436" width="250" height="25">
+      <content textType="caption" fontSize="12" textAlign="center" color="rgba(120,125,135,1)" fontFamily="微软雅黑"><p>原始业务资料量</p></content>
+    </shape>
+  </data>
+  <note><content textType="body"><p>数据处理是这个项目花时间最多的部分。</p><p>最初用 python-docx 解析，表格错位、合并单元格重复，导致"取现手续费"召回跑偏。</p><p>后来改成按文档真实顺序提取、费用项独立成块，切成89块。</p><p>这张页讲清楚切片策略和踩坑，评委最看重数据设计能力。</p></content></note>
+</slide>

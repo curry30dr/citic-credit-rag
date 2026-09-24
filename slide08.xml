@@ -1,0 +1,67 @@
+<slide>
+  <style><fill><fillColor color="rgb(255,255,255)"/></fill></style>
+  <data>
+    <shape type="text" topLeftX="60" topLeftY="40" width="840" height="40">
+      <content textType="headline" fontSize="28" fontFamily="微软雅黑" bold="true" color="rgb(43,47,54)">
+        <p>消融实验：各环节对 Recall@4 的贡献</p>
+      </content>
+    </shape>
+    <line startX="60" startY="90" endX="900" endY="90">
+      <border color="rgb(232,234,239)" width="1"/>
+    </line>
+
+    <shape type="rect" topLeftX="130" topLeftY="220" width="70" height="170">
+      <fill><fillColor color="rgb(200,205,215)"/></fill>
+    </shape>
+    <shape type="text" topLeftX="120" topLeftY="195" width="90" height="22">
+      <content textType="body" fontSize="14" fontFamily="微软雅黑" bold="true" textAlign="center" color="rgb(43,47,54)"><p>85%</p></content>
+    </shape>
+    <shape type="text" topLeftX="115" topLeftY="395" width="120" height="30">
+      <content textType="body" fontSize="12" fontFamily="微软雅黑" textAlign="center" color="rgb(138,144,156)"><p>纯向量</p></content>
+    </shape>
+
+    <shape type="rect" topLeftX="240" topLeftY="210" width="70" height="180">
+      <fill><fillColor color="rgb(200,205,215)"/></fill>
+    </shape>
+    <shape type="text" topLeftX="230" topLeftY="185" width="90" height="22">
+      <content textType="body" fontSize="14" fontFamily="微软雅黑" bold="true" textAlign="center" color="rgb(43,47,54)"><p>90%</p></content>
+    </shape>
+    <shape type="text" topLeftX="225" topLeftY="395" width="120" height="30">
+      <content textType="body" fontSize="12" fontFamily="微软雅黑" textAlign="center" color="rgb(138,144,156)"><p>纯BM25</p></content>
+    </shape>
+
+    <shape type="rect" topLeftX="350" topLeftY="210" width="70" height="180">
+      <fill><fillColor color="rgb(200,205,215)"/></fill>
+    </shape>
+    <shape type="text" topLeftX="340" topLeftY="185" width="90" height="22">
+      <content textType="body" fontSize="14" fontFamily="微软雅黑" bold="true" textAlign="center" color="rgb(43,47,54)"><p>90%</p></content>
+    </shape>
+    <shape type="text" topLeftX="335" topLeftY="395" width="120" height="30">
+      <content textType="body" fontSize="12" fontFamily="微软雅黑" textAlign="center" color="rgb(138,144,156)"><p>混合RRF</p></content>
+    </shape>
+
+    <shape type="rect" topLeftX="460" topLeftY="200" width="70" height="190">
+      <fill><fillColor color="rgb(230,0,18)"/></fill>
+    </shape>
+    <shape type="text" topLeftX="450" topLeftY="175" width="90" height="22">
+      <content textType="body" fontSize="14" fontFamily="微软雅黑" bold="true" textAlign="center" color="rgb(230,0,18)"><p>95%</p></content>
+    </shape>
+    <shape type="text" topLeftX="445" topLeftY="395" width="120" height="30">
+      <content textType="body" fontSize="12" fontFamily="微软雅黑" textAlign="center" color="rgb(230,0,18)"><p>混合+Rerank</p></content>
+    </shape>
+
+    <shape type="text" topLeftX="620" topLeftY="140" width="280" height="28">
+      <content textType="body" fontSize="14" fontFamily="微软雅黑" bold="true" color="rgb(230,0,18)">
+        <p>关键结论</p>
+      </content>
+    </shape>
+    <shape type="text" topLeftX="620" topLeftY="180" width="280" height="250">
+      <content textType="body" fontSize="13" fontFamily="微软雅黑" color="rgb(43,47,54)" lineSpacing="multiple:1.9">
+        <p>· BM25 比纯向量高 5%：银行业务数字、专有名词多，关键词匹配更稳</p>
+        <p>· 混合 RRF 持平 BM25：两路互补但互有冗余</p>
+        <p>· 加 Rerank 再涨 5%：精排把正确块顶到前面</p>
+      </content>
+    </shape>
+  </data>
+  <note><content textType="body" fontSize="14"><p>20道测试题测Recall@4。纯向量85%，纯BM25 90%——因为银行业务数字多，关键词匹配更准。混合RRF也是90%，加Rerank后到95%。说明Rerank这一步贡献最大。</p></content></note>
+</slide>

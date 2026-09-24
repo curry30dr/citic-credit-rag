@@ -1,0 +1,68 @@
+<slide>
+  <style><fill><fillColor color="rgb(255,255,255)"/></fill></style>
+  <data>
+    <shape type="text" topLeftX="60" topLeftY="40" width="840" height="40">
+      <content textType="headline" fontSize="28" fontFamily="微软雅黑" bold="true" color="rgb(43,47,54)">
+        <p>知识库构建：切块策略与消融实验</p>
+      </content>
+    </shape>
+    <line startX="60" startY="90" endX="900" endY="90">
+      <border color="rgb(232,234,239)" width="1"/>
+    </line>
+
+    <shape type="text" topLeftX="60" topLeftY="110" width="260" height="28">
+      <content textType="body" fontSize="14" fontFamily="微软雅黑" bold="true" color="rgb(230,0,18)"><p>文档来源</p></content>
+    </shape>
+    <shape type="text" topLeftX="60" topLeftY="140" width="260" height="140">
+      <content textType="body" fontSize="12.5" fontFamily="微软雅黑" color="rgb(43,47,54)" lineSpacing="multiple:1.9">
+        <p>· 信用卡领用合约</p>
+        <p>· 信用卡章程</p>
+        <p>· 收费价格表</p>
+        <p>· 三张返现海报（OCR）</p>
+        <p>· 去重后共 89 块</p>
+      </content>
+    </shape>
+
+    <shape type="text" topLeftX="350" topLeftY="110" width="260" height="28">
+      <content textType="body" fontSize="14" fontFamily="微软雅黑" bold="true" color="rgb(230,0,18)"><p>切块参数（消融选出）</p></content>
+    </shape>
+    <shape type="text" topLeftX="350" topLeftY="140" width="260" height="140">
+      <content textType="body" fontSize="12.5" fontFamily="微软雅黑" color="rgb(43,47,54)" lineSpacing="multiple:1.9">
+        <p>· chunk = 500 字/块</p>
+        <p>· overlap = 80 字</p>
+        <p>· 按句子边界切分</p>
+        <p>· 费用项独立成块</p>
+      </content>
+    </shape>
+
+    <shape type="text" topLeftX="640" topLeftY="110" width="260" height="28">
+      <content textType="body" fontSize="14" fontFamily="微软雅黑" bold="true" color="rgb(230,0,18)"><p>索引构建</p></content>
+    </shape>
+    <shape type="text" topLeftX="640" topLeftY="140" width="260" height="140">
+      <content textType="body" fontSize="12.5" fontFamily="微软雅黑" color="rgb(43,47,54)" lineSpacing="multiple:1.9">
+        <p>· BM25 关键词索引</p>
+        <p>· 本地向量 FAISS（512维）</p>
+        <p>· 在线向量 FAISS（1024维）</p>
+        <p>· 离线建库，在线查询</p>
+      </content>
+    </shape>
+
+    <shape type="rect" topLeftX="60" topLeftY="300" width="840" height="180" presetHandlers="8">
+      <fill><fillColor color="rgb(245,246,248)"/></fill>
+    </shape>
+    <shape type="text" topLeftX="80" topLeftY="312" width="800" height="24">
+      <content textType="body" fontSize="13" fontFamily="微软雅黑" bold="true" color="rgb(230,0,18)"><p>chunk-size 消融（overlap=80固定，30题Recall@4）</p></content>
+    </shape>
+    <shape type="text" topLeftX="80" topLeftY="340" width="800" height="60">
+      <content textType="body" fontSize="12" fontFamily="微软雅黑" color="rgb(43,47,54)" lineSpacing="multiple:1.8">
+        <p>200字→75%　300字→78%　400字→84%　<strong>500字→88%</strong>　600字→88%　700字→81%　800字→81%</p>
+      </content>
+    </shape>
+    <shape type="text" topLeftX="80" topLeftY="410" width="800" height="60">
+      <content textType="body" fontSize="12" fontFamily="微软雅黑" color="rgb(43,47,54)" lineSpacing="multiple:1.8">
+        <p>overlap 消融（chunk=500固定）：0→84%　40→84%　<strong>80→88%</strong>　120→78%　160→88%　｜　太小切碎规则，太大重复浪费，500/80为最优</p>
+      </content>
+    </shape>
+  </data>
+  <note><content textType="body" fontSize="14"><p>知识库来自四个文档源。做了消融实验：固定overlap=80，测了200-800七种chunk-size，500和600最高88%；固定chunk=500，测了0-160九种overlap，80最优。不是拍脑袋选的参数，是测出来的。</p></content></note>
+</slide>

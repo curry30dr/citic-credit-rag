@@ -1,0 +1,875 @@
+<presentation id="WetjsdSdclCh2gdCUIYcNYcsnYe" xmlns="https://www.larkoffice.com/sml/2.0" width="960" height="540">
+  <title>中信银行信用卡RAG智能客服系统</title>
+  <theme>
+    <textStyles>
+      <headline fontColor="rgba(31, 35, 41, 1)"/>
+      <sub-headline fontColor="rgba(31, 35, 41, 1)"/>
+      <body fontColor="rgba(31, 35, 41, 1)"/>
+      <caption fontColor="rgba(155, 158, 162, 1)" fontSize="14"/>
+    </textStyles>
+  </theme>
+  <slide id="pzz">
+    <style>
+      <fill id="fzz">
+        <fillColor color="rgba(255, 255, 255, 1)"/>
+      </fill>
+    </style>
+    <data>
+      <shape width="8" height="540" topLeftX="0" topLeftY="0" presetHandlers="0" type="rect" id="bAK">
+        <fill>
+          <fillColor color="rgba(230, 0, 18, 1)"/>
+        </fill>
+        <content fontSize="16" fontFamily="思源黑体" color="rgba(31, 35, 41, 1)"/>
+      </shape>
+      <shape width="700" height="60" topLeftX="80" topLeftY="160" type="text" id="bAU">
+        <content textType="title" fontSize="40" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" bold="true">
+          <p>中信银行信用卡智能咨询助手</p>
+        </content>
+      </shape>
+      <shape width="700" height="40" topLeftX="80" topLeftY="230" type="text" id="bAY">
+        <content fontSize="20" fontFamily="微软雅黑" color="rgba(138, 144, 156, 1)">
+          <p>基于 RAG 的双栈检索增强问答系统</p>
+        </content>
+      </shape>
+      <line id="bAD" startX="80" startY="290" endX="200.00416659433122" endY="290">
+        <border color="rgba(230, 0, 18, 1)" width="3"/>
+      </line>
+      <shape width="700" height="30" topLeftX="80" topLeftY="320" type="text" id="bAA">
+        <content fontSize="14" fontFamily="微软雅黑" color="rgba(138, 144, 156, 1)">
+          <p>本地开源栈 + 百炼在线 API 栈 ｜ 混合检索 + Rerank ｜ 流式多轮对话</p>
+        </content>
+      </shape>
+    </data>
+    <note id="bAG">
+      <content>
+        <p>大家好，今天介绍我做的中信银行信用卡智能咨询助手。这个项目完整实现了RAG链路，包括知识库构建、双栈检索、Rerank精排、流式多轮对话，并做了消融实验验证各环节效果。</p>
+      </content>
+    </note>
+  </slide>
+  <slide id="pzt">
+    <style>
+      <fill id="fzt">
+        <fillColor color="rgba(255, 255, 255, 1)"/>
+      </fill>
+    </style>
+    <data>
+      <shape width="840" height="40" topLeftX="60" topLeftY="40" type="text" id="bAN">
+        <content textType="headline" fontSize="28" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" bold="true">
+          <p>项目背景：信用卡业务资料分散，客户咨询效率低</p>
+        </content>
+      </shape>
+      <line id="bAy" startX="60" startY="90" endX="900.0005952378843" endY="90">
+        <border color="rgba(232, 234, 239, 1)" width="1"/>
+      </line>
+      <shape width="400" height="30" topLeftX="60" topLeftY="120" type="text" id="bAR">
+        <content fontSize="15" fontFamily="微软雅黑" color="rgba(230, 0, 18, 1)" bold="true">
+          <p>业务痛点</p>
+        </content>
+      </shape>
+      <shape width="400" height="200" topLeftX="60" topLeftY="160" type="text" id="bAB">
+        <content fontSize="14" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" lineSpacing="multiple:1.8">
+          <p>· 领用合约、收费价格表、活动海报分散在不同文档</p>
+          <p>· 人工客服排队等待，常见问题重复解答</p>
+          <p>· 大模型直接回答会编造资料里没有的卡种和数字</p>
+        </content>
+      </shape>
+      <shape width="400" height="30" topLeftX="500" topLeftY="120" type="text" id="bAJ">
+        <content fontSize="15" fontFamily="微软雅黑" color="rgba(230, 0, 18, 1)" bold="true">
+          <p>项目目标</p>
+        </content>
+      </shape>
+      <shape width="400" height="200" topLeftX="500" topLeftY="160" type="text" id="bAC">
+        <content fontSize="14" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" lineSpacing="multiple:1.8">
+          <p>· 基于RAG，只依据业务资料回答，数字有据可查</p>
+          <p>· 实现本地开源与在线API双栈对比</p>
+          <p>· 通过消融实验验证检索与重排各环节效果</p>
+        </content>
+      </shape>
+      <shape width="840" height="80" topLeftX="60" topLeftY="400" presetHandlers="8" type="rect" id="bAP">
+        <fill>
+          <fillColor color="rgba(253, 236, 236, 1)"/>
+        </fill>
+        <content fontSize="16" fontFamily="思源黑体" color="rgba(31, 35, 41, 1)"/>
+      </shape>
+      <shape width="800" height="50" topLeftX="80" topLeftY="415" type="text" id="bAp">
+        <content fontSize="14" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)">
+          <p>知识库覆盖：领用合约、信用卡章程、收费价格表、三张返现活动海报，共 <strong>89 个知识块</strong>，平均 281 字/块</p>
+        </content>
+      </shape>
+    </data>
+    <note id="bAT">
+      <content>
+        <p>信用卡业务资料分散在领用合约、价格表和活动海报里，客户问常见问题需要转人工。直接用大模型会编造数字。我们用RAG方案，让模型只根据业务资料回答，数字有据可查。</p>
+      </content>
+    </note>
+  </slide>
+  <slide id="pzp">
+    <style>
+      <fill id="fzp">
+        <fillColor color="rgba(255, 255, 255, 1)"/>
+      </fill>
+    </style>
+    <data>
+      <shape width="840" height="40" topLeftX="60" topLeftY="40" type="text" id="bAr">
+        <content textType="headline" fontSize="28" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" bold="true">
+          <p>知识库构建：切块策略与索引</p>
+        </content>
+      </shape>
+      <line id="bAQ" startX="60" startY="90" endX="900.0005952378843" endY="90">
+        <border color="rgba(232, 234, 239, 1)" width="1"/>
+      </line>
+      <shape width="260" height="28" topLeftX="60" topLeftY="120" type="text" id="bAd">
+        <content fontSize="15" fontFamily="微软雅黑" color="rgba(230, 0, 18, 1)" bold="true">
+          <p>文档来源</p>
+        </content>
+      </shape>
+      <shape width="260" height="180" topLeftX="60" topLeftY="155" type="text" id="bAX">
+        <content fontSize="13" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" lineSpacing="multiple:1.8">
+          <p>· 信用卡领用合约</p>
+          <p>· 信用卡章程</p>
+          <p>· 收费价格表</p>
+          <p>· 三张返现活动海报（OCR）</p>
+        </content>
+      </shape>
+      <shape width="260" height="28" topLeftX="350" topLeftY="120" type="text" id="bAI">
+        <content fontSize="15" fontFamily="微软雅黑" color="rgba(230, 0, 18, 1)" bold="true">
+          <p>切块策略</p>
+        </content>
+      </shape>
+      <shape width="260" height="180" topLeftX="350" topLeftY="155" type="text" id="bAa">
+        <content fontSize="13" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" lineSpacing="multiple:1.8">
+          <p>· chunk ≈ 500 字/块</p>
+          <p>· overlap ≈ 80 字</p>
+          <p>· 按句子边界切分</p>
+          <p>· 费用项独立成块</p>
+          <p>· 去重后共 89 块</p>
+        </content>
+      </shape>
+      <shape width="260" height="28" topLeftX="640" topLeftY="120" type="text" id="bAz">
+        <content fontSize="15" fontFamily="微软雅黑" color="rgba(230, 0, 18, 1)" bold="true">
+          <p>索引构建</p>
+        </content>
+      </shape>
+      <shape width="260" height="180" topLeftX="640" topLeftY="155" type="text" id="bAh">
+        <content fontSize="13" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" lineSpacing="multiple:1.8">
+          <p>· BM25 关键词索引</p>
+          <p>· 本地向量索引 FAISS（512维）</p>
+          <p>· 在线向量索引 FAISS（1024维）</p>
+          <p>· 离线建库，在线查询</p>
+        </content>
+      </shape>
+      <shape width="840" height="90" topLeftX="60" topLeftY="380" presetHandlers="8" type="rect" id="bAg">
+        <fill>
+          <fillColor color="rgba(245, 246, 248, 1)"/>
+        </fill>
+        <content fontSize="16" fontFamily="思源黑体" color="rgba(31, 35, 41, 1)"/>
+      </shape>
+      <shape width="800" height="60" topLeftX="80" topLeftY="395" type="text" id="bAq">
+        <content fontSize="13" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" lineSpacing="multiple:1.8">
+          <p>设计理由：500字够装一条完整业务规则而不切碎；overlap 80字避免规则刚好卡在边界；费用项独立成块，避免「取现手续费」和「违约金」混在一块导致召回噪声。</p>
+        </content>
+      </shape>
+    </data>
+    <note id="bAM">
+      <content>
+        <p>知识库来自四个文档源。切块用500字加80字重叠，费用项单独成块。索引分三套：BM25、本地向量、在线向量，离线建好后在线查询直接读。</p>
+      </content>
+    </note>
+  </slide>
+  <slide id="pzf">
+    <style>
+      <fill id="fzf">
+        <fillColor color="rgba(255, 255, 255, 1)"/>
+      </fill>
+    </style>
+    <data>
+      <shape width="840" height="40" topLeftX="60" topLeftY="40" type="text" id="bAf">
+        <content textType="headline" fontSize="28" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" bold="true">
+          <p>RAG 整体架构</p>
+        </content>
+      </shape>
+      <line id="bAt" startX="60" startY="90" endX="900.0005952378843" endY="90">
+        <border color="rgba(232, 234, 239, 1)" width="1"/>
+      </line>
+      <shape width="130" height="50" topLeftX="60" topLeftY="130" presetHandlers="8" type="rect" id="bAV">
+        <fill>
+          <fillColor color="rgba(253, 236, 236, 1)"/>
+        </fill>
+        <border color="rgba(230, 0, 18, 1)" width="1"/>
+        <content fontSize="16" fontFamily="思源黑体" color="rgba(31, 35, 41, 1)"/>
+      </shape>
+      <shape width="130" height="50" topLeftX="60" topLeftY="130" type="text" id="bAe">
+        <content fontSize="13" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" textAlign="center">
+          <p>用户提问</p>
+        </content>
+      </shape>
+      <line id="bAF" startX="190" startY="155" endX="230.0124980474851" endY="155">
+        <border color="rgba(138, 144, 156, 1)"/>
+        <endArrow type="arrow"/>
+      </line>
+      <shape width="150" height="70" topLeftX="230" topLeftY="120" presetHandlers="8" type="rect" id="bAc">
+        <fill>
+          <fillColor color="rgba(255, 255, 255, 1)"/>
+        </fill>
+        <border color="rgba(230, 0, 18, 1)" width="1"/>
+        <content fontSize="16" fontFamily="思源黑体" color="rgba(31, 35, 41, 1)"/>
+      </shape>
+      <shape width="150" height="65" topLeftX="230" topLeftY="125" type="text" id="bAi">
+        <content fontSize="12" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" textAlign="center">
+          <p><strong>混合检索</strong></p>
+          <p>向量召回 + BM25</p>
+          <p>RRF 融合</p>
+        </content>
+      </shape>
+      <line id="bAO" startX="380" startY="155" endX="420.0124980474851" endY="155">
+        <border color="rgba(138, 144, 156, 1)"/>
+        <endArrow type="arrow"/>
+      </line>
+      <shape width="150" height="70" topLeftX="420" topLeftY="120" presetHandlers="8" type="rect" id="bAE">
+        <fill>
+          <fillColor color="rgba(255, 255, 255, 1)"/>
+        </fill>
+        <border color="rgba(230, 0, 18, 1)" width="1"/>
+        <content fontSize="16" fontFamily="思源黑体" color="rgba(31, 35, 41, 1)"/>
+      </shape>
+      <shape width="150" height="65" topLeftX="420" topLeftY="125" type="text" id="bAb">
+        <content fontSize="12" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" textAlign="center">
+          <p><strong>Rerank 精排</strong></p>
+          <p>CrossEncoder 打分</p>
+          <p>阈值过滤 &lt;0.3</p>
+        </content>
+      </shape>
+      <line id="bAZ" startX="570" startY="155" endX="610.0124980474851" endY="155">
+        <border color="rgba(138, 144, 156, 1)"/>
+        <endArrow type="arrow"/>
+      </line>
+      <shape width="150" height="70" topLeftX="610" topLeftY="120" presetHandlers="8" type="rect" id="bAx">
+        <fill>
+          <fillColor color="rgba(230, 0, 18, 1)"/>
+        </fill>
+        <content fontSize="16" fontFamily="思源黑体" color="rgba(31, 35, 41, 1)"/>
+      </shape>
+      <shape width="150" height="65" topLeftX="610" topLeftY="125" type="text" id="bAW">
+        <content fontSize="12" fontFamily="微软雅黑" color="rgba(255, 255, 255, 1)" textAlign="center">
+          <p><strong>LLM 生成</strong></p>
+          <p>qwen-plus</p>
+          <p>流式输出</p>
+        </content>
+      </shape>
+      <line id="bAj" startX="760" startY="155" endX="800.0124980474851" endY="155">
+        <border color="rgba(138, 144, 156, 1)"/>
+        <endArrow type="arrow"/>
+      </line>
+      <shape width="100" height="50" topLeftX="800" topLeftY="130" presetHandlers="8" type="rect" id="bAs">
+        <fill>
+          <fillColor color="rgba(253, 236, 236, 1)"/>
+        </fill>
+        <border color="rgba(230, 0, 18, 1)" width="1"/>
+        <content fontSize="16" fontFamily="思源黑体" color="rgba(31, 35, 41, 1)"/>
+      </shape>
+      <shape width="100" height="50" topLeftX="800" topLeftY="130" type="text" id="bAL">
+        <content fontSize="12" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" textAlign="center">
+          <p>回答+来源</p>
+        </content>
+      </shape>
+      <shape width="840" height="28" topLeftX="60" topLeftY="240" type="text" id="bAw">
+        <content fontSize="14" fontFamily="微软雅黑" color="rgba(230, 0, 18, 1)" bold="true">
+          <p>工程优化层</p>
+        </content>
+      </shape>
+      <shape width="840" height="200" topLeftX="60" topLeftY="275" type="text" id="bAm">
+        <content fontSize="13" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" lineSpacing="multiple:2">
+          <p>· 多轮对话：保留最近 3 轮上下文，支持追问「那最低还款呢」</p>
+          <p>· 结果缓存：相同问题第二次 0 秒返回，减少 API 调用</p>
+          <p>· 反馈闭环：前端赞/踩按钮落库 CSV，便于后续优化</p>
+          <p>· 问答日志：JSONL 记录召回块、回答、是否缓存，可回溯排查</p>
+          <p>· 流式输出：SSE 逐 token 推送，前端实时打字</p>
+        </content>
+      </shape>
+    </data>
+    <note id="bAv">
+      <content>
+        <p>整体链路：用户提问先过混合检索（向量+BM25+RRF融合），再用Rerank精排并做阈值过滤，最后把相关资料拼进prompt交给qwen-plus生成回答。下面是工程优化层：多轮对话、缓存、反馈、日志、流式。</p>
+      </content>
+    </note>
+  </slide>
+  <slide id="pzb">
+    <style>
+      <fill id="fzb">
+        <fillColor color="rgba(255, 255, 255, 1)"/>
+      </fill>
+    </style>
+    <data>
+      <shape width="840" height="40" topLeftX="60" topLeftY="40" type="text" id="bAu">
+        <content textType="headline" fontSize="28" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" bold="true">
+          <p>双栈设计：本地开源 vs 百炼在线 API</p>
+        </content>
+      </shape>
+      <line id="bGU" startX="60" startY="90" endX="900.0005952378843" endY="90">
+        <border color="rgba(232, 234, 239, 1)" width="1"/>
+      </line>
+      <table id="bGI" width="840" height="300" topLeftX="60" topLeftY="130">
+        <colgroup>
+          <col span="1" width="180"/>
+          <col span="2" width="330"/>
+        </colgroup>
+        <tr height="45">
+          <td id="bGr">
+            <fill>
+              <fillColor color="rgba(230, 0, 18, 1)"/>
+            </fill>
+            <content fontSize="14" fontFamily="微软雅黑" color="rgba(255, 255, 255, 1)" bold="true">
+              <p>环节</p>
+            </content>
+          </td>
+          <td id="bGg">
+            <fill>
+              <fillColor color="rgba(230, 0, 18, 1)"/>
+            </fill>
+            <content fontSize="14" fontFamily="微软雅黑" color="rgba(255, 255, 255, 1)" bold="true">
+              <p>本地开源栈</p>
+            </content>
+          </td>
+          <td id="bAn">
+            <fill>
+              <fillColor color="rgba(230, 0, 18, 1)"/>
+            </fill>
+            <content fontSize="14" fontFamily="微软雅黑" color="rgba(255, 255, 255, 1)" bold="true">
+              <p>百炼在线 API 栈</p>
+            </content>
+          </td>
+        </tr>
+        <tr height="51">
+          <td id="bAl">
+            <content fontSize="13" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)">
+              <p>Embedding</p>
+            </content>
+          </td>
+          <td id="bGK">
+            <content fontSize="13" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)">
+              <p>bge-small-zh-v1.5（本地，512维）</p>
+            </content>
+          </td>
+          <td id="bGq">
+            <content fontSize="13" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)">
+              <p>text-embedding-v3（API，1024维）</p>
+            </content>
+          </td>
+        </tr>
+        <tr height="51">
+          <td id="bGz">
+            <content fontSize="13" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)">
+              <p>Rerank</p>
+            </content>
+          </td>
+          <td id="bGQ">
+            <content fontSize="13" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)">
+              <p>bge-reranker-base（本地）</p>
+            </content>
+          </td>
+          <td id="bAS">
+            <content fontSize="13" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)">
+              <p>gte-rerank-v2（API）</p>
+            </content>
+          </td>
+        </tr>
+        <tr height="51">
+          <td id="bAo">
+            <content fontSize="13" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)">
+              <p>向量索引</p>
+            </content>
+          </td>
+          <td id="bGG">
+            <content fontSize="13" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)">
+              <p>FAISS（内存索引）</p>
+            </content>
+          </td>
+          <td id="bGD">
+            <content fontSize="13" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)">
+              <p>FAISS（内存索引）</p>
+            </content>
+          </td>
+        </tr>
+        <tr height="51">
+          <td id="bGM">
+            <content fontSize="13" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)">
+              <p>LLM</p>
+            </content>
+          </td>
+          <td id="bGh">
+            <content fontSize="13" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)">
+              <p>qwen-plus（统一，公平对比）</p>
+            </content>
+          </td>
+          <td id="bAk">
+            <content fontSize="13" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)">
+              <p>qwen-plus（统一，公平对比）</p>
+            </content>
+          </td>
+        </tr>
+        <tr height="51">
+          <td id="bGA">
+            <content fontSize="13" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)">
+              <p>特点</p>
+            </content>
+          </td>
+          <td id="bGY">
+            <content fontSize="13" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)">
+              <p>离线可跑，无API费用</p>
+            </content>
+          </td>
+          <td id="bGa">
+            <content fontSize="13" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)">
+              <p>效果更好，在线调用</p>
+            </content>
+          </td>
+        </tr>
+      </table>
+    </data>
+    <note id="bAH">
+      <content>
+        <p>我们做了双栈对比。本地栈用bge-small-zh和bge-reranker-base，在线栈用百炼的text-embedding-v3和gte-rerank-v2。LLM统一用qwen-plus，保证对比公平。这样能比较开源方案和云API方案在效果上的差异。</p>
+      </content>
+    </note>
+  </slide>
+  <slide id="pzw">
+    <style>
+      <fill id="fzw">
+        <fillColor color="rgba(255, 255, 255, 1)"/>
+      </fill>
+    </style>
+    <data>
+      <shape width="840" height="40" topLeftX="60" topLeftY="40" type="text" id="bGV">
+        <content textType="headline" fontSize="28" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" bold="true">
+          <p>混合检索：向量召回 + BM25 + RRF 融合</p>
+        </content>
+      </shape>
+      <line id="bGW" startX="60" startY="90" endX="900.0005952378843" endY="90">
+        <border color="rgba(232, 234, 239, 1)" width="1"/>
+      </line>
+      <shape width="250" height="120" topLeftX="60" topLeftY="120" presetHandlers="8" type="rect" id="bGR">
+        <fill>
+          <fillColor color="rgba(245, 246, 248, 1)"/>
+        </fill>
+        <content fontSize="16" fontFamily="思源黑体" color="rgba(31, 35, 41, 1)"/>
+      </shape>
+      <shape width="210" height="100" topLeftX="80" topLeftY="135" type="text" id="bGt">
+        <content fontSize="13" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" lineSpacing="multiple:1.8">
+          <p><strong>向量召回</strong></p>
+          <p>擅长语义相似：用户问「卡丢了怎么办」能匹配到「挂失」</p>
+        </content>
+      </shape>
+      <shape width="250" height="120" topLeftX="355" topLeftY="120" presetHandlers="8" type="rect" id="bGi">
+        <fill>
+          <fillColor color="rgba(245, 246, 248, 1)"/>
+        </fill>
+        <content fontSize="16" fontFamily="思源黑体" color="rgba(31, 35, 41, 1)"/>
+      </shape>
+      <shape width="210" height="100" topLeftX="375" topLeftY="135" type="text" id="bGw">
+        <content fontSize="13" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" lineSpacing="multiple:1.8">
+          <p><strong>BM25 关键词召回</strong></p>
+          <p>擅长精确匹配：数字、专有名词如「4008895558」「违约金5%」</p>
+        </content>
+      </shape>
+      <shape width="250" height="120" topLeftX="650" topLeftY="120" presetHandlers="8" type="rect" id="bGO">
+        <fill>
+          <fillColor color="rgba(253, 236, 236, 1)"/>
+        </fill>
+        <content fontSize="16" fontFamily="思源黑体" color="rgba(31, 35, 41, 1)"/>
+      </shape>
+      <shape width="210" height="100" topLeftX="670" topLeftY="135" type="text" id="bGm">
+        <content fontSize="13" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" lineSpacing="multiple:1.8">
+          <p><strong>RRF 融合</strong></p>
+          <p>score = 1/(60+向量名次) + 1/(60+BM25名次)</p>
+          <p>不依赖原始分数，只看排名</p>
+        </content>
+      </shape>
+      <shape width="840" height="28" topLeftX="60" topLeftY="280" type="text" id="bGP">
+        <content fontSize="14" fontFamily="微软雅黑" color="rgba(230, 0, 18, 1)" bold="true">
+          <p>为什么用 RRF？</p>
+        </content>
+      </shape>
+      <shape width="840" height="150" topLeftX="60" topLeftY="315" type="text" id="bGL">
+        <content fontSize="14" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" lineSpacing="multiple:2">
+          <p>向量分数和 BM25 分数不在同一量纲，直接相加不可比。RRF 只看各自榜单上的名次，k=60 是论文默认值，平滑排名靠后的候选。</p>
+          <p>两路召回各取 Top 10，RRF 融合后取 Top 8 进入 Rerank。</p>
+        </content>
+      </shape>
+    </data>
+    <note id="bGx">
+      <content>
+        <p>向量召回擅长语义理解，BM25擅长精确匹配数字和专有名词。两路各召回10条，用RRF公式融合——只看排名不看原始分数，解决了两路分量纲不可比的问题。k=60是论文默认值。</p>
+      </content>
+    </note>
+  </slide>
+  <slide id="pzJ">
+    <style>
+      <fill id="fzJ">
+        <fillColor color="rgba(255, 255, 255, 1)"/>
+      </fill>
+    </style>
+    <data>
+      <shape width="840" height="40" topLeftX="60" topLeftY="40" type="text" id="bGN">
+        <content textType="headline" fontSize="28" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" bold="true">
+          <p>Rerank 精排与阈值过滤</p>
+        </content>
+      </shape>
+      <line id="bGy" startX="60" startY="90" endX="900.0005952378843" endY="90">
+        <border color="rgba(232, 234, 239, 1)" width="1"/>
+      </line>
+      <shape width="400" height="28" topLeftX="60" topLeftY="125" type="text" id="bGd">
+        <content fontSize="15" fontFamily="微软雅黑" color="rgba(230, 0, 18, 1)" bold="true">
+          <p>Rerank：CrossEncoder 精排</p>
+        </content>
+      </shape>
+      <shape width="400" height="120" topLeftX="60" topLeftY="160" type="text" id="bGB">
+        <content fontSize="13" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" lineSpacing="multiple:1.8">
+          <p>· RRF 融合取 Top 8 候选</p>
+          <p>· Rerank 逐对计算 query-doc 相关性分数</p>
+          <p>· 本地：bge-reranker-base</p>
+          <p>· 在线：gte-rerank-v2</p>
+        </content>
+      </shape>
+      <shape width="400" height="28" topLeftX="500" topLeftY="125" type="text" id="bGJ">
+        <content fontSize="15" fontFamily="微软雅黑" color="rgba(230, 0, 18, 1)" bold="true">
+          <p>阈值过滤：拒绝不相关</p>
+        </content>
+      </shape>
+      <shape width="400" height="120" topLeftX="500" topLeftY="160" type="text" id="bGC">
+        <content fontSize="13" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" lineSpacing="multiple:1.8">
+          <p>· Rerank 分数 &lt; 0.3 的块直接丢弃</p>
+          <p>· 资料不足时回答「无法回答，请转人工」</p>
+          <p>· 避免硬凑不相关资料导致 LLM 瞎编</p>
+        </content>
+      </shape>
+      <shape width="840" height="130" topLeftX="60" topLeftY="320" presetHandlers="8" type="rect" id="bGX">
+        <fill>
+          <fillColor color="rgba(245, 246, 248, 1)"/>
+        </fill>
+        <content fontSize="16" fontFamily="思源黑体" color="rgba(31, 35, 41, 1)"/>
+      </shape>
+      <shape width="800" height="100" topLeftX="80" topLeftY="340" type="text" id="bGp">
+        <content fontSize="13" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" lineSpacing="multiple:1.9">
+          <p><strong>为什么需要这一步？</strong></p>
+          <p>混合检索召回的 Top 8 里可能混着不相关块。Rerank 用 CrossEncoder 对 query 和 doc 做深度交互打分，比双塔向量更准。阈值过滤则保证：用户问资料里没有的问题时，系统不会硬凑 5 块不相干资料让 LLM 编答案，而是老实转人工。</p>
+        </content>
+      </shape>
+    </data>
+    <note id="bGT">
+      <content>
+        <p>Rerank用CrossEncoder对query和doc做深度交互，比双塔向量准。阈值0.3分以下直接丢——资料里没有的问题，系统会说无法回答转人工，而不是硬凑资料瞎编。这步把幻觉率压下来了。</p>
+      </content>
+    </note>
+  </slide>
+  <slide id="pzr">
+    <style>
+      <fill id="fzr">
+        <fillColor color="rgba(255, 255, 255, 1)"/>
+      </fill>
+    </style>
+    <data>
+      <shape width="840" height="40" topLeftX="60" topLeftY="40" type="text" id="bGf">
+        <content textType="headline" fontSize="28" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" bold="true">
+          <p>消融实验：各环节对 Recall@4 的贡献</p>
+        </content>
+      </shape>
+      <line id="bGc" startX="60" startY="90" endX="900.0005952378843" endY="90">
+        <border color="rgba(232, 234, 239, 1)" width="1"/>
+      </line>
+      <shape width="70" height="170" topLeftX="130" topLeftY="220" presetHandlers="0" type="rect" id="bGn">
+        <fill>
+          <fillColor color="rgba(200, 205, 215, 1)"/>
+        </fill>
+        <content fontSize="16" fontFamily="思源黑体" color="rgba(31, 35, 41, 1)"/>
+      </shape>
+      <shape width="90" height="22" topLeftX="120" topLeftY="195" type="text" id="bGl">
+        <content fontSize="14" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" bold="true" textAlign="center">
+          <p>85%</p>
+        </content>
+      </shape>
+      <shape width="120" height="30" topLeftX="115" topLeftY="395" type="text" id="bGe">
+        <content fontSize="12" fontFamily="微软雅黑" color="rgba(138, 144, 156, 1)" textAlign="center">
+          <p>纯向量</p>
+        </content>
+      </shape>
+      <shape width="70" height="180" topLeftX="240" topLeftY="210" presetHandlers="0" type="rect" id="bGE">
+        <fill>
+          <fillColor color="rgba(200, 205, 215, 1)"/>
+        </fill>
+        <content fontSize="16" fontFamily="思源黑体" color="rgba(31, 35, 41, 1)"/>
+      </shape>
+      <shape width="90" height="22" topLeftX="230" topLeftY="185" type="text" id="bGF">
+        <content fontSize="14" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" bold="true" textAlign="center">
+          <p>90%</p>
+        </content>
+      </shape>
+      <shape width="120" height="30" topLeftX="225" topLeftY="395" type="text" id="bGH">
+        <content fontSize="12" fontFamily="微软雅黑" color="rgba(138, 144, 156, 1)" textAlign="center">
+          <p>纯BM25</p>
+        </content>
+      </shape>
+      <shape width="70" height="180" topLeftX="350" topLeftY="210" presetHandlers="0" type="rect" id="bGu">
+        <fill>
+          <fillColor color="rgba(200, 205, 215, 1)"/>
+        </fill>
+        <content fontSize="16" fontFamily="思源黑体" color="rgba(31, 35, 41, 1)"/>
+      </shape>
+      <shape width="90" height="22" topLeftX="340" topLeftY="185" type="text" id="bGj">
+        <content fontSize="14" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" bold="true" textAlign="center">
+          <p>90%</p>
+        </content>
+      </shape>
+      <shape width="120" height="30" topLeftX="335" topLeftY="395" type="text" id="bGb">
+        <content fontSize="12" fontFamily="微软雅黑" color="rgba(138, 144, 156, 1)" textAlign="center">
+          <p>混合RRF</p>
+        </content>
+      </shape>
+      <shape width="70" height="190" topLeftX="460" topLeftY="200" presetHandlers="0" type="rect" id="bGZ">
+        <fill>
+          <fillColor color="rgba(230, 0, 18, 1)"/>
+        </fill>
+        <content fontSize="16" fontFamily="思源黑体" color="rgba(31, 35, 41, 1)"/>
+      </shape>
+      <shape width="90" height="22" topLeftX="450" topLeftY="175" type="text" id="bGk">
+        <content fontSize="14" fontFamily="微软雅黑" color="rgba(230, 0, 18, 1)" bold="true" textAlign="center">
+          <p>95%</p>
+        </content>
+      </shape>
+      <shape width="120" height="30" topLeftX="445" topLeftY="395" type="text" id="bGs">
+        <content fontSize="12" fontFamily="微软雅黑" color="rgba(230, 0, 18, 1)" textAlign="center">
+          <p>混合+Rerank</p>
+        </content>
+      </shape>
+      <shape width="280" height="28" topLeftX="620" topLeftY="140" type="text" id="bGS">
+        <content fontSize="14" fontFamily="微软雅黑" color="rgba(230, 0, 18, 1)" bold="true">
+          <p>关键结论</p>
+        </content>
+      </shape>
+      <shape width="280" height="250" topLeftX="620" topLeftY="180" type="text" id="bGo">
+        <content fontSize="13" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" lineSpacing="multiple:1.9">
+          <p>· BM25 比纯向量高 5%：银行业务数字、专有名词多，关键词匹配更稳</p>
+          <p>· 混合 RRF 持平 BM25：两路互补但互有冗余</p>
+          <p>· 加 Rerank 再涨 5%：精排把正确块顶到前面</p>
+        </content>
+      </shape>
+    </data>
+    <note id="bGv">
+      <content>
+        <p>20道测试题测Recall@4。纯向量85%，纯BM25 90%——因为银行业务数字多，关键词匹配更准。混合RRF也是90%，加Rerank后到95%。说明Rerank这一步贡献最大。</p>
+      </content>
+    </note>
+  </slide>
+  <slide id="pzZ">
+    <style>
+      <fill id="fzZ">
+        <fillColor color="rgba(255, 255, 255, 1)"/>
+      </fill>
+    </style>
+    <data>
+      <shape width="840" height="40" topLeftX="60" topLeftY="40" type="text" id="bKQ">
+        <content textType="headline" fontSize="28" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" bold="true">
+          <p>三道统一测试题结果</p>
+        </content>
+      </shape>
+      <line id="bKB" startX="60" startY="90" endX="900.0005952378843" endY="90">
+        <border color="rgba(232, 234, 239, 1)" width="1"/>
+      </line>
+      <table id="bKN" width="840" height="340" topLeftX="60" topLeftY="120">
+        <colgroup>
+          <col span="1" width="120"/>
+          <col span="2" width="360"/>
+        </colgroup>
+        <tr height="41">
+          <td id="bKz">
+            <fill>
+              <fillColor color="rgba(230, 0, 18, 1)"/>
+            </fill>
+            <content fontSize="13" fontFamily="微软雅黑" color="rgba(255, 255, 255, 1)" bold="true">
+              <p>难度</p>
+            </content>
+          </td>
+          <td id="bKg">
+            <fill>
+              <fillColor color="rgba(230, 0, 18, 1)"/>
+            </fill>
+            <content fontSize="13" fontFamily="微软雅黑" color="rgba(255, 255, 255, 1)" bold="true">
+              <p>问题</p>
+            </content>
+          </td>
+          <td id="bKp">
+            <fill>
+              <fillColor color="rgba(230, 0, 18, 1)"/>
+            </fill>
+            <content fontSize="13" fontFamily="微软雅黑" color="rgba(255, 255, 255, 1)" bold="true">
+              <p>系统回答</p>
+            </content>
+          </td>
+        </tr>
+        <tr height="93">
+          <td id="bKC">
+            <content fontSize="12" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)">
+              <p>简单</p>
+            </content>
+          </td>
+          <td id="bKI">
+            <content fontSize="12" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" lineSpacing="multiple:1.6">
+              <p>境外取现限额：国外一天最多取多少？一年累计有限制吗？</p>
+            </content>
+          </td>
+          <td id="bKr">
+            <content fontSize="12" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" lineSpacing="multiple:1.6">
+              <p>每日最高等值1万元人民币；本人名下所有卡每年累计不超过等值10万元人民币。</p>
+            </content>
+          </td>
+        </tr>
+        <tr height="93">
+          <td id="bKd">
+            <content fontSize="12" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)">
+              <p>中等</p>
+            </content>
+          </td>
+          <td id="bKT">
+            <content fontSize="12" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" lineSpacing="multiple:1.6">
+              <p>全额还款 vs 最低还款：10000元账单，两种方式在免息、利息上有什么区别？</p>
+            </content>
+          </td>
+          <td id="bKa">
+            <content fontSize="12" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" lineSpacing="multiple:1.6">
+              <p>全额还款享免息期；最低还款不享免息，自记账日起按日利率0.05%计息，未还足最低收5%违约金（最低20元）。</p>
+            </content>
+          </td>
+        </tr>
+        <tr height="113">
+          <td id="bKh">
+            <content fontSize="12" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)">
+              <p>困难</p>
+            </content>
+          </td>
+          <td id="bKX">
+            <content fontSize="12" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" lineSpacing="multiple:1.6">
+              <p>三类消费各600元/月，选对应卡，一个月和12个月各返现多少？</p>
+            </content>
+          </td>
+          <td id="bKJ">
+            <content fontSize="12" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" lineSpacing="multiple:1.6">
+              <p>三张卡各返90元（600×15%，未超月上限100元），月合计270元，12个月共3240元。</p>
+            </content>
+          </td>
+        </tr>
+      </table>
+    </data>
+    <note id="bKM">
+      <content>
+        <p>三道统一测试题全部答对。简单题考精确数字，中等题考概念对比，困难题考多文档聚合计算。特别是第三题，需要同时召回三张卡的返现规则并独立计算后相加，RAG准确处理了。</p>
+      </content>
+    </note>
+  </slide>
+  <slide id="pzn">
+    <style>
+      <fill id="fzn">
+        <fillColor color="rgba(255, 255, 255, 1)"/>
+      </fill>
+    </style>
+    <data>
+      <shape width="840" height="40" topLeftX="60" topLeftY="40" type="text" id="bKU">
+        <content textType="headline" fontSize="28" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" bold="true">
+          <p>工程优化与部署</p>
+        </content>
+      </shape>
+      <line id="bKD" startX="60" startY="90" endX="900.0005952378843" endY="90">
+        <border color="rgba(232, 234, 239, 1)" width="1"/>
+      </line>
+      <shape width="400" height="28" topLeftX="60" topLeftY="120" type="text" id="bKA">
+        <content fontSize="15" fontFamily="微软雅黑" color="rgba(230, 0, 18, 1)" bold="true">
+          <p>工程优化</p>
+        </content>
+      </shape>
+      <shape width="400" height="280" topLeftX="60" topLeftY="155" type="text" id="bKK">
+        <content fontSize="13" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" lineSpacing="multiple:2">
+          <p>· 流式输出：SSE 逐 token 推送，前端实时打字</p>
+          <p>· 多轮对话：保留最近3轮上下文，支持追问</p>
+          <p>· 结果缓存：相同问题 0 秒返回</p>
+          <p>· 反馈闭环：赞/踩落库 CSV</p>
+          <p>· 问答日志：JSONL 记录召回与回答</p>
+          <p>· 阈值过滤：Rerank &lt;0.3 转人工</p>
+          <p>· API Key：环境变量管理，不硬编码</p>
+        </content>
+      </shape>
+      <shape width="400" height="28" topLeftX="500" topLeftY="120" type="text" id="bKY">
+        <content fontSize="15" fontFamily="微软雅黑" color="rgba(230, 0, 18, 1)" bold="true">
+          <p>技术栈与部署</p>
+        </content>
+      </shape>
+      <shape width="400" height="280" topLeftX="500" topLeftY="155" type="text" id="bKq">
+        <content fontSize="13" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" lineSpacing="multiple:2">
+          <p>· 后端：Flask + Python</p>
+          <p>· 前端：原生 HTML/CSS/JS</p>
+          <p>· 向量库：FAISS（内存索引）</p>
+          <p>· LLM：qwen-plus（百炼）</p>
+          <p>· 开源部署：Dockerfile</p>
+          <p>· 在线部署：Streamlit Cloud</p>
+          <p>· 代码托管：GitHub</p>
+        </content>
+      </shape>
+    </data>
+    <note id="bKG">
+      <content>
+        <p>工程上做了流式输出、多轮对话、缓存、反馈闭环、问答日志。部署用Dockerfile和Streamlit Cloud，代码在GitHub上。API Key走环境变量管理。</p>
+      </content>
+    </note>
+  </slide>
+  <slide id="pzA">
+    <style>
+      <fill id="fzA">
+        <fillColor color="rgba(255, 255, 255, 1)"/>
+      </fill>
+    </style>
+    <data>
+      <shape width="8" height="540" topLeftX="0" topLeftY="0" presetHandlers="0" type="rect" id="bKR">
+        <fill>
+          <fillColor color="rgba(230, 0, 18, 1)"/>
+        </fill>
+        <content fontSize="16" fontFamily="思源黑体" color="rgba(31, 35, 41, 1)"/>
+      </shape>
+      <shape width="700" height="50" topLeftX="80" topLeftY="100" type="text" id="bKt">
+        <content textType="title" fontSize="36" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" bold="true">
+          <p>总结与展望</p>
+        </content>
+      </shape>
+      <line id="bKx" startX="80" startY="170" endX="200.00416659433122" endY="170">
+        <border color="rgba(230, 0, 18, 1)" width="3"/>
+      </line>
+      <shape width="400" height="28" topLeftX="80" topLeftY="210" type="text" id="bKP">
+        <content fontSize="15" fontFamily="微软雅黑" color="rgba(230, 0, 18, 1)" bold="true">
+          <p>项目成果</p>
+        </content>
+      </shape>
+      <shape width="400" height="200" topLeftX="80" topLeftY="245" type="text" id="bKL">
+        <content fontSize="13" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" lineSpacing="multiple:2">
+          <p>· 完整 RAG 链路：检索→融合→重排→生成</p>
+          <p>· 双栈对比：本地开源 vs 在线 API</p>
+          <p>· 消融实验 Recall@4 从 85% 提升至 95%</p>
+          <p>· 三道统一测试题全部答对</p>
+        </content>
+      </shape>
+      <shape width="400" height="28" topLeftX="500" topLeftY="210" type="text" id="bKi">
+        <content fontSize="15" fontFamily="微软雅黑" color="rgba(230, 0, 18, 1)" bold="true">
+          <p>后续优化方向</p>
+        </content>
+      </shape>
+      <shape width="400" height="200" topLeftX="500" topLeftY="245" type="text" id="bKw">
+        <content fontSize="13" fontFamily="微软雅黑" color="rgba(43, 47, 54, 1)" lineSpacing="multiple:2">
+          <p>· 向量数据库（FAISS → Milvus）</p>
+          <p>· 多模态：海报直接用视觉模型理解</p>
+          <p>· chunk-size 消融实验</p>
+          <p>· 自动评估 pipeline</p>
+        </content>
+      </shape>
+    </data>
+    <note id="bKy">
+      <content>
+        <p>这个项目完整实现了RAG链路，做了双栈对比和消融实验，Recall@4从85%提到95%，三道测试题全对。后续可以换向量数据库、加多模态理解、做chunk-size消融和自动评估。谢谢大家。</p>
+      </content>
+    </note>
+  </slide>
+</presentation>

@@ -1,0 +1,57 @@
+<slide>
+  <style><fill><fillColor color="rgb(255,255,255)"/></fill></style>
+  <data>
+    <shape type="text" topLeftX="60" topLeftY="40" width="840" height="40">
+      <content textType="headline" fontSize="28" fontFamily="微软雅黑" bold="true" color="rgb(43,47,54)">
+        <p>混合检索：向量召回 + BM25 + RRF 融合</p>
+      </content>
+    </shape>
+    <line startX="60" startY="90" endX="900" endY="90">
+      <border color="rgb(232,234,239)" width="1"/>
+    </line>
+
+    <shape type="rect" topLeftX="60" topLeftY="120" width="250" height="120" presetHandlers="8">
+      <fill><fillColor color="rgb(245,246,248)"/></fill>
+    </shape>
+    <shape type="text" topLeftX="80" topLeftY="135" width="210" height="100">
+      <content textType="body" fontSize="13" fontFamily="微软雅黑" color="rgb(43,47,54)" lineSpacing="multiple:1.8">
+        <p><strong>向量召回</strong></p>
+        <p>擅长语义相似：用户问「卡丢了怎么办」能匹配到「挂失」</p>
+      </content>
+    </shape>
+
+    <shape type="rect" topLeftX="355" topLeftY="120" width="250" height="120" presetHandlers="8">
+      <fill><fillColor color="rgb(245,246,248)"/></fill>
+    </shape>
+    <shape type="text" topLeftX="375" topLeftY="135" width="210" height="100">
+      <content textType="body" fontSize="13" fontFamily="微软雅黑" color="rgb(43,47,54)" lineSpacing="multiple:1.8">
+        <p><strong>BM25 关键词召回</strong></p>
+        <p>擅长精确匹配：数字、专有名词如「4008895558」「违约金5%」</p>
+      </content>
+    </shape>
+
+    <shape type="rect" topLeftX="650" topLeftY="120" width="250" height="120" presetHandlers="8">
+      <fill><fillColor color="rgb(253,236,236)"/></fill>
+    </shape>
+    <shape type="text" topLeftX="670" topLeftY="135" width="210" height="100">
+      <content textType="body" fontSize="13" fontFamily="微软雅黑" color="rgb(43,47,54)" lineSpacing="multiple:1.8">
+        <p><strong>RRF 融合</strong></p>
+        <p>score = 1/(60+向量名次) + 1/(60+BM25名次)</p>
+        <p>不依赖原始分数，只看排名</p>
+      </content>
+    </shape>
+
+    <shape type="text" topLeftX="60" topLeftY="280" width="840" height="28">
+      <content textType="body" fontSize="14" fontFamily="微软雅黑" bold="true" color="rgb(230,0,18)">
+        <p>为什么用 RRF？</p>
+      </content>
+    </shape>
+    <shape type="text" topLeftX="60" topLeftY="315" width="840" height="150">
+      <content textType="body" fontSize="14" fontFamily="微软雅黑" color="rgb(43,47,54)" lineSpacing="multiple:2">
+        <p>向量分数和 BM25 分数不在同一量纲，直接相加不可比。RRF 只看各自榜单上的名次，k=60 是论文默认值，平滑排名靠后的候选。</p>
+        <p>两路召回各取 Top 10，RRF 融合后取 Top 8 进入 Rerank。</p>
+      </content>
+    </shape>
+  </data>
+  <note><content textType="body" fontSize="14"><p>向量召回擅长语义理解，BM25擅长精确匹配数字和专有名词。两路各召回10条，用RRF公式融合——只看排名不看原始分数，解决了两路分量纲不可比的问题。k=60是论文默认值。</p></content></note>
+</slide>

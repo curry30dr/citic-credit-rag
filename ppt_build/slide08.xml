@@ -1,0 +1,48 @@
+<slide>
+  <style><fill><fillColor color="rgb(255,255,255)"/></fill></style>
+  <data>
+    <shape type="text" topLeftX="70" topLeftY="35" width="700" height="40">
+      <content textType="headline" fontSize="26" bold="true" color="rgba(20,20,20,1)" fontFamily="微软雅黑">
+        <p>三道统一测试题：全部正确回答</p>
+      </content>
+    </shape>
+    <line startX="70" startY="85" endX="130" endY="85"><border color="rgb(230,0,18)" width="3"/></line>
+
+    <table topLeftX="70" topLeftY="110" width="820" height="340">
+      <colgroup>
+        <col width="150"/><col width="310"/><col width="280"/><col width="80"/>
+      </colgroup>
+      <tr height="36">
+        <td><fill><fillColor color="rgba(230,0,18,1)"/></fill><content textType="body" fontSize="13" bold="true" textAlign="center" color="rgba(255,255,255,1)" fontFamily="微软雅黑"><p>题目</p></content></td>
+        <td><fill><fillColor color="rgba(230,0,18,1)"/></fill><content textType="body" fontSize="13" bold="true" textAlign="center" color="rgba(255,255,255,1)" fontFamily="微软雅黑"><p>系统回答要点</p></content></td>
+        <td><fill><fillColor color="rgba(230,0,18,1)"/></fill><content textType="body" fontSize="13" bold="true" textAlign="center" color="rgba(255,255,255,1)" fontFamily="微软雅黑"><p>关键数字核对</p></content></td>
+        <td><fill><fillColor color="rgba(230,0,18,1)"/></fill><content textType="body" fontSize="13" bold="true" textAlign="center" color="rgba(255,255,255,1)" fontFamily="微软雅黑"><p>结果</p></content></td>
+      </tr>
+      <tr height="90">
+        <td><fill><fillColor color="rgba(253,236,236,1)"/></fill><content textType="body" fontSize="12" bold="true" textAlign="center" color="rgba(230,0,18,1)" fontFamily="微软雅黑"><p>问题1<br/>境外取现限额<br/>（简单）</p></content></td>
+        <td><content textType="body" fontSize="11.5" textAlign="left" color="rgba(50,55,65,1)" fontFamily="微软雅黑" lineSpacing="multiple:1.5"><p>每卡每日境外取现最高等值1万元；本人名下银行卡合计每自然年度不超过等值10万元。</p></content></td>
+        <td><content textType="body" fontSize="11.5" textAlign="left" color="rgba(50,55,65,1)" fontFamily="微软雅黑" lineSpacing="multiple:1.5"><p>日限1万 / 年限10万，与外汇管理规定及领用合约一致。</p></content></td>
+        <td><fill><fillColor color="rgba(230,0,18,1)"/></fill><content textType="body" fontSize="14" bold="true" textAlign="center" color="rgba(255,255,255,1)" fontFamily="微软雅黑"><p>正确</p></content></td>
+      </tr>
+      <tr height="100">
+        <td><fill><fillColor color="rgba(253,236,236,1)"/></fill><content textType="body" fontSize="12" bold="true" textAlign="center" color="rgba(230,0,18,1)" fontFamily="微软雅黑"><p>问题2<br/>全额 vs 最低还款<br/>（中等）</p></content></td>
+        <td><content textType="body" fontSize="11.5" textAlign="left" color="rgba(50,55,65,1)" fontFamily="微软雅黑" lineSpacing="multiple:1.5"><p>全额还清享免息期最长50天；最低还款不享免息，自记账日起按日0.05%计息、按月复利；未还部分收5%违约金，最低20元。</p></content></td>
+        <td><content textType="body" fontSize="11.5" textAlign="left" color="rgba(50,55,65,1)" fontFamily="微软雅黑" lineSpacing="multiple:1.5"><p>免息50天 / 日息0.05% / 违约金5%最低20元，与利息与费用条款一致。</p></content></td>
+        <td><fill><fillColor color="rgba(230,0,18,1)"/></fill><content textType="body" fontSize="14" bold="true" textAlign="center" color="rgba(255,255,255,1)" fontFamily="微软雅黑"><p>正确</p></content></td>
+      </tr>
+      <tr height="100">
+        <td><fill><fillColor color="rgba(253,236,236,1)"/></fill><content textType="body" fontSize="12" bold="true" textAlign="center" color="rgba(230,0,18,1)" fontFamily="微软雅黑"><p>问题3<br/>三类消费返现聚合<br/>（困难）</p></content></td>
+        <td><content textType="body" fontSize="11.5" textAlign="left" color="rgba(50,55,65,1)" fontFamily="微软雅黑" lineSpacing="multiple:1.5"><p>吃饭选爱吃版、出行选爱行版、缴费选爱家版；每类600×15%=90元，每月合计270元，12个月3240元，均未超年上限1200元。</p></content></td>
+        <td><content textType="body" fontSize="11.5" textAlign="left" color="rgba(50,55,65,1)" fontFamily="微软雅黑" lineSpacing="multiple:1.5"><p>15%返现比例与三款卡规则原文一致；计算逻辑正确，年上限校验通过。</p></content></td>
+        <td><fill><fillColor color="rgba(230,0,18,1)"/></fill><content textType="body" fontSize="14" bold="true" textAlign="center" color="rgba(255,255,255,1)" fontFamily="微软雅黑"><p>正确</p></content></td>
+      </tr>
+    </table>
+
+    <shape type="text" topLeftX="70" topLeftY="470" width="820" height="30">
+      <content textType="caption" fontSize="12" color="rgba(120,125,135,1)" fontFamily="微软雅黑">
+        <p>三道题均通过 RAG 链路在线上 API 栈实测：检索召回准确，回答数字与业务资料原文一致，无幻觉。</p>
+      </content>
+    </shape>
+  </data>
+  <note><content textType="body"><p>这页是三道统一测试题的结果。</p><p>问题1简单题：境外取现日限1万年限10万，答对。</p><p>问题2中等题：全额免息50天，最低还款日息0.05%复利，违约金5%最低20元，答对。</p><p>问题3困难题：三类各600元，返现15%，每类90元，每月270元，12个月3240元，年上限1200元未超，答对。</p><p>三道全对，证明系统在真实业务问题上的准确性。</p></content></note>
+</slide>

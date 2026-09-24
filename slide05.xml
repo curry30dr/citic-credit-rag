@@ -1,0 +1,61 @@
+<slide>
+  <style><fill><fillColor color="rgb(255,255,255)"/></fill></style>
+  <data>
+    <shape type="text" topLeftX="60" topLeftY="40" width="840" height="40">
+      <content textType="headline" fontSize="28" fontFamily="微软雅黑" bold="true" color="rgb(43,47,54)">
+        <p>双栈设计：本地开源 vs 百炼在线 API</p>
+      </content>
+    </shape>
+    <line startX="60" startY="90" endX="900" endY="90">
+      <border color="rgb(232,234,239)" width="1"/>
+    </line>
+
+    <table topLeftX="60" topLeftY="130" width="840" height="300">
+      <colgroup>
+        <col width="180"/>
+        <col width="330"/>
+        <col width="330"/>
+      </colgroup>
+      <tr height="40">
+        <td>
+          <fill><fillColor color="rgb(230,0,18)"/></fill>
+          <content textType="body" fontSize="14" fontFamily="微软雅黑" bold="true" color="rgb(255,255,255)" textAlign="center"><p>环节</p></content>
+        </td>
+        <td>
+          <fill><fillColor color="rgb(230,0,18)"/></fill>
+          <content textType="body" fontSize="14" fontFamily="微软雅黑" bold="true" color="rgb(255,255,255)" textAlign="center"><p>本地开源栈</p></content>
+        </td>
+        <td>
+          <fill><fillColor color="rgb(230,0,18)"/></fill>
+          <content textType="body" fontSize="14" fontFamily="微软雅黑" bold="true" color="rgb(255,255,255)" textAlign="center"><p>百炼在线 API 栈</p></content>
+        </td>
+      </tr>
+      <tr height="45">
+        <td><content textType="body" fontSize="13" fontFamily="微软雅黑" textAlign="center" color="rgb(43,47,54)"><p>Embedding</p></content></td>
+        <td><content textType="body" fontSize="13" fontFamily="微软雅黑" textAlign="center" color="rgb(43,47,54)"><p>bge-small-zh-v1.5（本地，512维）</p></content></td>
+        <td><content textType="body" fontSize="13" fontFamily="微软雅黑" textAlign="center" color="rgb(43,47,54)"><p>text-embedding-v3（API，1024维）</p></content></td>
+      </tr>
+      <tr height="45">
+        <td><content textType="body" fontSize="13" fontFamily="微软雅黑" textAlign="center" color="rgb(43,47,54)"><p>Rerank</p></content></td>
+        <td><content textType="body" fontSize="13" fontFamily="微软雅黑" textAlign="center" color="rgb(43,47,54)"><p>bge-reranker-base（本地）</p></content></td>
+        <td><content textType="body" fontSize="13" fontFamily="微软雅黑" textAlign="center" color="rgb(43,47,54)"><p>gte-rerank-v2（API）</p></content></td>
+      </tr>
+      <tr height="45">
+        <td><content textType="body" fontSize="13" fontFamily="微软雅黑" textAlign="center" color="rgb(43,47,54)"><p>向量索引</p></content></td>
+        <td><content textType="body" fontSize="13" fontFamily="微软雅黑" textAlign="center" color="rgb(43,47,54)"><p>FAISS（内存索引）</p></content></td>
+        <td><content textType="body" fontSize="13" fontFamily="微软雅黑" textAlign="center" color="rgb(43,47,54)"><p>FAISS（内存索引）</p></content></td>
+      </tr>
+      <tr height="45">
+        <td><content textType="body" fontSize="13" fontFamily="微软雅黑" textAlign="center" color="rgb(43,47,54)"><p>LLM</p></content></td>
+        <td><content textType="body" fontSize="13" fontFamily="微软雅黑" textAlign="center" color="rgb(43,47,54)"><p>qwen-plus（统一，公平对比）</p></content></td>
+        <td><content textType="body" fontSize="13" fontFamily="微软雅黑" textAlign="center" color="rgb(43,47,54)"><p>qwen-plus（统一，公平对比）</p></content></td>
+      </tr>
+      <tr height="45">
+        <td><content textType="body" fontSize="13" fontFamily="微软雅黑" textAlign="center" color="rgb(43,47,54)"><p>特点</p></content></td>
+        <td><content textType="body" fontSize="13" fontFamily="微软雅黑" textAlign="center" color="rgb(43,47,54)"><p>离线可跑，无API费用</p></content></td>
+        <td><content textType="body" fontSize="13" fontFamily="微软雅黑" textAlign="center" color="rgb(43,47,54)"><p>效果更好，在线调用</p></content></td>
+      </tr>
+    </table>
+  </data>
+  <note><content textType="body" fontSize="14"><p>我们做了双栈对比。本地栈用bge-small-zh和bge-reranker-base，在线栈用百炼的text-embedding-v3和gte-rerank-v2。LLM统一用qwen-plus，保证对比公平。这样能比较开源方案和云API方案在效果上的差异。</p></content></note>
+</slide>

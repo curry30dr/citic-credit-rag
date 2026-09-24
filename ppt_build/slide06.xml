@@ -1,0 +1,66 @@
+<slide>
+  <style><fill><fillColor color="rgb(255,255,255)"/></fill></style>
+  <data>
+    <shape type="text" topLeftX="70" topLeftY="35" width="700" height="40">
+      <content textType="headline" fontSize="26" bold="true" color="rgba(20,20,20,1)" fontFamily="微软雅黑">
+        <p>系统演示：可对话网页 + 公网部署</p>
+      </content>
+    </shape>
+    <line startX="70" startY="85" endX="130" endY="85"><border color="rgb(230,0,18)" width="3"/></line>
+
+    <!-- 左侧：界面功能 -->
+    <shape type="text" topLeftX="70" topLeftY="115" width="400" height="28">
+      <content textType="body" fontSize="15" bold="true" color="rgba(230,0,18,1)" fontFamily="微软雅黑"><p>前端交互设计</p></content>
+    </shape>
+    <shape type="text" topLeftX="70" topLeftY="150" width="400" height="280">
+      <content textType="body" fontSize="13.5" color="rgba(60,65,75,1)" fontFamily="微软雅黑" lineSpacing="multiple:1.8">
+        <ul>
+          <li><p>中信红品牌风，白底，银行专业感</p></li>
+          <li><p>右侧"召回来源"默认折叠，客户看答案，评委展开看证据</p></li>
+          <li><p>🗑 清空、📋 复制、👍👎 反馈</p></li>
+          <li><p>快捷问题按"卡片服务/费用查询/账单概念"分组</p></li>
+          <li><p>底部免责声明，合规兜底</p></li>
+          <li><p>本地/在线双栈收进 ⚙ 技术选项，客户界面干净</p></li>
+        </ul>
+      </content>
+    </shape>
+
+    <!-- 右侧：部署链路 -->
+    <shape type="text" topLeftX="510" topLeftY="115" width="380" height="28">
+      <content textType="body" fontSize="15" bold="true" color="rgba(230,0,18,1)" fontFamily="微软雅黑"><p>部署上线</p></content>
+    </shape>
+
+    <shape type="round-rect" topLeftX="510" topLeftY="155" width="380" height="44" presetHandlers="8">
+      <fill><fillColor color="rgba(245,246,248,1)"/></fill><border color="rgb(200,205,215)" width="1"/>
+      <content textType="body" fontSize="13" textAlign="center" color="rgba(40,45,55,1)" fontFamily="微软雅黑"><p>本地 Flask 网页 · http://127.0.0.1:5000</p></content>
+    </shape>
+    <line startX="700" startY="199" endX="700" endY="218"><border color="rgb(150,155,165)" width="1"/><endArrow type="arrow"/></line>
+
+    <shape type="round-rect" topLeftX="510" topLeftY="220" width="380" height="44" presetHandlers="8">
+      <fill><fillColor color="rgba(245,246,248,1)"/></fill><border color="rgb(200,205,215)" width="1"/>
+      <content textType="body" fontSize="13" textAlign="center" color="rgba(40,45,55,1)" fontFamily="微软雅黑"><p>GitHub 仓库 · curry30dr/citic-credit-rag</p></content>
+    </shape>
+    <line startX="700" startY="264" endX="700" endY="283"><border color="rgb(150,155,165)" width="1"/><endArrow type="arrow"/></line>
+
+    <shape type="round-rect" topLeftX="510" topLeftY="285" width="380" height="44" presetHandlers="8">
+      <fill><fillColor color="rgba(230,0,18,1)"/></fill>
+      <content textType="body" fontSize="13" bold="true" textAlign="center" color="rgba(255,255,255,1)" fontFamily="微软雅黑"><p>Streamlit Cloud · 永久公网链接</p></content>
+    </shape>
+
+    <shape type="text" topLeftX="510" topLeftY="345" width="380" height="60">
+      <content textType="body" fontSize="12" color="rgba(90,95,105,1)" fontFamily="微软雅黑" lineSpacing="multiple:1.6">
+        <p>DASHSCOPE_API_KEY 以 Secret 方式托管，代码不暴露密钥；已跑通"境外取现手续费"正确回答。</p>
+      </content>
+    </shape>
+
+    <shape type="rect" topLeftX="70" topLeftY="455" width="820" height="50" presetHandlers="8">
+      <fill><fillColor color="rgba(253,236,236,1)"/></fill>
+    </shape>
+    <shape type="text" topLeftX="90" topLeftY="465" width="780" height="32">
+      <content textType="body" fontSize="13.5" textAlign="center" color="rgba(40,45,55,1)" fontFamily="微软雅黑">
+        <p>现场演示：客户问"境外取现手续费多少？" → 系统召回资料 → 准确回答"境内外取现均按交易金额2%收取，最低20元/笔"</p>
+      </content>
+    </shape>
+  </data>
+  <note><content textType="body"><p>这页讲部署。</p><p>本地Flask网页，推到GitHub，再用Streamlit Cloud出永久公网链接。</p><p>API Key存在Streamlit Secret里，不硬编码。</p><p>现场演示一个问题：境外取现手续费，看回答准不准、能不能溯源。</p></content></note>
+</slide>

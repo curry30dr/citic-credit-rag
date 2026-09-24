@@ -1,0 +1,48 @@
+<slide>
+  <style><fill><fillColor color="rgb(255,255,255)"/></fill></style>
+  <data>
+    <shape type="text" topLeftX="60" topLeftY="40" width="840" height="40">
+      <content textType="headline" fontSize="28" fontFamily="微软雅黑" bold="true" color="rgb(43,47,54)">
+        <p>工程优化与部署</p>
+      </content>
+    </shape>
+    <line startX="60" startY="90" endX="900" endY="90">
+      <border color="rgb(232,234,239)" width="1"/>
+    </line>
+
+    <shape type="text" topLeftX="60" topLeftY="120" width="400" height="28">
+      <content textType="body" fontSize="15" fontFamily="微软雅黑" bold="true" color="rgb(230,0,18)">
+        <p>工程优化</p>
+      </content>
+    </shape>
+    <shape type="text" topLeftX="60" topLeftY="155" width="400" height="280">
+      <content textType="body" fontSize="13" fontFamily="微软雅黑" color="rgb(43,47,54)" lineSpacing="multiple:2">
+        <p>· 流式输出：SSE 逐 token 推送，前端实时打字</p>
+        <p>· 多轮对话：保留最近3轮上下文，支持追问</p>
+        <p>· 结果缓存：相同问题 0 秒返回</p>
+        <p>· 反馈闭环：赞/踩落库 CSV</p>
+        <p>· 问答日志：JSONL 记录召回与回答</p>
+        <p>· 阈值过滤：Rerank &lt;0.3 转人工</p>
+        <p>· API Key：环境变量管理，不硬编码</p>
+      </content>
+    </shape>
+
+    <shape type="text" topLeftX="500" topLeftY="120" width="400" height="28">
+      <content textType="body" fontSize="15" fontFamily="微软雅黑" bold="true" color="rgb(230,0,18)">
+        <p>技术栈与部署</p>
+      </content>
+    </shape>
+    <shape type="text" topLeftX="500" topLeftY="155" width="400" height="280">
+      <content textType="body" fontSize="13" fontFamily="微软雅黑" color="rgb(43,47,54)" lineSpacing="multiple:2">
+        <p>· 后端：Flask + Python</p>
+        <p>· 前端：原生 HTML/CSS/JS</p>
+        <p>· 向量库：FAISS（内存索引）</p>
+        <p>· LLM：qwen-plus（百炼）</p>
+        <p>· 开源部署：Dockerfile</p>
+        <p>· 在线部署：Streamlit Cloud</p>
+        <p>· 代码托管：GitHub</p>
+      </content>
+    </shape>
+  </data>
+  <note><content textType="body" fontSize="14"><p>工程上做了流式输出、多轮对话、缓存、反馈闭环、问答日志。部署用Dockerfile和Streamlit Cloud，代码在GitHub上。API Key走环境变量管理。</p></content></note>
+</slide>

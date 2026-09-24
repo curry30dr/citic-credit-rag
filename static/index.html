@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>中信银行信用卡智能客服</title>
+<style>
+  :root{
+    --red:#e60012; --red-dark:#b8000e; --red-deep:#9a000c;
+    --red-light:#fdecec; --bg:#f4f6f9; --panel:#fff; --line:#e8eaef;
+    --text:#2b2f38; --muted:#8a909c;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;overflow:hidden}
+  a{text-decoration:none;color:inherit}
+
+  /* 左侧深红色侧边栏 */
+  .sidebar{width:220px;background:linear-gradient(180deg,var(--red) 0%,var(--red-dark) 100%);flex:none;display:flex;flex-direction:column;color:#fff;}
+  .logo-area{padding:24px 22px 20px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.15)}
+  .logo-circle{width:40px;height:40px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;color:var(--red);font-weight:800;font-size:16px}
+  .logo-text .cn{font-size:15px;font-weight:700;letter-spacing:1px}
+  .logo-text .en{font-size:9.5px;opacity:.8;letter-spacing:.5px}
+  .menu{flex:1;padding:14px 0}
+  .menu-item{display:flex;align-items:center;gap:12px;padding:13px 24px;font-size:14px;cursor:pointer;color:rgba(255,255,255,.85);transition:.2s;border-left:3px solid transparent}
+  .menu-item:hover{background:rgba(255,255,255,.1);color:#fff}
+  .menu-item.active{background:rgba(255,255,255,.15);color:#fff;border-left-color:#fff}
+  .menu-item .ic{font-size:17px;width:20px;text-align:center}
+  .sidebar-footer{padding:16px 22px;font-size:11px;opacity:.7;line-height:1.6;border-top:1px solid rgba(255,255,255,.15)}
+
+  /* 右侧主区域 */
+  .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+  /* 顶部红色搜索栏 */
+  .topbar{background:linear-gradient(90deg,var(--red) 0%,var(--red-dark) 100%);padding:14px 36px;display:flex;align-items:center;gap:20px}
+  .search-box{flex:1;max-width:680px;background:rgba(255,255,255,.95);border-radius:22px;padding:10px 22px;display:flex;align-items:center;gap:10px;color:#666;font-size:13.5px;cursor:pointer}
+  .search-box:hover{background:#fff}
+  .top-right{margin-left:auto;display:flex;align-items:center;gap:18px;color:#fff;font-size:13px}
+  .top-right .user{display:flex;align-items:center;gap:8px}
+  .top-right .avatar{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center}
+
+  /* 内容区 */
+  .content{flex:1;display:flex;overflow:hidden;position:relative}
+  .content::before{content:"";position:absolute;right:0;top:0;bottom:0;width:380px;background:linear-gradient(225deg,rgba(230,0,18,.06) 0%,transparent 60%);pointer-events:none}
+
+  /* 左侧欢迎区 */
+  .welcome{flex:1;padding:48px 44px;overflow-y:auto}
+  .hello{display:flex;align-items:center;gap:22px;margin-bottom:30px}
+  .robot{width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,var(--red) 0%,var(--red-dark) 100%);display:flex;align-items:center;justify-content:center;font-size:38px;box-shadow:0 6px 20px rgba(230,0,18,.25)}
+  .hello h2{font-size:28px;color:#1a1d24;margin-bottom:6px}
+  .hello h2 span{color:var(--red)}
+  .hello p{font-size:14.5px;color:#7a8290}
+
+  /* 5个功能卡片 */
+  .quick-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:36px}
+  .quick-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 14px;text-align:center;cursor:pointer;transition:.25s}
+  .quick-card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(230,0,18,.1);border-color:var(--red)}
+  .quick-card .ic{font-size:28px;margin-bottom:10px}
+  .quick-card .t{font-size:14px;color:#222;font-weight:600;margin-bottom:4px}
+  .quick-card .d{font-size:11.5px;color:var(--muted)}
+
+  /* 技术说明（第二屏） */
+  .tech-block{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:26px 28px}
+  .tech-block h3{font-size:17px;color:#1a1d24;margin-bottom:6px}
+  .tech-block .sub{font-size:12.5px;color:var(--muted);margin-bottom:18px}
+  .arch-flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+  .anode{background:#f5f6f8;border:1px solid var(--line);border-radius:10px;padding:9px 13px;font-size:12px;text-align:center}
+  .anode.hl{background:linear-gradient(135deg,var(--red),var(--red-dark));color:#fff;border:none}
+  .aarr{color:#bbb;font-size:15px}
+  .tech-note{display:flex;gap:24px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+  .tech-note b{color:var(--red)}
+  .stats-row{display:flex;gap:36px;margin-top:18px;flex-wrap:wrap}
+  .stat b{font-size:22px;color:var(--red);display:block}
+  .stat span{font-size:12px;color:var(--muted)}
+
+  /* 右侧常见问题栏 */
+  .faq{width:340px;background:rgba(255,255,255,.7);border-left:1px solid var(--line);padding:28px 22px;overflow-y:auto;display:flex;flex-direction:column}
+  .faq h3{font-size:15px;color:#222;margin-bottom:16px}
+  .faq-item{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:#fff;border:1px solid var(--line);border-radius:12px;margin-bottom:10px;cursor:pointer;transition:.2s;font-size:13.5px;color:#445}
+  .faq-item:hover{border-color:var(--red);background:var(--red-light);color:var(--red)}
+  .faq-item .arrow{color:#bbb;font-size:14px}
+  .faq-item:hover .arrow{color:var(--red)}
+
+  .input-bar{margin-top:auto;display:flex;gap:10px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:24px;padding:8px 8px 8px 18px}
+  .input-bar input{flex:1;border:none;outline:none;font-size:13.5px;background:transparent}
+  .send-btn{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--red),var(--red-dark));color:#fff;border:none;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
+  .footer-note{font-size:10.5px;color:var(--muted);text-align:center;margin-top:10px;line-height:1.5}
+</style>
+</head>
+<body>
+  <!-- 左侧侧边栏 -->
+  <aside class="sidebar">
+    <div class="logo-area">
+      <div class="logo-circle">中</div>
+      <div class="logo-text">
+        <div class="cn">中信银行</div>
+        <div class="en">CHINA CITIC BANK</div>
+      </div>
+    </div>
+    <nav class="menu">
+      <a class="menu-item active" href="javascript:void(0)" onclick="goHome()"><span class="ic">💬</span>智能客服</a>
+      <a class="menu-item" href="javascript:void(0)" onclick="toggleTech()"><span class="ic">🔧</span>技术说明</a>
+      <a class="menu-item" href="/chat.html"><span class="ic">📝</span>进入对话</a>
+    </nav>
+    <div class="sidebar-footer">
+      24小时客服热线<br>4008895558
+    </div>
+  </aside>
+
+  <!-- 右侧 -->
+  <div class="main">
+    <div class="topbar">
+      <div class="search-box" onclick="location.href='/chat.html'">💬 点击开始咨询信用卡问题 →</div>
+    </div>
+
+    <div class="content">
+      <!-- 欢迎区 -->
+      <div class="welcome">
+        <div id="homeView">
+        <div class="hello">
+          <div class="robot">🤖</div>
+          <div>
+            <h2>您好，我是中信银行<span>智能客服</span></h2>
+            <p>我可以为您解答信用卡相关问题，依据领用合约与收费价格表，数字有据可查</p>
+          </div>
+        </div>
+
+        <!-- 5个功能入口 -->
+        <div class="quick-grid">
+          <div class="quick-card" onclick="go('信用卡取现手续费怎么收？')">
+            <div class="ic">💳</div><div class="t">取现手续费</div><div class="d">境内外取现费率</div>
+          </div>
+          <div class="quick-card" onclick="go('境外取现限额是多少？')">
+            <div class="ic">🌍</div><div class="t">境外取现</div><div class="d">每日/年度限额</div>
+          </div>
+          <div class="quick-card" onclick="go('信用卡怎么激活？')">
+            <div class="ic">✨</div><div class="t">卡怎么激活</div><div class="d">快速激活流程</div>
+          </div>
+          <div class="quick-card" onclick="go('只还最低还款额有利息吗？')">
+            <div class="ic">💰</div><div class="t">还款指南</div><div class="d">最低还款/免息期</div>
+          </div>
+          <div class="quick-card" onclick="go('信用卡年费怎么收？怎么免年费？')">
+            <div class="ic">🎫</div><div class="t">年费怎么收</div><div class="d">年费标准/免年费政策</div>
+          </div>
+        </div>
+
+        <div style="background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin-bottom:24px">
+          <div style="font-size:13px;color:#888;margin-bottom:10px;font-weight:600">常见问题</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <a href="javascript:void(0)" onclick="go('如何申请信用卡？')" style="font-size:12.5px;color:#555;border:1px solid var(--line);border-radius:16px;padding:5px 14px;text-decoration:none">如何申请信用卡</a>
+            <a href="javascript:void(0)" onclick="go('账单日和还款日怎么看？')" style="font-size:12.5px;color:#555;border:1px solid var(--line);border-radius:16px;padding:5px 14px;text-decoration:none">账单日和还款日</a>
+            <a href="javascript:void(0)" onclick="go('逾期有什么后果？')" style="font-size:12.5px;color:#555;border:1px solid var(--line);border-radius:16px;padding:5px 14px;text-decoration:none">逾期后果</a>
+            <a href="javascript:void(0)" onclick="go('信用卡挂失手续费多少？')" style="font-size:12.5px;color:#555;border:1px solid var(--line);border-radius:16px;padding:5px 14px;text-decoration:none">挂失手续费</a>
+            <a href="javascript:void(0)" onclick="go('最低还款额怎么算？')" style="font-size:12.5px;color:#555;border:1px solid var(--line);border-radius:16px;padding:5px 14px;text-decoration:none">最低还款额怎么算</a>
+            <a href="javascript:void(0)" onclick="go('信用卡有哪些优惠活动？')" style="font-size:12.5px;color:#555;border:1px solid var(--line);border-radius:16px;padding:5px 14px;text-decoration:none">优惠活动</a>
+          </div>
+        </div>
+
+        <div style="background:#fff;border:1px solid var(--line);border-left:3px solid var(--red);border-radius:10px;padding:14px 18px;margin-bottom:28px;font-size:13.5px">
+          🤖 以上问题我可以帮您解答；如果需要人工服务，请拨打 <b style="color:var(--red)">24小时客服热线 4008895558</b>
+        </div>
+        </div><!-- /homeView -->
+
+        <!-- 技术说明（默认隐藏，点侧边栏"技术说明"才显示） -->
+        <div class="tech-block" id="tech" style="display:none">
+          <h3>RAG 技术架构</h3>
+          <p class="sub">检索增强生成全链路 · 混合召回 → Rerank 精排 → 大模型生成</p>
+          <div class="arch-flow">
+            <div class="anode">用户问题</div><div class="aarr">→</div>
+            <div class="anode">Embedding<br>向量化</div><div class="aarr">→</div>
+            <div class="anode">向量+BM25<br>混合召回</div><div class="aarr">→</div>
+            <div class="anode">RRF<br>融合</div><div class="aarr">→</div>
+            <div class="anode hl">Rerank<br>精排</div><div class="aarr">→</div>
+            <div class="anode">LLM<br>生成</div>
+          </div>
+          <div class="tech-note">
+            <span>向量检索：懂<b>语义</b>（"忘记还款"≈逾期）</span>
+            <span>BM25：抓<b>关键词</b>（年费/取现/违约金）</span>
+            <span>Rerank：<b>精排</b>候选资料相关性</span>
+          </div>
+          <div class="stats-row">
+            <div class="stat"><b>89</b><span>业务知识块</span></div>
+            <div class="stat"><b>2路</b><span>向量 + BM25</span></div>
+            <div class="stat"><b>双栈</b><span>本地开源/在线API</span></div>
+            <div class="stat"><b>3/3</b><span>测试题全对</span></div>
+          </div>
+        </div>
+
+        <div style="text-align:center;font-size:11.5px;color:var(--muted);margin-top:28px;padding-bottom:10px">
+          以上信息依据《领用合约》《信用卡章程》及收费价格表整理，仅供参考，具体以中信银行官方公告为准
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  function toggleTech(){
+    const t = document.getElementById('tech');
+    const h = document.getElementById('homeView');
+    const showTech = (t.style.display === 'none');
+    t.style.display = showTech ? 'block' : 'none';
+    h.style.display = showTech ? 'none' : 'block';
+    if(showTech) t.scrollIntoView();
+  }
+  function goHome(){
+    document.getElementById('homeView').style.display='block';
+    document.getElementById('tech').style.display='none';
+    window.scrollTo(0,0);
+  }
+  function go(q){
+    if(!q || !q.trim()) { location.href='/chat.html'; return; }
+    location.href='/chat.html?q='+encodeURIComponent(q.trim());
+  }
+</script>
+</body>
+</html>

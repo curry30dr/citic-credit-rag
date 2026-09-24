@@ -1,0 +1,42 @@
+<slide>
+  <style><fill><fillColor color="rgb(255,255,255)"/></fill></style>
+  <data>
+    <shape type="text" topLeftX="60" topLeftY="40" width="840" height="40">
+      <content textType="headline" fontSize="28" fontFamily="微软雅黑" bold="true" color="rgb(43,47,54)">
+        <p>三道统一测试题结果</p>
+      </content>
+    </shape>
+    <line startX="60" startY="90" endX="900" endY="90">
+      <border color="rgb(232,234,239)" width="1"/>
+    </line>
+
+    <table topLeftX="60" topLeftY="120" width="840" height="340">
+      <colgroup>
+        <col width="120"/>
+        <col width="360"/>
+        <col width="360"/>
+      </colgroup>
+      <tr height="40">
+        <td><fill><fillColor color="rgb(230,0,18)"/></fill><content textType="body" fontSize="13" fontFamily="微软雅黑" bold="true" color="rgb(255,255,255)" textAlign="center"><p>难度</p></content></td>
+        <td><fill><fillColor color="rgb(230,0,18)"/></fill><content textType="body" fontSize="13" fontFamily="微软雅黑" bold="true" color="rgb(255,255,255)" textAlign="center"><p>问题</p></content></td>
+        <td><fill><fillColor color="rgb(230,0,18)"/></fill><content textType="body" fontSize="13" fontFamily="微软雅黑" bold="true" color="rgb(255,255,255)" textAlign="center"><p>系统回答</p></content></td>
+      </tr>
+      <tr height="90">
+        <td><content textType="body" fontSize="12" fontFamily="微软雅黑" textAlign="center" color="rgb(43,47,54)"><p>简单</p></content></td>
+        <td><content textType="body" fontSize="12" fontFamily="微软雅黑" color="rgb(43,47,54)" lineSpacing="multiple:1.6"><p>境外取现限额：国外一天最多取多少？一年累计有限制吗？</p></content></td>
+        <td><content textType="body" fontSize="12" fontFamily="微软雅黑" color="rgb(43,47,54)" lineSpacing="multiple:1.6"><p>每日最高等值1万元人民币；本人名下所有卡每年累计不超过等值10万元人民币。</p></content></td>
+      </tr>
+      <tr height="90">
+        <td><content textType="body" fontSize="12" fontFamily="微软雅黑" textAlign="center" color="rgb(43,47,54)"><p>中等</p></content></td>
+        <td><content textType="body" fontSize="12" fontFamily="微软雅黑" color="rgb(43,47,54)" lineSpacing="multiple:1.6"><p>全额还款 vs 最低还款：10000元账单，两种方式在免息、利息上有什么区别？</p></content></td>
+        <td><content textType="body" fontSize="12" fontFamily="微软雅黑" color="rgb(43,47,54)" lineSpacing="multiple:1.6"><p>全额还款享免息期；最低还款不享免息，自记账日起按日利率0.05%计息，未还足最低收5%违约金（最低20元）。</p></content></td>
+      </tr>
+      <tr height="110">
+        <td><content textType="body" fontSize="12" fontFamily="微软雅黑" textAlign="center" color="rgb(43,47,54)"><p>困难</p></content></td>
+        <td><content textType="body" fontSize="12" fontFamily="微软雅黑" color="rgb(43,47,54)" lineSpacing="multiple:1.6"><p>三类消费各600元/月，选对应卡，一个月和12个月各返现多少？</p></content></td>
+        <td><content textType="body" fontSize="12" fontFamily="微软雅黑" color="rgb(43,47,54)" lineSpacing="multiple:1.6"><p>三张卡各返90元（600×15%，未超月上限100元），月合计270元，12个月共3240元。</p></content></td>
+      </tr>
+    </table>
+  </data>
+  <note><content textType="body" fontSize="14"><p>三道统一测试题全部答对。简单题考精确数字，中等题考概念对比，困难题考多文档聚合计算。特别是第三题，需要同时召回三张卡的返现规则并独立计算后相加，RAG准确处理了。</p></content></note>
+</slide>

@@ -1,0 +1,51 @@
+<slide>
+  <style><fill><fillColor color="rgb(255,255,255)"/></fill></style>
+  <data>
+    <shape type="text" topLeftX="60" topLeftY="40" width="840" height="40">
+      <content textType="headline" fontSize="28" fontFamily="微软雅黑" bold="true" color="rgb(43,47,54)">
+        <p>Rerank 精排与阈值过滤</p>
+      </content>
+    </shape>
+    <line startX="60" startY="90" endX="900" endY="90">
+      <border color="rgb(232,234,239)" width="1"/>
+    </line>
+
+    <shape type="text" topLeftX="60" topLeftY="125" width="400" height="28">
+      <content textType="body" fontSize="15" fontFamily="微软雅黑" bold="true" color="rgb(230,0,18)">
+        <p>Rerank：CrossEncoder 精排</p>
+      </content>
+    </shape>
+    <shape type="text" topLeftX="60" topLeftY="160" width="400" height="120">
+      <content textType="body" fontSize="13" fontFamily="微软雅黑" color="rgb(43,47,54)" lineSpacing="multiple:1.8">
+        <p>· RRF 融合取 Top 8 候选</p>
+        <p>· Rerank 逐对计算 query-doc 相关性分数</p>
+        <p>· 本地：bge-reranker-base</p>
+        <p>· 在线：gte-rerank-v2</p>
+      </content>
+    </shape>
+
+    <shape type="text" topLeftX="500" topLeftY="125" width="400" height="28">
+      <content textType="body" fontSize="15" fontFamily="微软雅黑" bold="true" color="rgb(230,0,18)">
+        <p>阈值过滤：拒绝不相关</p>
+      </content>
+    </shape>
+    <shape type="text" topLeftX="500" topLeftY="160" width="400" height="120">
+      <content textType="body" fontSize="13" fontFamily="微软雅黑" color="rgb(43,47,54)" lineSpacing="multiple:1.8">
+        <p>· Rerank 分数 &lt; 0.3 的块直接丢弃</p>
+        <p>· 资料不足时回答「无法回答，请转人工」</p>
+        <p>· 避免硬凑不相关资料导致 LLM 瞎编</p>
+      </content>
+    </shape>
+
+    <shape type="rect" topLeftX="60" topLeftY="320" width="840" height="130" presetHandlers="8">
+      <fill><fillColor color="rgb(245,246,248)"/></fill>
+    </shape>
+    <shape type="text" topLeftX="80" topLeftY="340" width="800" height="100">
+      <content textType="body" fontSize="13" fontFamily="微软雅黑" color="rgb(43,47,54)" lineSpacing="multiple:1.9">
+        <p><strong>为什么需要这一步？</strong></p>
+        <p>混合检索召回的 Top 8 里可能混着不相关块。Rerank 用 CrossEncoder 对 query 和 doc 做深度交互打分，比双塔向量更准。阈值过滤则保证：用户问资料里没有的问题时，系统不会硬凑 5 块不相干资料让 LLM 编答案，而是老实转人工。</p>
+      </content>
+    </shape>
+  </data>
+  <note><content textType="body" fontSize="14"><p>Rerank用CrossEncoder对query和doc做深度交互，比双塔向量准。阈值0.3分以下直接丢——资料里没有的问题，系统会说无法回答转人工，而不是硬凑资料瞎编。这步把幻觉率压下来了。</p></content></note>
+</slide>

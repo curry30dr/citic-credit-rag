@@ -1,0 +1,62 @@
+<slide>
+  <style><fill><fillColor color="rgb(255,255,255)"/></fill></style>
+  <data>
+    <shape type="text" topLeftX="60" topLeftY="40" width="840" height="40">
+      <content textType="headline" fontSize="28" fontFamily="微软雅黑" bold="true" color="rgb(43,47,54)">
+        <p>知识库构建：切块策略与索引</p>
+      </content>
+    </shape>
+    <line startX="60" startY="90" endX="900" endY="90">
+      <border color="rgb(232,234,239)" width="1"/>
+    </line>
+    <shape type="text" topLeftX="60" topLeftY="120" width="260" height="28">
+      <content textType="body" fontSize="15" fontFamily="微软雅黑" bold="true" color="rgb(230,0,18)">
+        <p>文档来源</p>
+      </content>
+    </shape>
+    <shape type="text" topLeftX="60" topLeftY="155" width="260" height="180">
+      <content textType="body" fontSize="13" fontFamily="微软雅黑" color="rgb(43,47,54)" lineSpacing="multiple:1.8">
+        <p>· 信用卡领用合约</p>
+        <p>· 信用卡章程</p>
+        <p>· 收费价格表</p>
+        <p>· 三张返现活动海报（OCR）</p>
+      </content>
+    </shape>
+    <shape type="text" topLeftX="350" topLeftY="120" width="260" height="28">
+      <content textType="body" fontSize="15" fontFamily="微软雅黑" bold="true" color="rgb(230,0,18)">
+        <p>切块策略</p>
+      </content>
+    </shape>
+    <shape type="text" topLeftX="350" topLeftY="155" width="260" height="180">
+      <content textType="body" fontSize="13" fontFamily="微软雅黑" color="rgb(43,47,54)" lineSpacing="multiple:1.8">
+        <p>· chunk ≈ 500 字/块</p>
+        <p>· overlap ≈ 80 字</p>
+        <p>· 按句子边界切分</p>
+        <p>· 费用项独立成块</p>
+        <p>· 去重后共 89 块</p>
+      </content>
+    </shape>
+    <shape type="text" topLeftX="640" topLeftY="120" width="260" height="28">
+      <content textType="body" fontSize="15" fontFamily="微软雅黑" bold="true" color="rgb(230,0,18)">
+        <p>索引构建</p>
+      </content>
+    </shape>
+    <shape type="text" topLeftX="640" topLeftY="155" width="260" height="180">
+      <content textType="body" fontSize="13" fontFamily="微软雅黑" color="rgb(43,47,54)" lineSpacing="multiple:1.8">
+        <p>· BM25 关键词索引</p>
+        <p>· 本地向量索引 FAISS（512维）</p>
+        <p>· 在线向量索引 FAISS（1024维）</p>
+        <p>· 离线建库，在线查询</p>
+      </content>
+    </shape>
+    <shape type="rect" topLeftX="60" topLeftY="380" width="840" height="90" presetHandlers="8">
+      <fill><fillColor color="rgb(245,246,248)"/></fill>
+    </shape>
+    <shape type="text" topLeftX="80" topLeftY="395" width="800" height="60">
+      <content textType="body" fontSize="13" fontFamily="微软雅黑" color="rgb(43,47,54)" lineSpacing="multiple:1.8">
+        <p>设计理由：500字够装一条完整业务规则而不切碎；overlap 80字避免规则刚好卡在边界；费用项独立成块，避免「取现手续费」和「违约金」混在一块导致召回噪声。</p>
+      </content>
+    </shape>
+  </data>
+  <note><content textType="body" fontSize="14"><p>知识库来自四个文档源。切块用500字加80字重叠，费用项单独成块。索引分三套：BM25、本地向量、在线向量，离线建好后在线查询直接读。</p></content></note>
+</slide>

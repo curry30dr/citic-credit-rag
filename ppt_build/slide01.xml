@@ -1,0 +1,34 @@
+<slide>
+  <style><fill><fillColor color="rgb(255,255,255)"/></fill></style>
+  <data>
+    <shape type="rect" topLeftX="0" topLeftY="0" width="960" height="8">
+      <fill><fillColor color="rgb(230,0,18)"/></fill>
+    </shape>
+    <shape type="text" topLeftX="90" topLeftY="150" width="780" height="70">
+      <content textType="title" fontSize="46" bold="true" color="rgba(20,20,20,1)" fontFamily="微软雅黑">
+        <p>中信银行信用卡智能咨询助手</p>
+      </content>
+    </shape>
+    <shape type="text" topLeftX="90" topLeftY="230" width="780" height="40">
+      <content textType="headline" fontSize="22" color="rgba(120,125,135,1)" fontFamily="微软雅黑">
+        <p>基于 RAG（检索增强生成）的智能客服系统</p>
+      </content>
+    </shape>
+    <line startX="90" startY="295" endX="180" endY="295">
+      <border color="rgb(230,0,18)" width="3"/>
+    </line>
+    <shape type="text" topLeftX="90" topLeftY="320" width="780" height="80">
+      <content textType="body" fontSize="16" color="rgba(80,85,95,1)" fontFamily="微软雅黑" lineSpacing="multiple:1.6">
+        <p>双栈实现（本地开源 / 在线 API）· 向量 + BM25 混合检索 · Rerank 精排 · 回答可溯源、防幻觉</p>
+      </content>
+    </shape>
+    <shape type="text" topLeftX="90" topLeftY="470" width="400" height="30">
+      <content textType="caption" fontSize="13" color="rgba(140,145,155,1)" fontFamily="微软雅黑">
+        <p>RAG 综合实践大作业 · 2026.09</p>
+      </content>
+    </shape>
+  </data>
+  <note>
+    <content textType="body"><p>各位老师好，我汇报的项目是中信银行信用卡智能咨询助手。</p><p>这个项目不训练大模型，而是把银行的业务资料"外挂"给大模型，做一个回答准确、数字可查、不编造的智能客服。</p><p>下面我从背景、数据、技术方案、实验效果、演示和总结六个部分汇报。</p></content>
+  </note>
+</slide>
