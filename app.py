@@ -75,6 +75,18 @@ st.markdown("""
 <style>
 .stApp { background: #f5f5f5; }
 .user-bubble { background: #e60012; color: white; padding: 12px 18px; border-radius: 12px; margin: 8px 0 8px auto; max-width: 70%; display: block; }
+
+.quick-tag button {
+    background: #f5f5f5 !important;
+    border: 1px solid #e0e0e0 !important;
+    border-radius: 16px !important;
+    color: #333 !important;
+}
+
+.stButton button[kind="primary"] {
+    background: #e60012 !important;
+    color: white !important;
+}
 .bot-bubble { background: white; color: #333; padding: 16px 20px; border-radius: 12px; margin: 8px auto 8px 0; max-width: 75%; display: block; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
 </style>
 """, unsafe_allow_html=True)
@@ -165,12 +177,43 @@ else:
         if st.button("← 返回首页"):
             st.session_state.chat_history = []
             st.rerun()
+    with top_cols[2]:
+        if st.button("📋 来源"):
+            st.toast("来源：领用合约+收费价格表")
+
+    # 欢迎语
+    if len(st.session_state.chat_history) == 0:
+        cols = st.columns([1,8])
+        with cols[0]:
+            st.markdown("""
+            <div style="width:36px;height:36px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;margin-top:8px;box-shadow:0 1px 3px rgba(0,0,0,0.1)">🤖</div>
+            """, unsafe_allow_html=True)
+        with cols[1]:
+            st.markdown("""
+            <div class="bot-bubble">
+                您好，我是中信银行信用卡智能咨询助手 👋<br><br>
+                我只依据《领用合约》《收费价格表》等业务资料为您解答，数字有据可查。<br><br>
+                可咨询：激活、取现、最低还款、年费、账单等。
+            </div>
+            """, unsafe_allow_html=True)
 
     for idx, msg in enumerate(st.session_state.chat_history):
         if msg["role"] == "user":
-            st.markdown(f'<div class="user-bubble">{msg["content"]}</div>', unsafe_allow_html=True)
+            cols = st.columns([8,1])
+            with cols[0]:
+                st.markdown(f'<div class="user-bubble">{msg["content"]}</div>', unsafe_allow_html=True)
+            with cols[1]:
+                st.markdown("""
+                <div style="width:36px;height:36px;background:#e60012;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-size:14px;margin-top:8px">我</div>
+                """, unsafe_allow_html=True)
         else:
-            st.markdown(f'<div class="bot-bubble">{msg["content"]}</div>', unsafe_allow_html=True)
+            cols = st.columns([1,8])
+            with cols[0]:
+                st.markdown("""
+                <div style="width:36px;height:36px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;margin-top:8px;box-shadow:0 1px 3px rgba(0,0,0,0.1)">🤖</div>
+                """, unsafe_allow_html=True)
+            with cols[1]:
+                st.markdown(f'<div class="bot-bubble">{msg["content"]}</div>', unsafe_allow_html=True)
             cols = st.columns([1,1,1,6])
             if cols[0].button("📋 复制", key=f"copy_{idx}"):
                 st.toast("已复制")
@@ -185,22 +228,22 @@ else:
 
     st.markdown("---")
     st.markdown("**卡片服务**")
-    cols = st.columns(4)
     quick1 = ["卡到了怎么用", "挂失手续费", "年费怎么收", "补卡"]
+    cols = st.columns(len(quick1))
     for i, q in enumerate(quick1):
         if cols[i].button(q, key=f"k1_{i}"):
             st.session_state.pending_q = q
             st.rerun()
     st.markdown("**费用查询**")
-    cols = st.columns(4)
     quick2 = ["取现手续费与限额", "最低还款利息", "违约金", "分期手续费"]
+    cols = st.columns(len(quick2))
     for i, q in enumerate(quick2):
         if cols[i].button(q, key=f"k2_{i}"):
             st.session_state.pending_q = q
             st.rerun()
     st.markdown("**账单概念**")
-    cols = st.columns(4)
     quick3 = ["免息期", "补对账单", "有效期", "账单日"]
+    cols = st.columns(len(quick3))
     for i, q in enumerate(quick3):
         if cols[i].button(q, key=f"k3_{i}"):
             st.session_state.pending_q = q
@@ -211,6 +254,14 @@ else:
     if input_cols[1].button("🗑 清空"):
         st.session_state.chat_history = []
         st.rerun()
-    if input_cols[2].button("发送"):
+    if input_cols[2].button("发送", type="primary"):
         if q:
             ask(q)
+
+    st.markdown("---")
+    st.markdown("""
+    <div style="text-align:center;font-size:12px;color:#999">
+        以上信息依据《领用合约》《信用卡章程》及收费价格表整理，仅供参考，具体以中信银行官方公告为准。
+    </div>
+    """, unsafe_allow_html=True)
+
