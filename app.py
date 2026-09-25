@@ -101,8 +101,6 @@ div[data-testid="stHorizontalBlock"] button {
 
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
-if "input_q" not in st.session_state:
-    st.session_state.input_q = ""
 if "pending_q" not in st.session_state:
     st.session_state.pending_q = None
 
@@ -259,15 +257,13 @@ else:
             st.rerun()
 
     input_cols = st.columns([6,1,1])
-    q = input_cols[0].text_input("请输入您的问题", label_visibility="collapsed", key="input_q")
+    q = input_cols[0].text_input("请输入您的问题", label_visibility="collapsed")
     if input_cols[1].button("🗑 清空"):
         st.session_state.chat_history = []
-        st.session_state.input_q = ""
         st.rerun()
     if input_cols[2].button("发送", type="primary"):
         if q:
             ask(q)
-            st.session_state.input_q = ""
             st.rerun()
 
     st.markdown("---")
