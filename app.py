@@ -98,9 +98,14 @@ if st.session_state.pending_q:
     ask(q)
 
 if not st.session_state.chat_history:
+    # 顶部栏
     st.markdown("""
-    <div style="background:#e60012;padding:10px 20px;border-radius:24px;margin-bottom:20px">
-        <span style="color:white;opacity:0.9">💬 点击开始咨询信用卡问题 →</span>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;margin-bottom:10px">
+        <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:36px;height:36px;background:#e60012;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-weight:bold">中</div>
+            <b>中信银行 · 信用卡智能咨询助手</b>
+        </div>
+        <div>24小时客服热线 <b style="color:#e60012">4008895558</b></div>
     </div>
     """, unsafe_allow_html=True)
     col1, col2 = st.columns([1, 8])
@@ -234,6 +239,7 @@ else:
     if st.button("🗑 清空对话"):
         st.session_state.chat_history = []
         st.rerun()
+
 
 
 
