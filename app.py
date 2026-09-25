@@ -148,17 +148,22 @@ if not st.session_state.chat_history:
 
 else:
     # 顶部栏
-    st.markdown("""
-    <div class="chat-top">
-        <div style="display:flex;align-items:center;gap:10px">
-            <div style="width:32px;height:32px;background:#e60012;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-weight:bold">中</div>
-            <b>中信银行 · 信用卡智能咨询助手</b>
+    top_cols = st.columns([6,1,1])
+    with top_cols[0]:
+        st.markdown("""
+        <div class="chat-top">
+            <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:32px;height:32px;background:#e60012;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-weight:bold">中</div>
+                <b>中信银行 · 信用卡智能咨询助手</b>
+                <span style="margin-left:20px">24小时客服热线 <b style="color:#e60012">4008895558</b></span>
+            </div>
         </div>
-        <div style="display:flex;gap:16px;align-items:center">
-            <span>24小时客服热线 <b style="color:#e60012">4008895558</b></span>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
+    with top_cols[1]:
+        if st.button("🏠 返回"):
+            st.session_state.chat_history = []
+            st.rerun()
+
 
     # 欢迎语
     if len(st.session_state.chat_history) == 0:
@@ -214,16 +219,13 @@ else:
     q = st.chat_input("请输入您的问题")
     if q:
         ask(q)
+    if st.button("🗑 清空对话"):
+        st.session_state.chat_history = []
+        st.rerun()
 
-    cols = st.columns([6,1,1])
-    with cols[1]:
-        if st.button("🏠 返回"):
-            st.session_state.chat_history = []
-            st.rerun()
-    with cols[2]:
-        if st.button("🗑 清空"):
-            st.session_state.chat_history = []
-            st.rerun()
+
+
+
 
 
 
