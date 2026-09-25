@@ -77,9 +77,11 @@ st.markdown("""
 .stApp { background: #f5f5f5; }
 section[data-testid="stSidebar"] { background: #e60012; }
 section[data-testid="stSidebar"] * { color: white !important; }
-.chat-header { background: white; padding: 16px 24px; border-radius: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
-.quick-btn { background: white; border: 1px solid #eee; padding: 6px 14px; border-radius: 16px; display: inline-block; margin: 3px; font-size: 13px; cursor: pointer; }
-.quick-btn:hover { background: #e60012; color: white; }
+.user-bubble { background: #e60012; color: white; padding: 12px 18px; border-radius: 12px; margin: 8px 0 8px auto; max-width: 70%; display: block; }
+.bot-bubble { background: white; color: #333; padding: 16px 20px; border-radius: 12px; margin: 8px auto 8px 0; max-width: 75%; display: block; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+.bot-bubble p { margin: 4px 0; }
+.chat-top { background: white; padding: 14px 24px; border-radius: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+.quick-tag { background: white; border: 1px solid #e0e0e0; padding: 6px 14px; border-radius: 16px; display: inline-block; margin: 3px; font-size: 13px; cursor: pointer; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -146,7 +148,7 @@ if not st.session_state.chat_history:
 else:
     # 顶部栏
     st.markdown("""
-    <div class="chat-header">
+    <div class="chat-top">
         <div style="display:flex;align-items:center;gap:10px">
             <div style="width:32px;height:32px;background:#e60012;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-weight:bold">中</div>
             <b>中信银行 · 信用卡智能咨询助手</b>
@@ -156,32 +158,33 @@ else:
     """, unsafe_allow_html=True)
 
     # 欢迎语
-    if len(st.session_state.chat_history) == 1:
+    if len(st.session_state.chat_history) <= 1:
         st.markdown("""
-        <div style="background:white;padding:20px;border-radius:12px;margin:10px 0;max-width:70%">
+        <div class="bot-bubble">
             您好，我是中信银行信用卡智能咨询助手 🤖<br><br>
             我只依据《领用合约》《收费价格表》等业务资料为您解答，数字有据可查。<br><br>
             可咨询：激活、取现、最低还款、年费、账单等。
         </div>
         """, unsafe_allow_html=True)
 
-    for msg in st.session_state.chat_history:
-        with st.chat_message(msg["role"], avatar="👤" if msg["role"]=="user" else "🤖"):
-            st.write(msg["content"])
-            if msg["role"] == "assistant":
-                cols = st.columns([1,1,1,6])
-                if cols[0].button("📋 复制", key=f"copy_{id(msg)}"):
-                    st.write("已复制")
-                if cols[1].button("👍 赞", key=f"up_{id(msg)}"):
-                    st.write("感谢反馈")
-                if cols[2].button("👎 踩", key=f"down_{id(msg)}"):
-                    st.write("感谢反馈")
-                if "ctx" in msg:
-                    with st.expander("查看召回来源"):
-                        for i, c in enumerate(msg["ctx"]):
-                            st.write(f"{i+1}. [{c.get('topic','')}] {c['text'][:100]}...")
+    for idx, msg in enumerate(st.session_state.chat_history):
+        if msg["role"] == "user":
+            st.markdown(f'<div class="user-bubble">{msg["content"]}</div>', unsafe_allow_html=True)
+        else:
+            st.markdown(f'<div class="bot-bubble">{msg["content"]}</div>', unsafe_allow_html=True)
+            cols = st.columns([1,1,1,6])
+            if cols[0].button("📋 复制", key=f"copy_{idx}"):
+                st.toast("已复制")
+            if cols[1].button("👍 赞", key=f"up_{idx}"):
+                st.toast("感谢反馈")
+            if cols[2].button("👎 踩", key=f"down_{idx}"):
+                st.toast("感谢反馈")
+            if "ctx" in msg:
+                with st.expander("查看召回来源"):
+                    for i, c in enumerate(msg["ctx"]):
+                        st.write(f"{i+1}. [{c.get('topic','')}] {c['text'][:100]}...")
 
-    # 底部分类快捷按钮
+    # 底部分类
     st.markdown("---")
     st.markdown("**卡片服务**")
     cols = st.columns(4)
