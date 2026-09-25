@@ -14,8 +14,12 @@ def api_call(path, data):
         f"https://dashscope.aliyuncs.com/compatible-mode/v1/{path}",
         data=body,
         headers={"Authorization": "Bearer " + DASHSCOPE_KEY, "Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=60) as r:
-        return json.loads(r.read())
+    try:
+        with urllib.request.urlopen(req, timeout=60) as r:
+            return json.loads(r.read())
+    except urllib.error.HTTPError as e:
+        st.error(f"API错误: {e.code} - {e.read().decode()[:200]}")
+        raise
 
 def emb_online(texts):
     resp = api_call("embeddings", {"model": "text-embedding-v3", "input": texts})
@@ -39,23 +43,9 @@ def load_index():
 
 def retrieve(q):
     chunks, bm25, emb = load_index()
-    # BM25
     bm_scores = bm25.get_scores(q.split())
-    bm_rank = sorted(range(len(bm_scores)), key=lambda i: -bm_scores[i])
-    # 向量
-    qv = np.array(emb_online([q])[0])
-    qv = qv / (np.linalg.norm(qv) + 1e-8)
-    vec_scores = emb @ qv
-    vec_rank = sorted(range(len(vec_scores)), key=lambda i: -vec_scores[i])
-    # RRF融合
-    k = 60
-    rrf = {}
-    for rank, idx in enumerate(bm_rank):
-        rrf[idx] = rrf.get(idx, 0) + 1.0 / (k + rank + 1)
-    for rank, idx in enumerate(vec_rank):
-        rrf[idx] = rrf.get(idx, 0) + 1.0 / (k + rank + 1)
-    top = sorted(rrf.items(), key=lambda x: -x[1])[:4]
-    return [chunks[i] for i, _ in top]
+    top = sorted(range(len(bm_scores)), key=lambda i: -bm_scores[i])[:8]
+    return [chunks[i] for i in top]
 
 def ask(q):
     st.session_state.chat_history.append({"role": "user", "content": q})
@@ -156,3 +146,6 @@ else:
     if col2.button("🗑 清空对话"):
         st.session_state.chat_history = []
         st.rerun()
+
+
+
