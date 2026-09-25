@@ -83,6 +83,14 @@ st.markdown("""
     color: #333 !important;
 }
 
+
+div[data-testid="stHorizontalBlock"] button {
+    background: #f5f5f5 !important;
+    border: 1px solid #e0e0e0 !important;
+    border-radius: 16px !important;
+    color: #333 !important;
+    font-size: 13px !important;
+}
 .stButton button[kind="primary"] {
     background: #e60012 !important;
     color: white !important;
