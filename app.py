@@ -1,37 +1,61 @@
 ﻿# -*- coding: utf-8 -*-
 """Streamlit 完整版：中信银行信用卡智能咨询助手"""
-import os, json, urllib.request
+import os, json, math, urllib.request
+import numpy as np
 from rank_bm25 import BM25Okapi
 import streamlit as st
 
 DASHSCOPE_KEY = os.environ.get("DASHSCOPE_API_KEY", "")
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-def llm_chat(messages):
-    body = json.dumps({"model": "qwen-plus", "messages": messages, "temperature": 0}).encode()
+def api_call(path, data):
+    body = json.dumps(data).encode()
     req = urllib.request.Request(
-        "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+        f"https://dashscope.aliyuncs.com/compatible-mode/v1/{path}",
         data=body,
         headers={"Authorization": "Bearer " + DASHSCOPE_KEY, "Content-Type": "application/json"})
     with urllib.request.urlopen(req, timeout=60) as r:
-        resp = json.loads(r.read())
+        return json.loads(r.read())
+
+def emb_online(texts):
+    resp = api_call("embeddings", {"model": "text-embedding-v3", "input": texts})
+    return [d["embedding"] for d in resp["data"]]
+
+def llm_chat(messages):
+    resp = api_call("chat/completions", {"model": "qwen-plus", "messages": messages, "temperature": 0})
     return resp["choices"][0]["message"]["content"]
 
 @st.cache_resource
-def load_bm25():
+def load_index():
     chunks = []
     with open(os.path.join(BASE_DIR, "knowledge_base.jsonl"), encoding="utf-8") as f:
         for line in f:
             chunks.append(json.loads(line))
     texts = [c["text"] for c in chunks]
     bm25 = BM25Okapi([t.split() for t in texts])
-    return chunks, bm25
+    emb = np.array(emb_online(texts))
+    emb = emb / (np.linalg.norm(emb, axis=1, keepdims=True) + 1e-8)
+    return chunks, bm25, emb
 
 def retrieve(q):
-    chunks, bm25 = load_bm25()
-    scores = bm25.get_scores(q.split())
-    top = sorted(range(len(scores)), key=lambda i: -scores[i])[:4]
-    return [chunks[i] for i in top]
+    chunks, bm25, emb = load_index()
+    # BM25
+    bm_scores = bm25.get_scores(q.split())
+    bm_rank = sorted(range(len(bm_scores)), key=lambda i: -bm_scores[i])
+    # 向量
+    qv = np.array(emb_online([q])[0])
+    qv = qv / (np.linalg.norm(qv) + 1e-8)
+    vec_scores = emb @ qv
+    vec_rank = sorted(range(len(vec_scores)), key=lambda i: -vec_scores[i])
+    # RRF融合
+    k = 60
+    rrf = {}
+    for rank, idx in enumerate(bm_rank):
+        rrf[idx] = rrf.get(idx, 0) + 1.0 / (k + rank + 1)
+    for rank, idx in enumerate(vec_rank):
+        rrf[idx] = rrf.get(idx, 0) + 1.0 / (k + rank + 1)
+    top = sorted(rrf.items(), key=lambda x: -x[1])[:4]
+    return [chunks[i] for i, _ in top]
 
 def ask(q):
     st.session_state.chat_history.append({"role": "user", "content": q})
@@ -132,7 +156,3 @@ else:
     if col2.button("🗑 清空对话"):
         st.session_state.chat_history = []
         st.rerun()
-
-
-
-
