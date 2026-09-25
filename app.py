@@ -1,37 +1,64 @@
 ﻿# -*- coding: utf-8 -*-
 """Streamlit 完整版：中信银行信用卡智能咨询助手"""
-import os, json, urllib.request
+import os, json
+import requests
 from rank_bm25 import BM25Okapi
+import numpy as np
 import streamlit as st
 
 DASHSCOPE_KEY = os.environ.get("DASHSCOPE_API_KEY", "")
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+HEADERS = {"Authorization": "Bearer " + DASHSCOPE_KEY, "Content-Type": "application/json"}
+
+def emb_online(texts):
+    all_emb = []
+    for i in range(0, len(texts), 10):
+        batch = texts[i:i+10]
+        resp = requests.post(
+            "https://dashscope.aliyuncs.com/compatible-mode/v1/embeddings",
+            headers=HEADERS,
+            json={"model": "text-embedding-v3", "input": batch},
+            timeout=60)
+        data = resp.json()
+        all_emb.extend([d["embedding"] for d in data["data"]])
+    return all_emb
 
 def llm_chat(messages):
-    body = json.dumps({"model": "qwen-plus", "messages": messages, "temperature": 0}).encode()
-    req = urllib.request.Request(
+    resp = requests.post(
         "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
-        data=body,
-        headers={"Authorization": "Bearer " + DASHSCOPE_KEY, "Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=60) as r:
-        resp = json.loads(r.read())
-    return resp["choices"][0]["message"]["content"]
+        headers=HEADERS,
+        json={"model": "qwen-plus", "messages": messages, "temperature": 0},
+        timeout=60)
+    return resp.json()["choices"][0]["message"]["content"]
 
 @st.cache_resource
-def load_bm25():
+def load_index():
     chunks = []
     with open(os.path.join(BASE_DIR, "knowledge_base.jsonl"), encoding="utf-8") as f:
         for line in f:
             chunks.append(json.loads(line))
     texts = [c["text"] for c in chunks]
     bm25 = BM25Okapi([t.split() for t in texts])
-    return chunks, bm25
+    emb = np.array(emb_online(texts))
+    emb = emb / (np.linalg.norm(emb, axis=1, keepdims=True) + 1e-8)
+    return chunks, bm25, emb
 
 def retrieve(q):
-    chunks, bm25 = load_bm25()
-    scores = bm25.get_scores(q.split())
-    top = sorted(range(len(scores)), key=lambda i: -scores[i])[:8]
-    return [chunks[i] for i in top]
+    chunks, bm25, emb = load_index()
+    bm_scores = bm25.get_scores(q.split())
+    bm_rank = sorted(range(len(bm_scores)), key=lambda i: -bm_scores[i])
+    qv = np.array(emb_online([q])[0])
+    qv = qv / (np.linalg.norm(qv) + 1e-8)
+    vec_scores = emb @ qv
+    vec_rank = sorted(range(len(vec_scores)), key=lambda i: -vec_scores[i])
+    k = 60
+    rrf = {}
+    for rank, idx in enumerate(bm_rank):
+        rrf[idx] = rrf.get(idx, 0) + 1.0 / (k + rank + 1)
+    for rank, idx in enumerate(vec_rank):
+        rrf[idx] = rrf.get(idx, 0) + 1.0 / (k + rank + 1)
+    top = sorted(rrf.items(), key=lambda x: -x[1])[:8]
+    return [chunks[i] for i, _ in top]
 
 def ask(q):
     st.session_state.chat_history.append({"role": "user", "content": q})
@@ -49,7 +76,6 @@ st.markdown("""
 .stApp { background: #f5f5f5; }
 .user-bubble { background: #e60012; color: white; padding: 12px 18px; border-radius: 12px; margin: 8px 0 8px auto; max-width: 70%; display: block; }
 .bot-bubble { background: white; color: #333; padding: 16px 20px; border-radius: 12px; margin: 8px auto 8px 0; max-width: 75%; display: block; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-.chat-top { background: white; padding: 14px 20px; border-radius: 12px; margin-bottom: 16px; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -64,15 +90,21 @@ if st.session_state.pending_q:
     ask(q)
 
 if not st.session_state.chat_history:
-    # 顶部栏
     st.markdown("""
-    <div class="chat-top">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-            <div style="display:flex;align-items:center;gap:10px">
-                <div style="width:36px;height:36px;background:#e60012;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-weight:bold">中</div>
-                <b>中信银行 · 信用卡智能咨询助手</b>
+    <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;color:#666">
+        <span>欢迎使用中信银行信用卡智能服务</span>
+        <span>24小时客服热线 <b style="color:#e60012">4008895558</b></span>
+    </div>
+    """, unsafe_allow_html=True)
+    st.markdown("""
+    <div style="background:white;padding:14px 20px;border-radius:8px;margin-bottom:20px">
+        <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:40px;height:40px;background:#e60012;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:18px">中</div>
+            <div>
+                <b style="font-size:18px">中信银行</b>
+                <span style="font-size:11px;color:#999;margin-left:8px">CHINA CITIC BANK</span>
+                <span style="margin-left:16px;color:#333">信用卡·智能咨询助手</span>
             </div>
-            <div>24小时客服热线 <b style="color:#e60012">4008895558</b></div>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -109,15 +141,13 @@ if not st.session_state.chat_history:
             st.rerun()
 
 else:
-    # 最顶部小字
     st.markdown("""
     <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;color:#666">
         <span>欢迎使用中信银行信用卡智能服务</span>
         <span>24小时客服热线 <b style="color:#e60012">4008895558</b></span>
     </div>
     """, unsafe_allow_html=True)
-    # 顶部栏
-    top_cols = st.columns([6,1])
+    top_cols = st.columns([6,1,1])
     with top_cols[0]:
         st.markdown("""
         <div style="background:white;padding:14px 20px;border-radius:8px">
@@ -184,6 +214,3 @@ else:
     if input_cols[2].button("发送"):
         if q:
             ask(q)
-
-
-
