@@ -66,7 +66,7 @@ def ask(q):
     ctx = retrieve(q)
     ctx_text = "\n\n".join([f"[资料{i+1}] {c['text']}" for i, c in enumerate(ctx)])
     history_msgs = st.session_state.chat_history[-4:-1]
-    msgs = [{"role": "system", "content": "你是中信银行信用卡智能咨询助手。仔细阅读业务资料，从资料中找答案，数字必须原样引用，确实没有才说不清楚并引导拨打4008895558。"}] + history_msgs + [{"role": "user", "content": f"【业务资料】\n{ctx_text}\n\n【用户问题】{q}"}]
+    msgs = [{"role": "system", "content": "你是中信银行信用卡智能咨询助手。仔细阅读业务资料，从资料中找答案，数字必须原样引用，确实没有才说不清楚。"}] + history_msgs + [{"role": "user", "content": f"【业务资料】\n{ctx_text}\n\n【用户问题】{q}"}]
     ans = llm_chat(msgs)
     st.session_state.chat_history.append({"role": "assistant", "content": ans, "ctx": ctx})
 
@@ -77,6 +77,9 @@ st.markdown("""
 .stApp { background: #f5f5f5; }
 section[data-testid="stSidebar"] { background: #e60012; }
 section[data-testid="stSidebar"] * { color: white !important; }
+.chat-header { background: white; padding: 16px 24px; border-radius: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+.quick-btn { background: white; border: 1px solid #eee; padding: 6px 14px; border-radius: 16px; display: inline-block; margin: 3px; font-size: 13px; cursor: pointer; }
+.quick-btn:hover { background: #e60012; color: white; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -141,13 +144,66 @@ if not st.session_state.chat_history:
             st.rerun()
 
 else:
+    # 顶部栏
+    st.markdown("""
+    <div class="chat-header">
+        <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:32px;height:32px;background:#e60012;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-weight:bold">中</div>
+            <b>中信银行 · 信用卡智能咨询助手</b>
+        </div>
+        <div>24小时客服热线 <b style="color:#e60012">4008895558</b></div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # 欢迎语
+    if len(st.session_state.chat_history) == 1:
+        st.markdown("""
+        <div style="background:white;padding:20px;border-radius:12px;margin:10px 0;max-width:70%">
+            您好，我是中信银行信用卡智能咨询助手 🤖<br><br>
+            我只依据《领用合约》《收费价格表》等业务资料为您解答，数字有据可查。<br><br>
+            可咨询：激活、取现、最低还款、年费、账单等。
+        </div>
+        """, unsafe_allow_html=True)
+
     for msg in st.session_state.chat_history:
         with st.chat_message(msg["role"], avatar="👤" if msg["role"]=="user" else "🤖"):
             st.write(msg["content"])
-            if msg["role"] == "assistant" and "ctx" in msg:
-                with st.expander("查看召回来源"):
-                    for i, c in enumerate(msg["ctx"]):
-                        st.write(f"{i+1}. [{c.get('topic','')}] {c['text'][:100]}...")
+            if msg["role"] == "assistant":
+                cols = st.columns([1,1,1,6])
+                if cols[0].button("📋 复制", key=f"copy_{id(msg)}"):
+                    st.write("已复制")
+                if cols[1].button("👍 赞", key=f"up_{id(msg)}"):
+                    st.write("感谢反馈")
+                if cols[2].button("👎 踩", key=f"down_{id(msg)}"):
+                    st.write("感谢反馈")
+                if "ctx" in msg:
+                    with st.expander("查看召回来源"):
+                        for i, c in enumerate(msg["ctx"]):
+                            st.write(f"{i+1}. [{c.get('topic','')}] {c['text'][:100]}...")
+
+    # 底部分类快捷按钮
+    st.markdown("---")
+    st.markdown("**卡片服务**")
+    cols = st.columns(4)
+    quick1 = ["卡到了怎么用", "挂失手续费", "年费怎么收", "补卡"]
+    for i, q in enumerate(quick1):
+        if cols[i].button(q, key=f"k1_{i}"):
+            st.session_state.pending_q = q
+            st.rerun()
+    st.markdown("**费用查询**")
+    cols = st.columns(4)
+    quick2 = ["取现手续费与限额", "最低还款利息", "违约金", "分期手续费"]
+    for i, q in enumerate(quick2):
+        if cols[i].button(q, key=f"k2_{i}"):
+            st.session_state.pending_q = q
+            st.rerun()
+    st.markdown("**账单概念**")
+    cols = st.columns(4)
+    quick3 = ["免息期", "补对账单", "有效期", "账单日"]
+    for i, q in enumerate(quick3):
+        if cols[i].button(q, key=f"k3_{i}"):
+            st.session_state.pending_q = q
+            st.rerun()
 
     q = st.chat_input("请输入您的问题")
     if q:
@@ -160,5 +216,3 @@ else:
     if col2.button("🗑 清空对话"):
         st.session_state.chat_history = []
         st.rerun()
-
-
