@@ -96,13 +96,9 @@ if page_idx == 0:
     cols = st.columns(5)
     for i, (icon, title, desc, q_text) in enumerate(cards):
         with cols[i]:
-            st.markdown(f"""
-            <div class="brand-card">
-                <div class="icon">{icon}</div>
-                <div class="title">{title}</div>
-                <div class="desc">{desc}</div>
-            </div>
-            """, unsafe_allow_html=True)
+            if st.button(f"{icon}\n**{title}**\n{desc}", key=f"card{i}"):
+                st.session_state["start_chat"] = q_text
+                st.rerun()
             if st.button("点击咨询", key=f"card{i}"):
                 st.session_state["start_chat"] = q_text
                 st.rerun()
@@ -186,3 +182,5 @@ else:
     if st.button("🗑 清空对话"):
         st.session_state.chat_history = []
         st.rerun()
+
+
