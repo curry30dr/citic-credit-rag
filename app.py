@@ -58,7 +58,7 @@ def retrieve(q):
         rrf[idx] = rrf.get(idx, 0) + 1.0 / (k + rank + 1)
     for rank, idx in enumerate(vec_rank):
         rrf[idx] = rrf.get(idx, 0) + 1.0 / (k + rank + 1)
-    top = sorted(rrf.items(), key=lambda x: -x[1])[:6]
+    top = sorted(rrf.items(), key=lambda x: -x[1])[:8]
     return [chunks[i] for i, _ in top]
 
 def ask(q):
@@ -66,7 +66,7 @@ def ask(q):
     ctx = retrieve(q)
     ctx_text = "\n\n".join([f"[资料{i+1}] {c['text']}" for i, c in enumerate(ctx)])
     history_msgs = st.session_state.chat_history[-4:-1]
-    msgs = [{"role": "system", "content": "你是中信银行信用卡智能咨询助手。只依据提供的业务资料回答，数字必须原样引用，资料没有就说不清楚并引导拨打4008895558。"}] + history_msgs + [{"role": "user", "content": f"【业务资料】\n{ctx_text}\n\n【用户问题】{q}"}]
+    msgs = [{"role": "system", "content": "你是中信银行信用卡智能咨询助手。仔细阅读业务资料，从资料中找答案，数字必须原样引用，确实没有才说不清楚并引导拨打4008895558。"}] + history_msgs + [{"role": "user", "content": f"【业务资料】\n{ctx_text}\n\n【用户问题】{q}"}]
     ans = llm_chat(msgs)
     st.session_state.chat_history.append({"role": "assistant", "content": ans, "ctx": ctx})
 
@@ -160,4 +160,5 @@ else:
     if col2.button("🗑 清空对话"):
         st.session_state.chat_history = []
         st.rerun()
+
 
