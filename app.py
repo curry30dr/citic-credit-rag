@@ -190,7 +190,7 @@ else:
             st.toast("来源：领用合约+收费价格表")
 
     # 欢迎语
-    cols = st.columns([1,8])
+    cols = st.columns([0.5,9.5])
     with cols[0]:
         st.markdown("""
         <div style="width:36px;height:36px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;margin-top:8px;box-shadow:0 1px 3px rgba(0,0,0,0.1)">🤖</div>
@@ -206,7 +206,7 @@ else:
 
     for idx, msg in enumerate(st.session_state.chat_history):
         if msg["role"] == "user":
-            cols = st.columns([8,1])
+            cols = st.columns([9.5,0.5])
             with cols[0]:
                 st.markdown(f'<div class="user-bubble">{msg["content"]}</div>', unsafe_allow_html=True)
             with cols[1]:
@@ -214,7 +214,7 @@ else:
                 <div style="width:36px;height:36px;background:#e60012;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-size:14px;margin-top:8px">我</div>
                 """, unsafe_allow_html=True)
         else:
-            cols = st.columns([1,8])
+            cols = st.columns([0.5,9.5])
             with cols[0]:
                 st.markdown("""
                 <div style="width:36px;height:36px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;margin-top:8px;box-shadow:0 1px 3px rgba(0,0,0,0.1)">🤖</div>
@@ -257,13 +257,16 @@ else:
             st.rerun()
 
     input_cols = st.columns([6,1,1])
-    q = input_cols[0].text_input("请输入您的问题", label_visibility="collapsed")
+    q = input_cols[0].text_input("请输入您的问题", label_visibility="collapsed", key="input_q")
     if input_cols[1].button("🗑 清空"):
         st.session_state.chat_history = []
+        st.session_state.input_q = ""
         st.rerun()
     if input_cols[2].button("发送", type="primary"):
         if q:
             ask(q)
+            st.session_state.input_q = ""
+            st.rerun()
 
     st.markdown("---")
     st.markdown("""
