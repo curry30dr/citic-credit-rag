@@ -59,7 +59,8 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
     menu_items = ["💬 智能客服", "🔧 技术说明", "📤 进入对话"]
-    page_idx = st.radio("", range(3), format_func=lambda x: menu_items[x], label_visibility="collapsed")
+    default_page = st.session_state.get("page", 0)
+    page_idx = st.radio("", range(3), format_func=lambda x: menu_items[x], label_visibility="collapsed", index=default_page)
     st.markdown("---")
     st.markdown("24小时客服热线")
     st.markdown("**4008895558**")
@@ -160,4 +161,6 @@ else:
     if st.button("🗑 清空对话"):
         st.session_state.chat_history = []
         st.rerun()
+
+
 
