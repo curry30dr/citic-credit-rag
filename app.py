@@ -216,12 +216,37 @@ else:
             st.session_state.pending_q = q
             st.rerun()
 
+    # 底部分类
+    st.markdown("---")
+    st.markdown("**卡片服务**")
+    cols = st.columns(4)
+    quick1 = ["卡到了怎么用", "挂失手续费", "年费怎么收", "补卡"]
+    for i, q in enumerate(quick1):
+        if cols[i].button(q, key=f"k1_{i}"):
+            st.session_state.pending_q = q
+            st.rerun()
+    st.markdown("**费用查询**")
+    cols = st.columns(4)
+    quick2 = ["取现手续费与限额", "最低还款利息", "违约金", "分期手续费"]
+    for i, q in enumerate(quick2):
+        if cols[i].button(q, key=f"k2_{i}"):
+            st.session_state.pending_q = q
+            st.rerun()
+    st.markdown("**账单概念**")
+    cols = st.columns(4)
+    quick3 = ["免息期", "补对账单", "有效期", "账单日"]
+    for i, q in enumerate(quick3):
+        if cols[i].button(q, key=f"k3_{i}"):
+            st.session_state.pending_q = q
+            st.rerun()
+
     q = st.chat_input("请输入您的问题")
     if q:
         ask(q)
     if st.button("🗑 清空对话"):
         st.session_state.chat_history = []
         st.rerun()
+
 
 
 
