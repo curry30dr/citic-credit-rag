@@ -176,13 +176,14 @@ else:
             st.session_state.pending_q = q
             st.rerun()
 
-    input_cols = st.columns([6,1])
-    with input_cols[1]:
-        if st.button("🗑 清空"):
-            st.session_state.chat_history = []
-            st.rerun()
-    q = st.chat_input("请输入您的问题")
-    if q:
-        ask(q)
+    input_cols = st.columns([6,1,1])
+    q = input_cols[0].text_input("请输入您的问题", label_visibility="collapsed")
+    if input_cols[1].button("🗑 清空"):
+        st.session_state.chat_history = []
+        st.rerun()
+    if input_cols[2].button("发送"):
+        if q:
+            ask(q)
+
 
 
