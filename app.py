@@ -40,19 +40,14 @@ st.markdown("""
 .stApp { background: #f5f5f5; }
 section[data-testid="stSidebar"] { background: #e60012; }
 section[data-testid="stSidebar"] * { color: white !important; }
-.stButton > button { background: #e60012; color: white; border: none; border-radius: 24px; }
-.stButton > button:hover { background: #cc0010; }
-.brand-card { background: white; padding: 24px 16px; border-radius: 12px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin: 4px; }
-.brand-card .icon { font-size: 28px; }
-.brand-card .title { font-size: 15px; font-weight: bold; margin: 8px 0 4px 0; color: #333; }
-.brand-card .desc { font-size: 12px; color: #888; }
+.stButton > button { background: white; color: #333; border: none; border-radius: 12px; text-align: center; }
+.stButton > button:hover { background: #fff5f5; color: #e60012; }
 .faq-box { background: white; padding: 20px; border-radius: 12px; margin: 16px 0; }
 .faq-tag { background: #f5f5f5; padding: 6px 14px; border-radius: 16px; display: inline-block; margin: 4px; font-size: 13px; }
 .tip-bar { background: white; border-left: 4px solid #e60012; padding: 14px 20px; border-radius: 4px; margin: 16px 0; }
 </style>
 """, unsafe_allow_html=True)
 
-# 侧边栏
 with st.sidebar:
     st.markdown("""
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:30px">
@@ -70,7 +65,6 @@ with st.sidebar:
     st.markdown("**4008895558**")
 
 if page_idx == 0:
-    # 首页
     st.markdown("""
     <div style="background:#e60012;padding:10px 20px;border-radius:24px;margin-bottom:20px">
         <span style="color:white;opacity:0.9">💬 点击开始咨询信用卡问题 →</span>
@@ -99,9 +93,6 @@ if page_idx == 0:
             if st.button(f"{icon}\n**{title}**\n{desc}", key=f"card{i}"):
                 st.session_state["start_chat"] = q_text
                 st.rerun()
-            if st.button("点击咨询", key=f"card{i}"):
-                st.session_state["start_chat"] = q_text
-                st.rerun()
 
     st.markdown("""
     <div class="faq-box">
@@ -114,13 +105,6 @@ if page_idx == 0:
         <span class="faq-tag">优惠活动</span>
     </div>
     """, unsafe_allow_html=True)
-
-    quick = ["如何申请信用卡", "账单日和还款日", "逾期后果", "挂失手续费", "最低还款额怎么算", "优惠活动"]
-    cols = st.columns(6)
-    for i, qq in enumerate(quick):
-        if cols[i].button(qq, key=f"q{i}"):
-            st.session_state["start_chat"] = qq
-            st.rerun()
 
     st.markdown("""
     <div class="tip-bar">🤖 以上问题我可以帮您解答；如果需要人工服务，请拨打 <span style='color:#e60012;font-weight:bold'>24小时客服热线 4008895558</span></div>
@@ -135,7 +119,6 @@ elif page_idx == 1:
     - 精排：bge-reranker-base 交叉编码器
     - 生成：qwen-plus 大模型
     - 部署：Streamlit Cloud
-    
     **参数：**
     - chunk_size = 500字
     - overlap = 80字
@@ -144,7 +127,6 @@ elif page_idx == 1:
     """)
 
 else:
-    # 对话页
     st.markdown("""
     <div style="background:linear-gradient(135deg,#e60012,#ff4444);padding:16px;border-radius:12px;color:white;margin-bottom:16px">
     <h3 style="color:white;margin:0">中信银行智能客服</h3>
@@ -182,5 +164,3 @@ else:
     if st.button("🗑 清空对话"):
         st.session_state.chat_history = []
         st.rerun()
-
-
