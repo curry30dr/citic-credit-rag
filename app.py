@@ -33,6 +33,22 @@ def retrieve(q):
     top = sorted(range(len(scores)), key=lambda i: -scores[i])[:4]
     return [chunks[i] for i in top]
 
+def ask(q):
+    st.session_state.chat_history.append({"role": "user", "content": q})
+    with st.chat_message("user", avatar="👤"):
+        st.write(q)
+    with st.chat_message("assistant", avatar="🤖"):
+        ctx = retrieve(q)
+        ctx_text = "\n\n".join([f"[资料{i+1}] {c['text']}" for i, c in enumerate(ctx)])
+        history_msgs = st.session_state.chat_history[-4:-1]
+        msgs = [{"role": "system", "content": "你是中信银行信用卡智能咨询助手。只依据提供的业务资料回答，数字必须原样引用，资料没有就说不清楚并引导拨打4008895558。"}] + history_msgs + [{"role": "user", "content": f"【业务资料】\n{ctx_text}\n\n【用户问题】{q}"}]
+        ans = llm_chat(msgs)
+        st.write(ans)
+        with st.expander("查看召回来源"):
+            for i, c in enumerate(ctx):
+                st.write(f"{i+1}. [{c.get('topic','')}] {c['text'][:100]}...")
+        st.session_state.chat_history.append({"role": "assistant", "content": ans})
+
 st.set_page_config(page_title="中信信用卡智能咨询", page_icon="💳", layout="wide")
 
 st.markdown("""
@@ -60,6 +76,13 @@ with st.sidebar:
 
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
+if "pending_q" not in st.session_state:
+    st.session_state.pending_q = None
+
+if st.session_state.pending_q:
+    q = st.session_state.pending_q
+    st.session_state.pending_q = None
+    ask(q)
 
 if not st.session_state.chat_history:
     st.markdown("""
@@ -87,7 +110,7 @@ if not st.session_state.chat_history:
     for i, (icon, title, desc, q_text) in enumerate(cards):
         with cols[i]:
             if st.button(f"{icon} {title}\n{desc}", key=f"card{i}"):
-                st.session_state.chat_history.append({"role": "user", "content": q_text})
+                st.session_state.pending_q = q_text
                 st.rerun()
 
     st.markdown("**常见问题**")
@@ -95,7 +118,7 @@ if not st.session_state.chat_history:
     cols = st.columns(6)
     for i, faq in enumerate(faqs):
         if cols[i].button(faq, key=f"faq{i}"):
-            st.session_state.chat_history.append({"role": "user", "content": faq})
+            st.session_state.pending_q = faq
             st.rerun()
 
 else:
@@ -104,22 +127,8 @@ else:
             st.write(msg["content"])
 
     q = st.chat_input("请输入您的问题")
-
     if q:
-        st.session_state.chat_history.append({"role": "user", "content": q})
-        with st.chat_message("user", avatar="👤"):
-            st.write(q)
-        with st.chat_message("assistant", avatar="🤖"):
-            ctx = retrieve(q)
-            ctx_text = "\n\n".join([f"[资料{i+1}] {c['text']}" for i, c in enumerate(ctx)])
-            history_msgs = st.session_state.chat_history[-4:-1]
-            msgs = [{"role": "system", "content": "你是中信银行信用卡智能咨询助手。只依据提供的业务资料回答，数字必须原样引用，资料没有就说不清楚并引导拨打4008895558。"}] + history_msgs + [{"role": "user", "content": f"【业务资料】\n{ctx_text}\n\n【用户问题】{q}"}]
-            ans = llm_chat(msgs)
-            st.write(ans)
-            with st.expander("查看召回来源"):
-                for i, c in enumerate(ctx):
-                    st.write(f"{i+1}. [{c.get('topic','')}] {c['text'][:100]}...")
-            st.session_state.chat_history.append({"role": "assistant", "content": ans})
+        ask(q)
 
     if st.button("🗑 返回首页/清空对话"):
         st.session_state.chat_history = []
