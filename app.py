@@ -35,19 +35,12 @@ def retrieve(q):
 
 def ask(q):
     st.session_state.chat_history.append({"role": "user", "content": q})
-    with st.chat_message("user", avatar="👤"):
-        st.write(q)
-    with st.chat_message("assistant", avatar="🤖"):
-        ctx = retrieve(q)
-        ctx_text = "\n\n".join([f"[资料{i+1}] {c['text']}" for i, c in enumerate(ctx)])
-        history_msgs = st.session_state.chat_history[-4:-1]
-        msgs = [{"role": "system", "content": "你是中信银行信用卡智能咨询助手。只依据提供的业务资料回答，数字必须原样引用，资料没有就说不清楚并引导拨打4008895558。"}] + history_msgs + [{"role": "user", "content": f"【业务资料】\n{ctx_text}\n\n【用户问题】{q}"}]
-        ans = llm_chat(msgs)
-        st.write(ans)
-        with st.expander("查看召回来源"):
-            for i, c in enumerate(ctx):
-                st.write(f"{i+1}. [{c.get('topic','')}] {c['text'][:100]}...")
-        st.session_state.chat_history.append({"role": "assistant", "content": ans})
+    ctx = retrieve(q)
+    ctx_text = "\n\n".join([f"[资料{i+1}] {c['text']}" for i, c in enumerate(ctx)])
+    history_msgs = st.session_state.chat_history[-4:-1]
+    msgs = [{"role": "system", "content": "你是中信银行信用卡智能咨询助手。只依据提供的业务资料回答，数字必须原样引用，资料没有就说不清楚并引导拨打4008895558。"}] + history_msgs + [{"role": "user", "content": f"【业务资料】\n{ctx_text}\n\n【用户问题】{q}"}]
+    ans = llm_chat(msgs)
+    st.session_state.chat_history.append({"role": "assistant", "content": ans, "ctx": ctx})
 
 st.set_page_config(page_title="中信信用卡智能咨询", page_icon="💳", layout="wide")
 
@@ -56,8 +49,6 @@ st.markdown("""
 .stApp { background: #f5f5f5; }
 section[data-testid="stSidebar"] { background: #e60012; }
 section[data-testid="stSidebar"] * { color: white !important; }
-.stButton > button { background: white; color: #333; border: none; border-radius: 12px; text-align: center; }
-.stButton > button:hover { background: #fff5f5; color: #e60012; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -125,11 +116,23 @@ else:
     for msg in st.session_state.chat_history:
         with st.chat_message(msg["role"], avatar="👤" if msg["role"]=="user" else "🤖"):
             st.write(msg["content"])
+            if msg["role"] == "assistant" and "ctx" in msg:
+                with st.expander("查看召回来源"):
+                    for i, c in enumerate(msg["ctx"]):
+                        st.write(f"{i+1}. [{c.get('topic','')}] {c['text'][:100]}...")
 
     q = st.chat_input("请输入您的问题")
     if q:
         ask(q)
 
-    if st.button("🗑 返回首页/清空对话"):
+    col1, col2 = st.columns(2)
+    if col1.button("🏠 返回首页"):
         st.session_state.chat_history = []
         st.rerun()
+    if col2.button("🗑 清空对话"):
+        st.session_state.chat_history = []
+        st.rerun()
+
+
+
+
