@@ -94,17 +94,13 @@ if page_idx == 0:
                 st.session_state["start_chat"] = q_text
                 st.rerun()
 
-    st.markdown("""
-    <div class="faq-box">
-        <b>常见问题</b><br>
-        <span class="faq-tag">如何申请信用卡</span>
-        <span class="faq-tag">账单日和还款日</span>
-        <span class="faq-tag">逾期后果</span>
-        <span class="faq-tag">挂失手续费</span>
-        <span class="faq-tag">最低还款额怎么算</span>
-        <span class="faq-tag">优惠活动</span>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown("**常见问题**")
+    faqs = ["如何申请信用卡", "账单日和还款日", "逾期后果", "挂失手续费", "最低还款额怎么算", "优惠活动"]
+    cols = st.columns(6)
+    for i, faq in enumerate(faqs):
+        if cols[i].button(faq, key=f"faq{i}"):
+            st.session_state["start_chat"] = faq
+            st.rerun()
 
     st.markdown("""
     <div class="tip-bar">🤖 以上问题我可以帮您解答；如果需要人工服务，请拨打 <span style='color:#e60012;font-weight:bold'>24小时客服热线 4008895558</span></div>
@@ -164,3 +160,4 @@ else:
     if st.button("🗑 清空对话"):
         st.session_state.chat_history = []
         st.rerun()
+
