@@ -182,20 +182,19 @@ else:
             st.toast("来源：领用合约+收费价格表")
 
     # 欢迎语
-    if len(st.session_state.chat_history) == 0:
-        cols = st.columns([1,8])
-        with cols[0]:
-            st.markdown("""
-            <div style="width:36px;height:36px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;margin-top:8px;box-shadow:0 1px 3px rgba(0,0,0,0.1)">🤖</div>
-            """, unsafe_allow_html=True)
-        with cols[1]:
-            st.markdown("""
-            <div class="bot-bubble">
-                您好，我是中信银行信用卡智能咨询助手 👋<br><br>
-                我只依据《领用合约》《收费价格表》等业务资料为您解答，数字有据可查。<br><br>
-                可咨询：激活、取现、最低还款、年费、账单等。
-            </div>
-            """, unsafe_allow_html=True)
+    cols = st.columns([1,8])
+    with cols[0]:
+        st.markdown("""
+        <div style="width:36px;height:36px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;margin-top:8px;box-shadow:0 1px 3px rgba(0,0,0,0.1)">🤖</div>
+        """, unsafe_allow_html=True)
+    with cols[1]:
+        st.markdown("""
+        <div class="bot-bubble">
+            您好，我是中信银行信用卡智能咨询助手 👋<br><br>
+            我只依据《领用合约》《收费价格表》等业务资料为您解答，数字有据可查。<br><br>
+            可咨询：激活、取现、最低还款、年费、账单等。
+        </div>
+        """, unsafe_allow_html=True)
 
     for idx, msg in enumerate(st.session_state.chat_history):
         if msg["role"] == "user":
@@ -215,16 +214,16 @@ else:
             with cols[1]:
                 st.markdown(f'<div class="bot-bubble">{msg["content"]}</div>', unsafe_allow_html=True)
             cols = st.columns([1,1,1,6])
-            if cols[0].button("📋 复制", key=f"copy_{idx}"):
+            if cols[0].button("📋", key=f"copy_{idx}"):
                 st.toast("已复制")
-            if cols[1].button("👍 赞", key=f"up_{idx}"):
+            if cols[1].button("👍", key=f"up_{idx}"):
                 st.toast("感谢反馈")
-            if cols[2].button("👎 踩", key=f"down_{idx}"):
+            if cols[2].button("👎", key=f"down_{idx}"):
                 st.toast("感谢反馈")
             if "ctx" in msg:
                 with st.expander("查看召回来源"):
-                    for i, c in enumerate(msg["ctx"]):
-                        st.write(f"{i+1}. [{c.get('topic','')}] {c['text'][:100]}...")
+                    for i, cc in enumerate(msg["ctx"]):
+                        st.write(f"{i+1}. [{cc.get('topic','')}] {cc['text'][:100]}...")
 
     st.markdown("---")
     st.markdown("**卡片服务**")
