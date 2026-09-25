@@ -109,20 +109,30 @@ if not st.session_state.chat_history:
             st.rerun()
 
 else:
+    # 最顶部小字
+    st.markdown("""
+    <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px;color:#666">
+        <span>欢迎使用中信银行信用卡智能服务</span>
+        <span>24小时客服热线 <b style="color:#e60012">4008895558</b></span>
+    </div>
+    """, unsafe_allow_html=True)
     # 顶部栏
     top_cols = st.columns([6,1])
     with top_cols[0]:
         st.markdown("""
-        <div class="chat-top">
-            <div style="display:flex;align-items:center;gap:10px">
-                <div style="width:32px;height:32px;background:#e60012;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-weight:bold">中</div>
-                <b>中信银行 · 信用卡智能咨询助手</b>
-                <span style="margin-left:20px">24小时客服热线 <b style="color:#e60012">4008895558</b></span>
+        <div style="background:white;padding:14px 20px;border-radius:8px">
+            <div style="display:flex;align-items:center;gap:12px">
+                <div style="width:40px;height:40px;background:#e60012;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:18px">中</div>
+                <div>
+                    <b style="font-size:18px">中信银行</b>
+                    <span style="font-size:11px;color:#999;margin-left:8px">CHINA CITIC BANK</span>
+                    <span style="margin-left:16px;color:#333">信用卡·智能咨询助手</span>
+                </div>
             </div>
         </div>
         """, unsafe_allow_html=True)
     with top_cols[1]:
-        if st.button("🏠 返回"):
+        if st.button("← 返回首页"):
             st.session_state.chat_history = []
             st.rerun()
 
@@ -172,3 +182,4 @@ else:
     if st.button("🗑 清空对话"):
         st.session_state.chat_history = []
         st.rerun()
+
