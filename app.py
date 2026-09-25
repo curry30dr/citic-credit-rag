@@ -1,26 +1,11 @@
 ﻿# -*- coding: utf-8 -*-
 """Streamlit 完整版：中信银行信用卡智能咨询助手"""
 import os, json, urllib.request
-import numpy as np
 from rank_bm25 import BM25Okapi
 import streamlit as st
 
 DASHSCOPE_KEY = os.environ.get("DASHSCOPE_API_KEY", "")
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-def emb_online(texts):
-    all_emb = []
-    for i in range(0, len(texts), 10):
-        batch = texts[i:i+10]
-        body = json.dumps({"model": "text-embedding-v3", "input": batch}).encode()
-        req = urllib.request.Request(
-            "https://dashscope.aliyuncs.com/compatible-mode/v1/embeddings",
-            data=body,
-            headers={"Authorization": "Bearer " + DASHSCOPE_KEY, "Content-Type": "application/json"})
-        with urllib.request.urlopen(req, timeout=60) as r:
-            resp = json.loads(r.read())
-        all_emb.extend([d["embedding"] for d in resp["data"]])
-    return all_emb
 
 def llm_chat(messages):
     body = json.dumps({"model": "qwen-plus", "messages": messages, "temperature": 0}).encode()
@@ -33,33 +18,20 @@ def llm_chat(messages):
     return resp["choices"][0]["message"]["content"]
 
 @st.cache_resource
-def load_index():
+def load_bm25():
     chunks = []
     with open(os.path.join(BASE_DIR, "knowledge_base.jsonl"), encoding="utf-8") as f:
         for line in f:
             chunks.append(json.loads(line))
     texts = [c["text"] for c in chunks]
     bm25 = BM25Okapi([t.split() for t in texts])
-    emb = np.array(emb_online(texts))
-    emb = emb / (np.linalg.norm(emb, axis=1, keepdims=True) + 1e-8)
-    return chunks, bm25, emb
+    return chunks, bm25
 
 def retrieve(q):
-    chunks, bm25, emb = load_index()
-    bm_scores = bm25.get_scores(q.split())
-    bm_rank = sorted(range(len(bm_scores)), key=lambda i: -bm_scores[i])
-    qv = np.array(emb_online([q])[0])
-    qv = qv / (np.linalg.norm(qv) + 1e-8)
-    vec_scores = emb @ qv
-    vec_rank = sorted(range(len(vec_scores)), key=lambda i: -vec_scores[i])
-    k = 60
-    rrf = {}
-    for rank, idx in enumerate(bm_rank):
-        rrf[idx] = rrf.get(idx, 0) + 1.0 / (k + rank + 1)
-    for rank, idx in enumerate(vec_rank):
-        rrf[idx] = rrf.get(idx, 0) + 1.0 / (k + rank + 1)
-    top = sorted(rrf.items(), key=lambda x: -x[1])[:8]
-    return [chunks[i] for i, _ in top]
+    chunks, bm25 = load_bm25()
+    scores = bm25.get_scores(q.split())
+    top = sorted(range(len(scores)), key=lambda i: -scores[i])[:8]
+    return [chunks[i] for i in top]
 
 def ask(q):
     st.session_state.chat_history.append({"role": "user", "content": q})
@@ -75,17 +47,11 @@ st.set_page_config(page_title="中信信用卡智能咨询", page_icon="💳", l
 st.markdown("""
 <style>
 .stApp { background: #f5f5f5; }
-section[data-testid="stSidebar"] { background: #e60012; }
-section[data-testid="stSidebar"] * { color: white !important; }
-.main .block-container { padding-top: 1rem; max-width: 1200px; }
 .user-bubble { background: #e60012; color: white; padding: 12px 18px; border-radius: 12px; margin: 8px 0 8px auto; max-width: 70%; display: block; }
 .bot-bubble { background: white; color: #333; padding: 16px 20px; border-radius: 12px; margin: 8px auto 8px 0; max-width: 75%; display: block; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-.bot-bubble p { margin: 4px 0; }
-.chat-top { background: white; padding: 14px 24px; border-radius: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
-.quick-tag { background: white; border: 1px solid #e0e0e0; padding: 6px 14px; border-radius: 16px; display: inline-block; margin: 3px; font-size: 13px; cursor: pointer; }
+.chat-top { background: white; padding: 14px 20px; border-radius: 12px; margin-bottom: 16px; }
 </style>
 """, unsafe_allow_html=True)
-
 
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
@@ -100,14 +66,17 @@ if st.session_state.pending_q:
 if not st.session_state.chat_history:
     # 顶部栏
     st.markdown("""
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;margin-bottom:10px">
-        <div style="display:flex;align-items:center;gap:10px">
-            <div style="width:36px;height:36px;background:#e60012;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-weight:bold">中</div>
-            <b>中信银行 · 信用卡智能咨询助手</b>
+    <div class="chat-top">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="display:flex;align-items:center;gap:10px">
+                <div style="width:36px;height:36px;background:#e60012;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-weight:bold">中</div>
+                <b>中信银行 · 信用卡智能咨询助手</b>
+            </div>
+            <div>24小时客服热线 <b style="color:#e60012">4008895558</b></div>
         </div>
-        <div>24小时客服热线 <b style="color:#e60012">4008895558</b></div>
     </div>
     """, unsafe_allow_html=True)
+
     col1, col2 = st.columns([1, 8])
     with col1:
         st.markdown("""
@@ -141,7 +110,7 @@ if not st.session_state.chat_history:
 
 else:
     # 顶部栏
-    top_cols = st.columns([6,1,1])
+    top_cols = st.columns([6,1])
     with top_cols[0]:
         st.markdown("""
         <div class="chat-top">
@@ -156,17 +125,6 @@ else:
         if st.button("🏠 返回"):
             st.session_state.chat_history = []
             st.rerun()
-
-
-    # 欢迎语
-    if len(st.session_state.chat_history) == 0:
-        st.markdown("""
-        <div class="bot-bubble">
-            您好，我是中信银行信用卡智能咨询助手 🤖<br><br>
-            我只依据《领用合约》《收费价格表》等业务资料为您解答，数字有据可查。<br><br>
-            可咨询：激活、取现、最低还款、年费、账单等。
-        </div>
-        """, unsafe_allow_html=True)
 
     for idx, msg in enumerate(st.session_state.chat_history):
         if msg["role"] == "user":
@@ -185,31 +143,6 @@ else:
                     for i, c in enumerate(msg["ctx"]):
                         st.write(f"{i+1}. [{c.get('topic','')}] {c['text'][:100]}...")
 
-    # 底部分类
-    st.markdown("---")
-    st.markdown("**卡片服务**")
-    cols = st.columns(4)
-    quick1 = ["卡到了怎么用", "挂失手续费", "年费怎么收", "补卡"]
-    for i, q in enumerate(quick1):
-        if cols[i].button(q, key=f"k1_{i}"):
-            st.session_state.pending_q = q
-            st.rerun()
-    st.markdown("**费用查询**")
-    cols = st.columns(4)
-    quick2 = ["取现手续费与限额", "最低还款利息", "违约金", "分期手续费"]
-    for i, q in enumerate(quick2):
-        if cols[i].button(q, key=f"k2_{i}"):
-            st.session_state.pending_q = q
-            st.rerun()
-    st.markdown("**账单概念**")
-    cols = st.columns(4)
-    quick3 = ["免息期", "补对账单", "有效期", "账单日"]
-    for i, q in enumerate(quick3):
-        if cols[i].button(q, key=f"k3_{i}"):
-            st.session_state.pending_q = q
-            st.rerun()
-
-    # 底部分类
     st.markdown("---")
     st.markdown("**卡片服务**")
     cols = st.columns(4)
@@ -239,15 +172,3 @@ else:
     if st.button("🗑 清空对话"):
         st.session_state.chat_history = []
         st.rerun()
-
-
-
-
-
-
-
-
-
-
-
-
