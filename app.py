@@ -77,7 +77,7 @@ st.markdown("""
 .stApp { background: #f5f5f5; }
 section[data-testid="stSidebar"] { background: #e60012; }
 section[data-testid="stSidebar"] * { color: white !important; }
-.main .block-container { padding-top: 1rem; }
+.main .block-container { padding-top: 1rem; max-width: 1200px; }
 .user-bubble { background: #e60012; color: white; padding: 12px 18px; border-radius: 12px; margin: 8px 0 8px auto; max-width: 70%; display: block; }
 .bot-bubble { background: white; color: #333; padding: 16px 20px; border-radius: 12px; margin: 8px auto 8px 0; max-width: 75%; display: block; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
 .bot-bubble p { margin: 4px 0; }
@@ -86,18 +86,6 @@ section[data-testid="stSidebar"] * { color: white !important; }
 </style>
 """, unsafe_allow_html=True)
 
-with st.sidebar:
-    st.markdown("""
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:30px">
-        <div style="width:40px;height:40px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#e60012;font-weight:bold;font-size:18px">中</div>
-        <div>
-            <div style="font-weight:bold;font-size:16px">中信银行</div>
-            <div style="font-size:11px;opacity:0.8">CHINA CITIC BANK</div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-    st.markdown("24小时客服热线")
-    st.markdown("**4008895558**")
 
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
@@ -246,6 +234,8 @@ else:
     if st.button("🗑 清空对话"):
         st.session_state.chat_history = []
         st.rerun()
+
+
 
 
 
