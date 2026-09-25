@@ -221,7 +221,7 @@ else:
                 """, unsafe_allow_html=True)
             with cols[1]:
                 st.markdown(f'<div class="bot-bubble">{msg["content"]}</div>', unsafe_allow_html=True)
-            cols = st.columns([1,1,1,6])
+            cols = st.columns([1,1,1,10])
             if cols[0].button("📋", key=f"copy_{idx}"):
                 st.toast("已复制")
             if cols[1].button("👍", key=f"up_{idx}"):
