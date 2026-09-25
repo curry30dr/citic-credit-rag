@@ -77,6 +77,7 @@ st.markdown("""
 .stApp { background: #f5f5f5; }
 section[data-testid="stSidebar"] { background: #e60012; }
 section[data-testid="stSidebar"] * { color: white !important; }
+.main .block-container { padding-top: 1rem; }
 .user-bubble { background: #e60012; color: white; padding: 12px 18px; border-radius: 12px; margin: 8px 0 8px auto; max-width: 70%; display: block; }
 .bot-bubble { background: white; color: #333; padding: 16px 20px; border-radius: 12px; margin: 8px auto 8px 0; max-width: 75%; display: block; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
 .bot-bubble p { margin: 4px 0; }
@@ -153,12 +154,14 @@ else:
             <div style="width:32px;height:32px;background:#e60012;border-radius:50%;color:white;display:flex;align-items:center;justify-content:center;font-weight:bold">中</div>
             <b>中信银行 · 信用卡智能咨询助手</b>
         </div>
-        <div>24小时客服热线 <b style="color:#e60012">4008895558</b></div>
+        <div style="display:flex;gap:16px;align-items:center">
+            <span>24小时客服热线 <b style="color:#e60012">4008895558</b></span>
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
     # 欢迎语
-    if len(st.session_state.chat_history) <= 1:
+    if len(st.session_state.chat_history) == 0:
         st.markdown("""
         <div class="bot-bubble">
             您好，我是中信银行信用卡智能咨询助手 🤖<br><br>
@@ -212,10 +215,16 @@ else:
     if q:
         ask(q)
 
-    col1, col2 = st.columns(2)
-    if col1.button("🏠 返回首页"):
-        st.session_state.chat_history = []
-        st.rerun()
-    if col2.button("🗑 清空对话"):
-        st.session_state.chat_history = []
-        st.rerun()
+    cols = st.columns([6,1,1])
+    with cols[1]:
+        if st.button("🏠 返回"):
+            st.session_state.chat_history = []
+            st.rerun()
+    with cols[2]:
+        if st.button("🗑 清空"):
+            st.session_state.chat_history = []
+            st.rerun()
+
+
+
+
