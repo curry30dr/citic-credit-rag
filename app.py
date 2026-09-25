@@ -101,6 +101,8 @@ div[data-testid="stHorizontalBlock"] button {
 
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
+if "input_q" not in st.session_state:
+    st.session_state.input_q = ""
 if "pending_q" not in st.session_state:
     st.session_state.pending_q = None
 
