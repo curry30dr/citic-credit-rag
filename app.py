@@ -35,40 +35,46 @@ def retrieve(q):
 
 st.set_page_config(page_title="中信信用卡智能咨询", page_icon="💳", layout="wide")
 
-# 品牌风格
 st.markdown("""
 <style>
 .stApp { background: #f5f5f5; }
 section[data-testid="stSidebar"] { background: #e60012; }
 section[data-testid="stSidebar"] * { color: white !important; }
-.stButton > button { background: #e60012; color: white; border: none; border-radius: 8px; }
+.stButton > button { background: #e60012; color: white; border: none; border-radius: 20px; }
 .stButton > button:hover { background: #cc0010; }
-.card { background: white; padding: 20px; border-radius: 12px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-.card h3 { margin: 10px 0 5px 0; }
-.card p { margin: 0; opacity: 0.7; }
+.topbar { background: #e60012; padding: 12px 24px; border-radius: 24px; color: white; margin-bottom: 20px; }
+.card { background: white; padding: 24px; border-radius: 12px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin: 4px; }
+.card .icon { font-size: 32px; }
+.card .title { font-size: 16px; font-weight: bold; margin: 8px 0 4px 0; }
+.card .desc { font-size: 12px; color: #888; }
+.tip { border-left: 4px solid #e60012; background: white; padding: 16px; border-radius: 4px; margin: 16px 0; }
 </style>
 """, unsafe_allow_html=True)
 
-# 侧边栏
 with st.sidebar:
-    st.markdown("### 中信银行")
-    st.markdown("CHINA CITIC BANK")
-    st.markdown("---")
-    page = st.radio("", ["智能客服", "技术说明", "关于我们"])
+    st.markdown("""
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+        <div style="width:40px;height:40px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#e60012;font-weight:bold">中</div>
+        <div>
+            <div style="font-weight:bold">中信银行</div>
+            <div style="font-size:12px;opacity:0.8">CHINA CITIC BANK</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    page = st.radio("", ["智能客服", "技术说明", "进入对话"], label_visibility="collapsed")
     st.markdown("---")
     st.markdown("24小时客服热线")
     st.markdown("**4008895558**")
 
 if page == "智能客服":
-    # 顶栏
-    st.markdown("""
-    <div style="background:linear-gradient(135deg,#e60012,#ff4444);padding:20px;border-radius:12px;color:white;margin-bottom:20px">
-    <h2 style="color:white;margin:0">您好，我是中信银行智能客服</h2>
-    <p style="opacity:0.9;margin:8px 0 0">我可以为您解答信用卡相关问题，依据领用合约与收费价格表，数字有据可查</p>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown('<div class="topbar">💬 点击开始咨询信用卡问题 →</div>', unsafe_allow_html=True)
+    col1, col2 = st.columns([1, 6])
+    with col1:
+        st.markdown('<div style="width:60px;height:60px;background:linear-gradient(135deg,#e60012,#ff4444);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:32px">🤖</div>', unsafe_allow_html=True)
+    with col2:
+        st.markdown('### 您好，我是中信银行**<span style="color:#e60012">智能客服</span>**', unsafe_allow_html=True)
+        st.caption("我可以为您解答信用卡相关问题，依据领用合约与收费价格表，数字有据可查")
 
-    # 品牌卡片
     cards = [
         ("💳", "取现手续费", "境内外取现费率"),
         ("🌍", "境外取现", "每日/年度限额"),
@@ -80,12 +86,12 @@ if page == "智能客服":
     card_q = None
     for i, (icon, title, desc) in enumerate(cards):
         with cols[i]:
-            if st.button(f"{icon}\n**{title}**\n{desc}", key=f"card{i}"):
+            st.markdown(f'<div class="card"><div class="icon">{icon}</div><div class="title">{title}</div><div class="desc">{desc}</div></div>', unsafe_allow_html=True)
+            if st.button("选择", key=f"card{i}", help=title):
                 card_q = title
-    st.markdown("---")
 
-    # 常见问题
-    st.markdown("**常见问题：**")
+    st.markdown("---")
+    st.markdown("**常见问题**")
     quick = ["如何申请信用卡", "账单日和还款日", "逾期后果", "挂失手续费", "最低还款额怎么算", "优惠活动"]
     cols = st.columns(3)
     q = card_q
@@ -93,7 +99,6 @@ if page == "智能客服":
         if cols[i%3].button(qq, key=f"q{i}"):
             q = qq
 
-    # 对话历史
     if "chat_history" not in st.session_state:
         st.session_state.chat_history = []
     for msg in st.session_state.chat_history:
@@ -119,8 +124,7 @@ if page == "智能客服":
                     st.write(f"{i+1}. [{c.get('topic','')}] {c['text'][:100]}...")
             st.session_state.chat_history.append({"role": "assistant", "content": ans})
 
-    st.markdown("---")
-    st.markdown("🤖 以上问题我可以帮您解答；如果需要人工服务，请拨打 **24小时客服热线 4008895558**")
+    st.markdown('<div class="tip">🤖 以上问题我可以帮您解答；如果需要人工服务，请拨打 <span style="color:#e60012;font-weight:bold">24小时客服热线 4008895558</span></div>', unsafe_allow_html=True)
     st.caption("以上信息依据《领用合约》《信用卡章程》及收费价格整理，仅供参考，具体以中信银行官方公告为准")
 
 elif page == "技术说明":
@@ -140,5 +144,4 @@ elif page == "技术说明":
     """)
 
 else:
-    st.title("关于我们")
-    st.markdown("中信银行信用卡智能咨询助手，为您提供7×24小时信用卡业务咨询服务。")
+    st.title("进入对话")
