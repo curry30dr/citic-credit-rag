@@ -58,7 +58,7 @@ def retrieve(q):
         rrf[idx] = rrf.get(idx, 0) + 1.0 / (k + rank + 1)
     for rank, idx in enumerate(vec_rank):
         rrf[idx] = rrf.get(idx, 0) + 1.0 / (k + rank + 1)
-    top = sorted(rrf.items(), key=lambda x: -x[1])[:4]
+    top = sorted(rrf.items(), key=lambda x: -x[1])[:6]
     return [chunks[i] for i, _ in top]
 
 def ask(q):
@@ -160,3 +160,4 @@ else:
     if col2.button("🗑 清空对话"):
         st.session_state.chat_history = []
         st.rerun()
+
