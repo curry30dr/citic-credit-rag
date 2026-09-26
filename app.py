@@ -74,7 +74,7 @@ st.set_page_config(page_title="中信信用卡智能咨询", page_icon="💳", l
 st.markdown("""
 <style>
 .stApp { background: #f5f5f5; }
-.user-bubble { background: #e60012; color: white; padding: 12px 18px; border-radius: 12px; margin: 8px 0 8px auto; max-width: 70%; display: block; }
+.user-bubble { background: linear-gradient(135deg,#e60012,#c7000b); color: white; padding: 10px 14px; border-radius: 14px; border-bottom-right-radius: 4px; margin: 8px 0 8px auto; width: fit-content; max-width: 100%; display: table; font-size: 14px; line-height: 1.7; }
 
 .quick-tag button {
     background: #f5f5f5 !important;
@@ -95,7 +95,7 @@ div[data-testid="stHorizontalBlock"] button {
     background: #e60012 !important;
     color: white !important;
 }
-.bot-bubble { background: white; color: #333; padding: 16px 20px; border-radius: 12px; margin: 8px auto 8px 0; max-width: 75%; display: block; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+.bot-bubble { background: white; color: #2b2f38; padding: 10px 14px; border-radius: 14px; border-bottom-left-radius: 4px; margin: 8px auto 8px 0; width: fit-content; max-width: 100%; display: table; border: 1px solid #e8eaef; font-size: 14px; line-height: 1.7; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -272,4 +272,5 @@ else:
         以上信息依据《领用合约》《信用卡章程》及收费价格表整理，仅供参考，具体以中信银行官方公告为准。
     </div>
     """, unsafe_allow_html=True)
+
 
