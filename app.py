@@ -105,7 +105,12 @@ div[data-testid="stHorizontalBlock"] button {
 .src-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3); z-index: 9998; display: none; }
 .src-overlay.show { display: block; }
 .src-card { background: white; border: 1px solid #e8eaef; border-radius: 10px; padding: 12px; margin-bottom: 10px; font-size: 12.5px; }
-.src-tag { display: inline-block; background: #fdecec; color: #e60012; padding: 2px 9px; border-radius: 6px; font-size: 11px; margin-bottom: 6px; font-weight: 600; }</style>
+.src-tag { display: inline-block; background: #fdecec; color: #e60012; padding: 2px 9px; border-radius: 6px; font-size: 11px; margin-bottom: 6px; font-weight: 600; }
+/* 左侧红色侧边栏 */
+section[data-testid="stSidebar"] { background: linear-gradient(180deg,#e60012,#c7000b); width: 220px !important; }
+section[data-testid="stSidebar"] .stMarkdown { color: white; }
+section[data-testid="stSidebar"] button { background: rgba(255,255,255,0.1) !important; color: white !important; border: none !important; text-align: left !important; }
+section[data-testid="stSidebar"] button:hover { background: rgba(255,255,255,0.2) !important; }</style>
 """, unsafe_allow_html=True)
 
 if "chat_history" not in st.session_state:
@@ -281,6 +286,8 @@ else:
         以上信息依据《领用合约》《信用卡章程》及收费价格表整理，仅供参考，具体以中信银行官方公告为准。
     </div>
     """, unsafe_allow_html=True)
+
+
 
 
 
