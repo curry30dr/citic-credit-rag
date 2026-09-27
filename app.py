@@ -87,6 +87,18 @@ section[data-testid="stSidebar"] button:hover { background: rgba(255,255,255,0.2
 .user-bubble { background: linear-gradient(135deg,#e60012,#c7000b); color: white; padding: 10px 14px; border-radius: 14px; border-bottom-right-radius: 4px; margin: 6px 0; width: fit-content; max-width: 100%; display: table; font-size: 14px; line-height: 1.7; }
 .bot-bubble { background: white; color: #2b2f38; padding: 10px 14px; border-radius: 14px; border-bottom-left-radius: 4px; margin: 6px 0; width: fit-content; max-width: 100%; display: table; border: 1px solid #e8eaef; font-size: 14px; line-height: 1.7; }
 
+/* 顶部开始咨询按钮：白色长条 */
+div.stButton > button[key="start_chat"] {
+    background: white !important;
+    color: #555 !important;
+    border-radius: 22px !important;
+    width: 60% !important;
+    display: block !important;
+    margin: 0 auto !important;
+    border: none !important;
+    font-size: 14px !important;
+    padding: 9px 20px !important;
+}
 /* 普通按钮 */
 div[data-testid="stHorizontalBlock"] button {
     background: white !important;
@@ -134,9 +146,8 @@ if not st.session_state.chat_history:
         st.markdown('<div style="position:fixed;bottom:20px;left:24px;color:rgba(255,255,255,0.8);font-size:11px">24小时客服热线<br><b style="color:white;font-size:14px">4008895558</b></div>', unsafe_allow_html=True)
 
     # 顶部红色通栏（可点击进入对话）
-    st.markdown('<div style="background:linear-gradient(135deg,#e60012,#c7000b);padding:12px 24px;border-radius:10px;margin-bottom:24px">', unsafe_allow_html=True)
-    tcols = st.columns([5,1,5])
-    if tcols[1].button("💬 点击开始咨询信用卡问题 →", key="start_chat"):
+    st.markdown('<div style="background:linear-gradient(135deg,#e60012,#c7000b);padding:14px 28px;border-radius:10px;margin-bottom:24px">', unsafe_allow_html=True)
+    if st.button("💬  点击开始咨询信用卡问题  →", key="start_chat"):
         st.session_state.chat_history.append({"role": "assistant", "content": "您好，我是中信银行信用卡智能咨询助手 👋\n\n我只依据《领用合约》《收费价格表》等业务资料为您解答，数字有据可查。\n\n可咨询：激活、取现、最低还款、年费、账单等。"})
         st.rerun()
     st.markdown('</div>', unsafe_allow_html=True)
@@ -285,6 +296,7 @@ else:
             drawer += '<div style="color:#999;text-align:center;margin-top:60px;font-size:13px">暂无来源</div>'
         drawer += '</div>'
         st.markdown(drawer, unsafe_allow_html=True)
+
 
 
 
