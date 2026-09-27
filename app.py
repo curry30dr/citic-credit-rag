@@ -143,7 +143,18 @@ if not st.session_state.chat_history:
     # 欢迎区
     c1, c2 = st.columns([1, 6])
     with c1:
-        st.markdown('<div style="width:72px;height:72px;background:linear-gradient(135deg,#e60012,#ff3344);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:40px;box-shadow:0 8px 20px rgba(230,0,18,0.35)">🤖</div>', unsafe_allow_html=True)
+        st.markdown('<div style="width:72px;height:72px;background:linear-gradient(135deg,#e60012,#ff3344);border-radius:20px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(230,0,18,0.35)">
+<svg width="44" height="44" viewBox="0 0 64 64">
+<rect x="14" y="20" width="36" height="30" rx="8" fill="#f5f0ff"/>
+<rect x="18" y="26" width="10" height="10" rx="3" fill="#6366f1"/>
+<rect x="36" y="26" width="10" height="10" rx="3" fill="#6366f1"/>
+<rect x="24" y="40" width="16" height="4" rx="2" fill="#a78bfa"/>
+<rect x="30" y="10" width="4" height="10" rx="2" fill="#f5f0ff"/>
+<circle cx="32" cy="9" r="4" fill="#fbbf24"/>
+<rect x="8" y="30" width="6" height="12" rx="3" fill="#f5f0ff"/>
+<rect x="50" y="30" width="6" height="12" rx="3" fill="#f5f0ff"/>
+</svg>
+</div>', unsafe_allow_html=True)
     with c2:
         st.markdown("# 您好，我是中信银行 <span style='color:#e60012'>智能客服</span>", unsafe_allow_html=True)
         st.caption("我可以为您解答信用卡相关问题，依据领用合约与收费价格表，数字有据可查")
@@ -284,4 +295,5 @@ else:
             drawer += '<div style="color:#999;text-align:center;margin-top:60px;font-size:13px">暂无来源</div>'
         drawer += '</div>'
         st.markdown(drawer, unsafe_allow_html=True)
+
 
