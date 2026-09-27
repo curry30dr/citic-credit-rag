@@ -133,12 +133,13 @@ if not st.session_state.chat_history:
             st.rerun()
         st.markdown('<div style="position:fixed;bottom:20px;left:24px;color:rgba(255,255,255,0.8);font-size:11px">24小时客服热线<br><b style="color:white;font-size:14px">4008895558</b></div>', unsafe_allow_html=True)
 
-    # 顶部红色通栏
-    st.markdown("""
-    <div style="background:linear-gradient(135deg,#e60012,#c7000b);padding:14px 30px;border-radius:10px;margin-bottom:24px">
-        <div style="background:rgba(255,255,255,0.95);border-radius:20px;padding:8px 20px;color:#666;font-size:14px;max-width:600px">💬 点击开始咨询信用卡问题 →</div>
-    </div>
-    """, unsafe_allow_html=True)
+    # 顶部红色通栏（可点击进入对话）
+    st.markdown('<div style="background:linear-gradient(135deg,#e60012,#c7000b);padding:12px 24px;border-radius:10px;margin-bottom:24px">', unsafe_allow_html=True)
+    tcols = st.columns([5,1,5])
+    if tcols[1].button("💬 点击开始咨询信用卡问题 →", key="start_chat"):
+        st.session_state.chat_history.append({"role": "assistant", "content": "您好，我是中信银行信用卡智能咨询助手 👋\n\n我只依据《领用合约》《收费价格表》等业务资料为您解答，数字有据可查。\n\n可咨询：激活、取现、最低还款、年费、账单等。"})
+        st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
 
     # 欢迎区
     c1, c2 = st.columns([1, 6])
@@ -284,6 +285,7 @@ else:
             drawer += '<div style="color:#999;text-align:center;margin-top:60px;font-size:13px">暂无来源</div>'
         drawer += '</div>'
         st.markdown(drawer, unsafe_allow_html=True)
+
 
 
 
