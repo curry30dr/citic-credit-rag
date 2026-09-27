@@ -143,7 +143,7 @@ if not st.session_state.chat_history:
     # 欢迎区
     c1, c2 = st.columns([1, 6])
     with c1:
-        st.markdown('<div style="width:70px;height:70px;background:linear-gradient(135deg,#e60012,#ff4444);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:36px;box-shadow:0 6px 16px rgba(230,0,18,0.3)">🤖</div>', unsafe_allow_html=True)
+        st.markdown('<div style="width:72px;height:72px;background:linear-gradient(135deg,#e60012,#ff3344);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:40px;box-shadow:0 8px 20px rgba(230,0,18,0.35)">🤖</div>', unsafe_allow_html=True)
     with c2:
         st.markdown("# 您好，我是中信银行 <span style='color:#e60012'>智能客服</span>", unsafe_allow_html=True)
         st.caption("我可以为您解答信用卡相关问题，依据领用合约与收费价格表，数字有据可查")
@@ -165,13 +165,14 @@ if not st.session_state.chat_history:
                 st.rerun()
 
     # 常见问题白色卡片
-    st.markdown('<div style="background:white;border-radius:12px;padding:18px 24px;margin-top:20px"><div style="font-size:14px;color:#666;margin-bottom:6px">常见问题</div></div>', unsafe_allow_html=True)
-    faqs = ["如何申请信用卡", "账单日和还款日", "逾期后果", "挂失手续费", "最低还款额怎么算", "优惠活动"]
-    fcols = st.columns([1,1,1,1,1,1,3])
-    for i, faq in enumerate(faqs):
-        if fcols[i].button(faq, key=f"faq{i}"):
-            st.session_state.pending_q = faq
-            st.rerun()
+    with st.container(border=True):
+        st.markdown('<div style="font-size:14px;color:#666;margin:4px 0 8px">常见问题</div>', unsafe_allow_html=True)
+        faqs = ["如何申请信用卡", "账单日和还款日", "逾期后果", "挂失手续费", "最低还款额怎么算", "优惠活动"]
+        fcols = st.columns([1,1,1,1,1,1,2])
+        for i, faq in enumerate(faqs):
+            if fcols[i].button(faq, key=f"faq{i}"):
+                st.session_state.pending_q = faq
+                st.rerun()
 
     # 热线提示条
     st.markdown("""
@@ -283,3 +284,4 @@ else:
             drawer += '<div style="color:#999;text-align:center;margin-top:60px;font-size:13px">暂无来源</div>'
         drawer += '</div>'
         st.markdown(drawer, unsafe_allow_html=True)
+
