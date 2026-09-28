@@ -92,17 +92,21 @@ section[data-testid="stSidebar"] button:hover { background: rgba(255,255,255,0.2
     background: linear-gradient(135deg,#e60012,#c7000b) !important;
     margin-left: -5rem; margin-right: -5rem;
     margin-top: -2rem;
-    padding: 16px 5rem;
+    width: calc(100% + 10rem);
+    padding: 15px 5rem;
+    box-sizing: border-box;
 }
 .st-key-topbanner button {
     background: white !important;
     color: #555 !important;
     border-radius: 22px !important;
-    width: 58% !important;
+    width: 470px !important;
     border: none !important;
     font-size: 14px !important;
     padding: 9px 22px !important;
     text-align: left !important;
+    white-space: nowrap !important;
+    height: auto !important;
 }
 .st-key-topbanner button:hover { background: #fff5f5 !important; color: #e60012 !important; }
 
@@ -322,6 +326,7 @@ else:
             drawer += '<div style="color:#999;text-align:center;margin-top:60px;font-size:13px">暂无来源</div>'
         drawer += '</div>'
         st.markdown(drawer, unsafe_allow_html=True)
+
 
 
 
