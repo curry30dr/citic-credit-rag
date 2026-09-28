@@ -93,7 +93,7 @@ section[data-testid="stSidebar"] button:hover { background: rgba(255,255,255,0.2
     margin-left: -5rem; margin-right: -5rem;
     margin-top: -2rem;
     width: calc(100% + 10rem);
-    padding: 15px 5rem;
+    padding: 15px 2rem;
     box-sizing: border-box;
 }
 .st-key-topbanner button {
@@ -125,6 +125,8 @@ section[data-testid="stSidebar"] button:hover { background: rgba(255,255,255,0.2
 }
 .st-key-cardrow button[key="card4"] { background: linear-gradient(160deg,#ffffff,#fff0f1) !important; }
 .st-key-cardrow button:hover { border-color: #e60012 !important; color: #e60012 !important; }
+.st-key-cardrow button p { white-space: pre-wrap !important; text-align: center !important; margin: 0 !important; line-height: 1.9 !important; }
+.st-key-cardrow button div { justify-content: center !important; }
 
 /* 常见问题：纯白无边框卡片 */
 .st-key-faqbox { background: white; border-radius: 12px; padding: 16px 22px 20px; border: none; }
@@ -183,7 +185,7 @@ if not st.session_state.chat_history:
             st.rerun()
 
     # 欢迎区
-    c1, c2 = st.columns([1, 6])
+    c1, c2 = st.columns([0.75, 10], gap="small")
     with c1:
         st.markdown("""<div style="width:72px;height:72px;background:linear-gradient(135deg,#e60012,#ff3344);border-radius:20px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(230,0,18,0.35)"><svg width="46" height="46" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="hg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#dcd3f6"/></linearGradient><linearGradient id="fg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7c6fe0"/><stop offset="1" stop-color="#4a409f"/></linearGradient><radialGradient id="bl" cx="0.35" cy="0.35" r="0.85"><stop offset="0" stop-color="#ffe27a"/><stop offset="1" stop-color="#f5a623"/></radialGradient><linearGradient id="eg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#eae5fb"/><stop offset="1" stop-color="#c6bcef"/></linearGradient></defs><rect x="7" y="29" width="7" height="13" rx="3.5" fill="url(#eg)"/><rect x="50" y="29" width="7" height="13" rx="3.5" fill="url(#eg)"/><rect x="30.5" y="9" width="3" height="9" rx="1.5" fill="#e8e2f7"/><circle cx="32" cy="8" r="4.2" fill="url(#bl)"/><rect x="14" y="19" width="36" height="31" rx="9" fill="url(#hg)" stroke="#c4b9ee" stroke-width="0.8"/><rect x="19" y="25" width="26" height="17" rx="6" fill="url(#fg)"/><circle cx="26.5" cy="33.5" r="3.2" fill="#8fd3ff"/><circle cx="37.5" cy="33.5" r="3.2" fill="#8fd3ff"/><circle cx="27.4" cy="32.6" r="1" fill="#eafaff"/><circle cx="38.4" cy="32.6" r="1" fill="#eafaff"/><rect x="27" y="45" width="10" height="3" rx="1.5" fill="#a78bfa"/></svg></div>""", unsafe_allow_html=True)
     with c2:
@@ -202,7 +204,7 @@ if not st.session_state.chat_history:
         cols = st.columns(5)
         for i, (icon, title, desc, q_text) in enumerate(cards):
             with cols[i]:
-                if st.button(f"{icon}\n{title}\n{desc}", key=f"card{i}", use_container_width=True):
+                if st.button(f"{icon}\n**{title}**\n{desc}", key=f"card{i}", use_container_width=True):
                     st.session_state.pending_q = q_text
                     st.rerun()
 
@@ -326,6 +328,8 @@ else:
             drawer += '<div style="color:#999;text-align:center;margin-top:60px;font-size:13px">暂无来源</div>'
         drawer += '</div>'
         st.markdown(drawer, unsafe_allow_html=True)
+
+
 
 
 
