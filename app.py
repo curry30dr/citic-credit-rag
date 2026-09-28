@@ -130,7 +130,7 @@ section[data-testid="stSidebar"] button:hover { background: rgba(255,255,255,0.2
 
 /* 常见问题：纯白无边框卡片 */
 .st-key-faqbox { background: white; border-radius: 12px; padding: 16px 22px 20px; border: none; }
-.st-key-faqbox button { background: white !important; border: 1px solid #eceef2 !important; border-radius: 18px !important; color: #555 !important; font-size: 12px !important; }
+.st-key-faqbox button { background: white !important; border: 1px solid #eceef2 !important; border-radius: 18px !important; color: #555 !important; font-size: 12px !important; white-space: nowrap !important; padding: 6px 14px !important; }
 .st-key-faqbox button:hover { border-color: #e60012 !important; color: #e60012 !important; }
 /* 普通按钮 */
 div[data-testid="stHorizontalBlock"] button {
@@ -212,7 +212,7 @@ if not st.session_state.chat_history:
     with st.container(key="faqbox"):
         st.markdown('<div style="font-size:14px;color:#8a909c;margin:2px 0 10px">常见问题</div>', unsafe_allow_html=True)
         faqs = ["如何申请信用卡", "账单日和还款日", "逾期后果", "挂失手续费", "最低还款额怎么算", "优惠活动"]
-        fcols = st.columns([1,1,1,1,1,1,2])
+        fcols = st.columns([1.35,1.35,0.85,1.0,1.55,0.85,1.5])
         for i, faq in enumerate(faqs):
             if fcols[i].button(faq, key=f"faq{i}"):
                 st.session_state.pending_q = faq
@@ -328,6 +328,7 @@ else:
             drawer += '<div style="color:#999;text-align:center;margin-top:60px;font-size:13px">暂无来源</div>'
         drawer += '</div>'
         st.markdown(drawer, unsafe_allow_html=True)
+
 
 
 
