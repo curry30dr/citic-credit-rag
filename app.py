@@ -212,7 +212,7 @@ if not st.session_state.chat_history:
     with st.container(key="faqbox"):
         st.markdown('<div style="font-size:14px;color:#8a909c;margin:2px 0 10px">常见问题</div>', unsafe_allow_html=True)
         faqs = ["如何申请信用卡", "账单日和还款日", "逾期后果", "挂失手续费", "最低还款额怎么算", "优惠活动"]
-        fcols = st.columns([1.15,1.15,0.78,0.92,1.3,0.78,6], gap="small")
+        fcols = st.columns([128,128,86,98,138,86,820], gap="small")
         for i, faq in enumerate(faqs):
             if fcols[i].button(faq, key=f"faq{i}"):
                 st.session_state.pending_q = faq
@@ -328,6 +328,7 @@ else:
             drawer += '<div style="color:#999;text-align:center;margin-top:60px;font-size:13px">暂无来源</div>'
         drawer += '</div>'
         st.markdown(drawer, unsafe_allow_html=True)
+
 
 
 
