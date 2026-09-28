@@ -88,12 +88,17 @@ section[data-testid="stSidebar"] button:hover { background: rgba(255,255,255,0.2
 .bot-bubble { background: white; color: #2b2f38; padding: 10px 14px; border-radius: 14px; border-bottom-left-radius: 4px; margin: 6px 0; width: fit-content; max-width: 100%; display: table; border: 1px solid #e8eaef; font-size: 14px; line-height: 1.7; }
 
 /* 顶部全宽红色通栏容器 */
-.stApp, section.main { overflow-x: hidden !important; }
+.stApp, section.main, .stAppViewContainer { overflow-x: hidden !important; }
 .st-key-topbanner {
     background: linear-gradient(135deg,#e60012,#c7000b) !important;
-    margin-left: -5rem; margin-right: -12rem;
-    margin-top: -2rem;
-    padding: 15px 2rem;
+    width: 100vw !important;
+    position: relative !important;
+    left: 50% !important;
+    margin-left: -50vw !important;
+    margin-right: 0 !important;
+    margin-top: -2rem !important;
+    padding: 15px max(2rem,calc((100vw - 1100px)/2 + 2rem)) !important;
+    box-sizing: border-box !important;
 }
 .st-key-topbanner button {
     background: white !important;
@@ -327,6 +332,7 @@ else:
             drawer += '<div style="color:#999;text-align:center;margin-top:60px;font-size:13px">暂无来源</div>'
         drawer += '</div>'
         st.markdown(drawer, unsafe_allow_html=True)
+
 
 
 
