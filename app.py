@@ -208,15 +208,13 @@ if not st.session_state.chat_history:
                     st.session_state.pending_q = q_text
                     st.rerun()
 
-    # 常见问题纯白无边框卡片
+    # 常见问题纯白无边框卡片（pills自适应宽度，不截断）
     with st.container(key="faqbox"):
-        st.markdown('<div style="font-size:14px;color:#8a909c;margin:2px 0 10px">常见问题</div>', unsafe_allow_html=True)
         faqs = ["如何申请信用卡", "账单日和还款日", "逾期后果", "挂失手续费", "最低还款额怎么算", "优惠活动"]
-        fcols = st.columns([128,128,86,98,138,86,820], gap="small")
-        for i, faq in enumerate(faqs):
-            if fcols[i].button(faq, key=f"faq{i}"):
-                st.session_state.pending_q = faq
-                st.rerun()
+        picked = st.pills("常见问题", faqs, key="faq_pills")
+        if picked:
+            st.session_state.pending_q = picked
+            st.rerun()
 
     # 热线提示条
     st.markdown("""
@@ -328,6 +326,7 @@ else:
             drawer += '<div style="color:#999;text-align:center;margin-top:60px;font-size:13px">暂无来源</div>'
         drawer += '</div>'
         st.markdown(drawer, unsafe_allow_html=True)
+
 
 
 
