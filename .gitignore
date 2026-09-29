@@ -20,3 +20,7 @@ Thumbs.db
 # Runtime cache
 .ipynb_checkpoints/
 .gradio/
+
+# 答辩内部材料（不上传）
+答辩PPT大纲.md
+答辩讲稿.md
