@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """Streamlit 完整版：中信银行信用卡智能咨询助手"""
 import os, json
 import requests
@@ -92,6 +92,7 @@ section[data-testid="stSidebar"] button:hover { background: rgba(255,255,255,0.2
 .stMainBlockContainer.block-container { padding: 0 !important; }
 [data-testid="stSidebarUserContent"] { padding-top: 0 !important; margin-top: 0 !important; }
 .stSidebar .stSidebarContent { padding-top: 0 !important; }
+section[data-testid="stSidebar"] { top: 2.875rem !important; height: calc(100vh - 2.875rem) !important; }
 
 /* 首页顶部全宽红条（width100%，无负margin） */
 .st-key-topbanner {
