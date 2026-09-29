@@ -89,8 +89,9 @@ section[data-testid="stSidebar"] button:hover { background: rgba(255,255,255,0.2
 
 /* 顶部全宽红色通栏容器 */
 /* 主内容区左右padding归零，使红条可填满到边缘 */
-header[data-testid="stHeader"] { display: none !important; }
 .stMainBlockContainer.block-container { padding: 0 !important; }
+[data-testid="stSidebarUserContent"] { padding-top: 0 !important; margin-top: 0 !important; }
+.stSidebar .stSidebarContent { padding-top: 0 !important; }
 
 /* 首页顶部全宽红条（width100%，无负margin） */
 .st-key-topbanner {
@@ -117,8 +118,10 @@ header[data-testid="stHeader"] { display: none !important; }
     height: auto !important;
     overflow: hidden !important;
 }
+.st-key-topbanner button,
+.st-key-topbanner button * { text-align: left !important; justify-content: flex-start !important; }
 .st-key-topbanner button div,
-.st-key-topbanner button [data-testid="stElementContainer"] { justify-content: flex-start !important; align-items: center !important; text-align: left !important; }
+.st-key-topbanner button [data-testid="stElementContainer"] { justify-content: flex-start !important; align-items: center !important; text-align: left !important; display: flex !important; }
 .st-key-topbanner button p { display: block !important; width: 100% !important; text-align: left !important; margin: 0 !important; padding: 0 !important; }
 .st-key-topbanner button:hover { background: #fff5f5 !important; color: #e60012 !important; }
 
