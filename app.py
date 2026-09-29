@@ -89,10 +89,10 @@ section[data-testid="stSidebar"] button:hover { background: rgba(255,255,255,0.2
 
 /* 顶部全宽红色通栏容器 */
 /* 主内容区左右padding归零，使红条可填满到边缘 */
-.stMainBlockContainer.block-container { padding: 0 !important; }
+.stMainBlockContainer.block-container { padding: 3.5rem 0 0 0 !important; }
 [data-testid="stSidebarUserContent"] { padding-top: 0 !important; margin-top: 0 !important; }
 .stSidebar .stSidebarContent { padding-top: 0 !important; }
-section[data-testid="stSidebar"] { top: 2.875rem !important; height: calc(100vh - 2.875rem) !important; }
+section[data-testid="stSidebar"] { top: 3.5rem !important; height: calc(100vh - 3.5rem) !important; }
 
 /* 首页顶部全宽红条（width100%，无负margin） */
 .st-key-topbanner {
