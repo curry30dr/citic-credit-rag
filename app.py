@@ -119,11 +119,8 @@ section[data-testid="stSidebar"] { top: 2.875rem !important; height: calc(100vh 
     height: auto !important;
     overflow: hidden !important;
 }
-.st-key-topbanner button,
-.st-key-topbanner button * { text-align: left !important; justify-content: flex-start !important; }
-.st-key-topbanner button div,
-.st-key-topbanner button [data-testid="stElementContainer"] { justify-content: flex-start !important; align-items: center !important; text-align: left !important; display: flex !important; }
-.st-key-topbanner button p { display: block !important; width: 100% !important; text-align: left !important; margin: 0 !important; padding: 0 !important; }
+.st-key-topbanner .stButton button div { justify-content: flex-start !important; }
+.st-key-topbanner button p { text-align: left !important; margin: 0 !important; }
 .st-key-topbanner button:hover { background: #fff5f5 !important; color: #e60012 !important; }
 
 /* 内层内容容器：恢复响应式左右内边距 */
