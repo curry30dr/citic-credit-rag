@@ -16,3 +16,7 @@ models/
 # OS
 .DS_Store
 Thumbs.db
+
+# Runtime cache
+.ipynb_checkpoints/
+.gradio/
