@@ -121,6 +121,7 @@ section[data-testid="stSidebar"] { top: 3.5rem !important; height: calc(100vh - 
     box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
 }
 .st-key-topbanner .stButton button p { margin: 0 !important; text-align: left !important; }
+.st-key-topbanner button * { justify-content: flex-start !important; }
 .st-key-topbanner .stButton button:hover { background: #fff5f5 !important; color: #e60012 !important; }
 
 /* 内层内容容器：恢复响应式左右内边距 */
