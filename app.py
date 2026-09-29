@@ -98,7 +98,7 @@ section[data-testid="stSidebar"] { top: 3.5rem !important; height: calc(100vh - 
 .st-key-topbanner {
     background: linear-gradient(135deg,#e60012,#c7000b) !important;
     width: 100% !important;
-    margin: 0 !important;
+    margin: -6px 0 0 0 !important;
     padding: 15px clamp(1rem,4vw,3.5rem) !important;
     border-radius: 0 !important;
     position: static !important;
