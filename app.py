@@ -106,7 +106,7 @@ section[data-testid="stSidebar"] button:hover { background: rgba(255,255,255,0.2
     background: white !important;
     color: #555 !important;
     border-radius: 22px !important;
-    width: min(470px,82%) !important;
+    width: min(500px,90%) !important;
     border: none !important;
     font-size: 14px !important;
     padding: 9px 22px !important;
@@ -114,8 +114,11 @@ section[data-testid="stSidebar"] button:hover { background: rgba(255,255,255,0.2
     justify-content: flex-start !important;
     white-space: nowrap !important;
     height: auto !important;
+    overflow: hidden !important;
 }
-.st-key-topbanner button p { text-align: left !important; margin: 0 !important; }
+.st-key-topbanner button div,
+.st-key-topbanner button [data-testid="stElementContainer"] { justify-content: flex-start !important; align-items: center !important; }
+.st-key-topbanner button p { text-align: left !important; margin: 0 !important; width: auto !important; flex: 0 0 auto !important; }
 .st-key-topbanner button:hover { background: #fff5f5 !important; color: #e60012 !important; }
 
 /* 内层内容容器：恢复响应式左右内边距 */
