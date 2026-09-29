@@ -105,25 +105,23 @@ section[data-testid="stSidebar"] { top: 2.875rem !important; height: calc(100vh 
     left: auto !important;
     box-sizing: border-box !important;
 }
-.st-key-topbanner .stButton { width: 100% !important; }
-.st-key-topbanner button {
+.st-key-topbanner .stButton { text-align: left !important; width: 100% !important; }
+.st-key-topbanner .stButton button {
     background: white !important;
     color: #555 !important;
     border-radius: 22px !important;
-    width: 500px !important;
-    max-width: 90% !important;
     border: none !important;
     font-size: 14px !important;
-    padding: 9px 22px !important;
+    padding: 10px 24px !important;
+    width: auto !important;
+    min-width: 400px !important;
+    height: auto !important;
     text-align: left !important;
     justify-content: flex-start !important;
-    white-space: nowrap !important;
-    height: auto !important;
-    overflow: hidden !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
 }
-.st-key-topbanner .stButton button div { justify-content: flex-start !important; }
-.st-key-topbanner button p { text-align: left !important; margin: 0 !important; }
-.st-key-topbanner button:hover { background: #fff5f5 !important; color: #e60012 !important; }
+.st-key-topbanner .stButton button p { margin: 0 !important; text-align: left !important; }
+.st-key-topbanner .stButton button:hover { background: #fff5f5 !important; color: #e60012 !important; }
 
 /* 内层内容容器：恢复响应式左右内边距 */
 .st-key-contentpad { padding: 1rem clamp(1rem,4vw,3.5rem) 2rem; }
