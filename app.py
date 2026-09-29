@@ -89,7 +89,8 @@ section[data-testid="stSidebar"] button:hover { background: rgba(255,255,255,0.2
 
 /* 顶部全宽红色通栏容器 */
 /* 主内容区左右padding归零，使红条可填满到边缘 */
-.stMainBlockContainer.block-container { padding-left: 0 !important; padding-right: 0 !important; }
+header[data-testid="stHeader"] { display: none !important; }
+.stMainBlockContainer.block-container { padding: 0 !important; }
 
 /* 首页顶部全宽红条（width100%，无负margin） */
 .st-key-topbanner {
@@ -117,12 +118,12 @@ section[data-testid="stSidebar"] button:hover { background: rgba(255,255,255,0.2
     overflow: hidden !important;
 }
 .st-key-topbanner button div,
-.st-key-topbanner button [data-testid="stElementContainer"] { justify-content: flex-start !important; align-items: center !important; }
-.st-key-topbanner button p { text-align: left !important; margin: 0 !important; width: auto !important; flex: 0 0 auto !important; }
+.st-key-topbanner button [data-testid="stElementContainer"] { justify-content: flex-start !important; align-items: center !important; text-align: left !important; }
+.st-key-topbanner button p { display: block !important; width: 100% !important; text-align: left !important; margin: 0 !important; padding: 0 !important; }
 .st-key-topbanner button:hover { background: #fff5f5 !important; color: #e60012 !important; }
 
 /* 内层内容容器：恢复响应式左右内边距 */
-.st-key-contentpad { padding-left: clamp(1rem,4vw,3.5rem); padding-right: clamp(1rem,4vw,3.5rem); }
+.st-key-contentpad { padding: 1rem clamp(1rem,4vw,3.5rem) 2rem; }
 
 /* 功能卡片行：整卡可点 */
 .st-key-cardrow button {
