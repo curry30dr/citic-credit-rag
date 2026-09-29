@@ -105,11 +105,13 @@ section[data-testid="stSidebar"] { top: 2.875rem !important; height: calc(100vh 
     left: auto !important;
     box-sizing: border-box !important;
 }
+.st-key-topbanner .stButton { width: 100% !important; }
 .st-key-topbanner button {
     background: white !important;
     color: #555 !important;
     border-radius: 22px !important;
-    width: min(500px,90%) !important;
+    width: 500px !important;
+    max-width: 90% !important;
     border: none !important;
     font-size: 14px !important;
     padding: 9px 22px !important;
