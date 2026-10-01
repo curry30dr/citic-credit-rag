@@ -128,7 +128,7 @@ def _action_bar(text, idx, voted_up, voted_down):
     dn_disabled = "disabled" if voted_down else ""
     components.html(f"""
     <style>
-      .ab-wrap{{display:flex;gap:6px;align-items:center;margin-top:4px}}
+      .ab-wrap{{display:flex;gap:6px;align-items:center;margin-top:4px;margin-left:52px}}
       .ab-btn{{background:#fff;border:1px solid #e8eaef;color:#888;border-radius:6px;padding:2px 10px;font-size:12px;cursor:pointer;line-height:1.6}}
       .ab-btn:hover{{color:#e60012;border-color:#e60012}}
       .ab-btn[disabled]{{opacity:.5;cursor:default}}
