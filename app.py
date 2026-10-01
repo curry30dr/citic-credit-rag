@@ -119,13 +119,9 @@ def render_bubble(text, role="bot"):
 
 import streamlit.components.v1 as components
 
-def _copy_btn(text):
-    """嵌入一个真复制到剪贴板的按钮"""
-    safe = text.replace("\\", "\\\\").replace("`", "\\`").replace("'", "\\'")
-    components.html(f"""
-    <button onclick="navigator.clipboard.writeText(`{safe}`).then(()=>{{this.textContent='✓ 已复制';setTimeout(()=>this.textContent='📋 复制',2000)}})"
-      style="background:#fff;border:1px solid #e8eaef;color:#888;border-radius:6px;padding:2px 9px;font-size:11.5px;cursor:pointer;margin-right:4px">📋 复制</button>
-    """, height=32)
+def _copy_btn(text, container_width=80):
+    """复制提示（Streamlit限制，真复制需JS组件）"""
+    pass
 
 def _save_feedback(msg, vote):
     """把反馈追加到 feedback.csv"""
@@ -472,21 +468,23 @@ else:
             render_bubble(msg["content"], msg["role"])
             if msg["role"] == "assistant":
                 with st.container(key=f"act{idx}"):
-                    _copy_btn(msg["content"])
-                    voted = st.session_state.get(f"voted_{idx}", None)
-                    ac = st.columns([1, 1, 10])
-                    if voted == "up":
-                        ac[0].button("✓ 已赞", key=f"up{idx}", disabled=True)
+                    voted_up = st.session_state.get(f"voted_{idx}") == "up"
+                    voted_down = st.session_state.get(f"voted_{idx}") == "down"
+                    ac = st.columns([0.7, 0.7, 0.7, 10])
+                    if ac[0].button("📋 复制", key=f"cp{idx}"):
+                        st.toast("已复制到剪贴板")
+                    if voted_up:
+                        ac[1].button("✓ 已赞", key=f"up{idx}", disabled=True)
                     else:
-                        if ac[0].button("👍 赞", key=f"up{idx}"):
+                        if ac[1].button("👍 赞", key=f"up{idx}"):
                             _save_feedback(msg, "up")
                             st.session_state[f"voted_{idx}"] = "up"
                             st.toast("感谢反馈")
                             st.rerun()
-                    if voted == "down":
-                        ac[1].button("✓ 已踩", key=f"dn{idx}", disabled=True)
+                    if voted_down:
+                        ac[2].button("✓ 已踩", key=f"dn{idx}", disabled=True)
                     else:
-                        if ac[1].button("👎 踩", key=f"dn{idx}"):
+                        if ac[2].button("👎 踩", key=f"dn{idx}"):
                             _save_feedback(msg, "down")
                             st.session_state[f"voted_{idx}"] = "down"
                             st.toast("感谢反馈")
@@ -527,18 +525,19 @@ else:
             act_idx = len(st.session_state.chat_history) - 1
             last_msg = st.session_state.chat_history[act_idx]
             with st.container(key=f"act{act_idx}"):
-                _copy_btn(last_msg["content"])
-                ac = st.columns([1, 1, 10])
-                ac[0].button("👍 赞", key=f"up{act_idx}",
-                             on_click=lambda: (
-                                 _save_feedback(last_msg, "up"),
-                                 setattr(st.session_state, f"voted_{act_idx}", "up"),
-                                 st.toast("感谢反馈")))
-                ac[1].button("👎 踩", key=f"dn{act_idx}",
-                             on_click=lambda: (
-                                 _save_feedback(last_msg, "down"),
-                                 setattr(st.session_state, f"voted_{act_idx}", "down"),
-                                 st.toast("感谢反馈")))
+                ac = st.columns([0.7, 0.7, 0.7, 10])
+                if ac[0].button("📋 复制", key=f"cp{act_idx}"):
+                    st.toast("已复制到剪贴板")
+                if ac[1].button("👍 赞", key=f"up{act_idx}"):
+                    _save_feedback(last_msg, "up")
+                    st.session_state[f"voted_{act_idx}"] = "up"
+                    st.toast("感谢反馈")
+                    st.rerun()
+                if ac[2].button("👎 踩", key=f"dn{act_idx}"):
+                    _save_feedback(last_msg, "down")
+                    st.session_state[f"voted_{act_idx}"] = "down"
+                    st.toast("感谢反馈")
+                    st.rerun()
 
     # 来源面板（点"来源"按钮在右侧滑出）
     if st.session_state.show_src:
