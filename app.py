@@ -462,15 +462,26 @@ else:
             render_bubble(msg["content"], msg["role"])
             if msg["role"] == "assistant":
                 with st.container(key=f"act{idx}"):
-                    ac = st.columns([0.8, 0.8, 0.8, 12])
-                    if ac[0].button("📋 复制", key=f"cp{idx}"):
-                        st.toast("已复制到剪贴板")
-                    if ac[1].button("👍 赞", key=f"up{idx}"):
-                        _save_feedback(msg, "up")
-                        st.toast("感谢反馈")
-                    if ac[2].button("👎 踩", key=f"dn{idx}"):
-                        _save_feedback(msg, "down")
-                        st.toast("感谢反馈")
+                    ac = st.columns([1.2, 1, 1, 10])
+                    ac[0].download_button("📋 复制", msg["content"].encode("utf-8"),
+                                          file_name=f"回答_{idx+1}.txt", key=f"dl{idx}")
+                    voted = st.session_state.get(f"voted_{idx}", None)
+                    if voted == "up":
+                        ac[1].button("✓ 已赞", key=f"up{idx}", disabled=True)
+                    else:
+                        if ac[1].button("👍 赞", key=f"up{idx}"):
+                            _save_feedback(msg, "up")
+                            st.session_state[f"voted_{idx}"] = "up"
+                            st.toast("感谢反馈")
+                            st.rerun()
+                    if voted == "down":
+                        ac[2].button("✓ 已踩", key=f"dn{idx}", disabled=True)
+                    else:
+                        if ac[2].button("👎 踩", key=f"dn{idx}"):
+                            _save_feedback(msg, "down")
+                            st.session_state[f"voted_{idx}"] = "down"
+                            st.toast("感谢反馈")
+                            st.rerun()
 
         # 处理新问题：流式生成
         if st.session_state.pending_q:
@@ -507,15 +518,19 @@ else:
             act_idx = len(st.session_state.chat_history) - 1
             last_msg = st.session_state.chat_history[act_idx]
             with st.container(key=f"act{act_idx}"):
-                ac = st.columns([0.8, 0.8, 0.8, 12])
-                if ac[0].button("📋 复制", key=f"cp{act_idx}"):
-                    st.toast("已复制到剪贴板")
-                if ac[1].button("👍 赞", key=f"up{act_idx}"):
-                    _save_feedback(last_msg, "up")
-                    st.toast("感谢反馈")
-                if ac[2].button("👎 踩", key=f"dn{act_idx}"):
-                    _save_feedback(last_msg, "down")
-                    st.toast("感谢反馈")
+                ac = st.columns([1.2, 1, 1, 10])
+                ac[0].download_button("📋 复制", last_msg["content"].encode("utf-8"),
+                                      file_name=f"回答_{act_idx+1}.txt", key=f"dl{act_idx}")
+                ac[1].button("👍 赞", key=f"up{act_idx}",
+                             on_click=lambda: (
+                                 _save_feedback(last_msg, "up"),
+                                 setattr(st.session_state, f"voted_{act_idx}", "up"),
+                                 st.toast("感谢反馈")))
+                ac[2].button("👎 踩", key=f"dn{act_idx}",
+                             on_click=lambda: (
+                                 _save_feedback(last_msg, "down"),
+                                 setattr(st.session_state, f"voted_{act_idx}", "down"),
+                                 st.toast("感谢反馈")))
 
     # 来源面板（点"来源"按钮在右侧滑出）
     if st.session_state.show_src:
