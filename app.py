@@ -284,9 +284,10 @@ div[data-testid="stHorizontalBlock"] button {
 /* 操作按钮半透明 hover */
 .st-key-act button { opacity:.5; transition:opacity .2s; }
 .st-key-act button:hover { opacity:1; }
-/* 复制按钮iframe和赞踩并排 */
-.st-key-act .stHtml { float:left; width:90px !important; margin-right:4px; }
-.st-key-act [data-testid="stHorizontalBlock"] { float:left; width:200px; }
+/* 复制按钮iframe和赞踩并排：用flex */
+.st-key-act { display:flex !important; flex-wrap:wrap; align-items:center; gap:4px; }
+.st-key-act .element-container { display:inline-block !important; width:auto !important; }
+.st-key-act [data-testid="stHorizontalBlock"] { display:inline-block !important; width:auto !important; }
 [class*="st-key-act"] { padding-left:52px; margin-bottom:6px; }
 [class*="st-key-act"] button { background:#fff !important;border:1px solid #e8eaef !important;color:#999 !important;border-radius:6px !important;padding:3px 10px !important;font-size:11.5px !important;height:auto !important;min-height:0 !important;width:auto !important; }
 .st-key-s-chips { background:#fff; padding:10px 32px 2px; }
