@@ -113,9 +113,19 @@ def render_bubble(text, role="bot"):
         body = html.escape(text)
         body = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', body)
         body = body.replace('\n', '<br>')
-        st.markdown(f'<div class="b-row"><div class="b-avatar">🤖</div><div class="b-bubble">{body}</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="b-row"><div class="b-avatar">AI</div><div class="b-bubble">{body}</div></div>', unsafe_allow_html=True)
         if any(k in text for k in HARD):
             st.markdown('<div class="fallback" style="margin-left:52px">如需进一步帮助，请拨打 <b>24小时客服热线 4008895558</b> 转人工，或尝试提问：取现手续费 / 最低还款 / 年费。</div>', unsafe_allow_html=True)
+
+import streamlit.components.v1 as components
+
+def _copy_btn(text):
+    """嵌入一个真复制到剪贴板的按钮"""
+    safe = text.replace("\\", "\\\\").replace("`", "\\`").replace("'", "\\'")
+    components.html(f"""
+    <button onclick="navigator.clipboard.writeText(`{safe}`).then(()=>{{this.textContent='✓ 已复制';setTimeout(()=>this.textContent='📋 复制',2000)}})"
+      style="background:#fff;border:1px solid #e8eaef;color:#888;border-radius:6px;padding:2px 9px;font-size:11.5px;cursor:pointer;margin-right:4px">📋 复制</button>
+    """, height=32)
 
 def _save_feedback(msg, vote):
     """把反馈追加到 feedback.csv"""
@@ -136,7 +146,7 @@ def stream_answer(msgs, ph):
         body = html.escape(full)
         body = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', body)
         body = body.replace('\n', '<br>')
-        ph.markdown(f'<div class="b-row"><div class="b-avatar">🤖</div><div class="b-bubble">{body}</div></div>', unsafe_allow_html=True)
+        ph.markdown(f'<div class="b-row"><div class="b-avatar">AI</div><div class="b-bubble">{body}</div></div>', unsafe_allow_html=True)
     return full
 
 st.set_page_config(page_title="中信信用卡智能咨询", page_icon="💳", layout="wide")
@@ -251,7 +261,7 @@ div[data-testid="stHorizontalBlock"] button {
 .st-key-go_src button { background:#f2f3f6 !important; border:1px solid #e8eaef !important; color:#555 !important; font-weight:600 !important; height:40px !important; border-radius:18px !important; }
 .st-key-s-msgs { background:#f5f6f8; padding:24px 32px; min-height:180px; }
 .b-row { display:flex; gap:12px; max-width:84%; align-items:flex-start; margin-bottom:4px; }
-.b-avatar { width:40px;height:40px;border-radius:50%;background:#fdf0f0;flex:none;display:flex;align-items:center;justify-content:center;font-size:20px; }
+.b-avatar { width:40px;height:40px;border-radius:50%;background:#fdf0f0;flex:none;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#e60012; }
 .b-bubble { background:#fff;border:1px solid #e8eaef;border-radius:14px;border-bottom-left-radius:4px;padding:10px 14px;width:fit-content;max-width:100%;font-size:14.5px;line-height:1.55;word-break:break-word;box-shadow:0 1px 3px rgba(0,0,0,.04); }
 .b-bubble strong { color:#e60012; }
 
@@ -435,7 +445,7 @@ else:
 
     # 品牌栏：左品牌 右返回首页+来源（紧挨）
     with st.container(key="s-header"):
-        hc = st.columns([11, 1.1, 1.3])
+        hc = st.columns([9, 1.5, 1.5])
         with hc[0]:
             st.markdown("""
             <div class="s-brand">
@@ -457,27 +467,26 @@ else:
 
     # 消息区（浅灰底，气泡fit-content左右分置）
     with st.container(key="s-msgs"):
-        st.markdown('<div class="b-row"><div class="b-avatar">🤖</div><div class="b-bubble">您好，我是中信银行信用卡智能咨询助手 👋<br>我只依据《领用合约》《收费价格表》等业务资料为您解答，数字有据可查。<br>可咨询：激活、取现、最低还款、年费、账单等。</div></div>', unsafe_allow_html=True)
+        st.markdown('<div class="b-row"><div class="b-avatar">AI</div><div class="b-bubble">您好，我是中信银行信用卡智能咨询助手 👋<br>我只依据《领用合约》《收费价格表》等业务资料为您解答，数字有据可查。<br>可咨询：激活、取现、最低还款、年费、账单等。</div></div>', unsafe_allow_html=True)
         for idx, msg in enumerate(st.session_state.chat_history):
             render_bubble(msg["content"], msg["role"])
             if msg["role"] == "assistant":
                 with st.container(key=f"act{idx}"):
-                    ac = st.columns([1.2, 1, 1, 10])
-                    ac[0].download_button("📋 复制", msg["content"].encode("utf-8"),
-                                          file_name=f"回答_{idx+1}.txt", key=f"dl{idx}")
+                    _copy_btn(msg["content"])
                     voted = st.session_state.get(f"voted_{idx}", None)
+                    ac = st.columns([1, 1, 10])
                     if voted == "up":
-                        ac[1].button("✓ 已赞", key=f"up{idx}", disabled=True)
+                        ac[0].button("✓ 已赞", key=f"up{idx}", disabled=True)
                     else:
-                        if ac[1].button("👍 赞", key=f"up{idx}"):
+                        if ac[0].button("👍 赞", key=f"up{idx}"):
                             _save_feedback(msg, "up")
                             st.session_state[f"voted_{idx}"] = "up"
                             st.toast("感谢反馈")
                             st.rerun()
                     if voted == "down":
-                        ac[2].button("✓ 已踩", key=f"dn{idx}", disabled=True)
+                        ac[1].button("✓ 已踩", key=f"dn{idx}", disabled=True)
                     else:
-                        if ac[2].button("👎 踩", key=f"dn{idx}"):
+                        if ac[1].button("👎 踩", key=f"dn{idx}"):
                             _save_feedback(msg, "down")
                             st.session_state[f"voted_{idx}"] = "down"
                             st.toast("感谢反馈")
@@ -492,20 +501,20 @@ else:
             render_bubble(q, "user")
             # loading 动画
             ph = st.empty()
-            ph.markdown('<div class="b-row"><div class="b-avatar">🤖</div><div class="b-bubble"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span> <span style="font-size:13px;color:#999;margin-left:8px">正在检索业务资料…</span></div></div>', unsafe_allow_html=True)
+            ph.markdown('<div class="b-row"><div class="b-avatar">AI</div><div class="b-bubble"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span> <span style="font-size:13px;color:#999;margin-left:8px">正在检索业务资料…</span></div></div>', unsafe_allow_html=True)
             # 检索 + 流式生成
             try:
                 msgs, ctx = build_msgs(q)
                 full = stream_answer(msgs, ph)
                 if not full:
-                    ph.markdown('<div class="b-row"><div class="b-avatar">🤖</div><div class="b-bubble" style="color:#e60012">抱歉，暂时无法获取回答，请稍后重试。</div></div>', unsafe_allow_html=True)
+                    ph.markdown('<div class="b-row"><div class="b-avatar">AI</div><div class="b-bubble" style="color:#e60012">抱歉，暂时无法获取回答，请稍后重试。</div></div>', unsafe_allow_html=True)
                     full = "抱歉，暂时无法获取回答，请稍后重试。"
                     ctx = []
             except Exception as e:
                 import traceback
                 full = f"服务异常：{type(e).__name__}: {e}"
                 ctx = []
-                ph.markdown(f'<div class="b-row"><div class="b-avatar">🤖</div><div class="b-bubble" style="color:#e60012">{full}</div></div>', unsafe_allow_html=True)
+                ph.markdown(f'<div class="b-row"><div class="b-avatar">AI</div><div class="b-bubble" style="color:#e60012">{full}</div></div>', unsafe_allow_html=True)
                 print("ERROR:", traceback.format_exc())
             # 存历史
             st.session_state.chat_history.append({"role": "assistant", "content": full, "ctx": ctx, "q": q})
@@ -518,15 +527,14 @@ else:
             act_idx = len(st.session_state.chat_history) - 1
             last_msg = st.session_state.chat_history[act_idx]
             with st.container(key=f"act{act_idx}"):
-                ac = st.columns([1.2, 1, 1, 10])
-                ac[0].download_button("📋 复制", last_msg["content"].encode("utf-8"),
-                                      file_name=f"回答_{act_idx+1}.txt", key=f"dl{act_idx}")
-                ac[1].button("👍 赞", key=f"up{act_idx}",
+                _copy_btn(last_msg["content"])
+                ac = st.columns([1, 1, 10])
+                ac[0].button("👍 赞", key=f"up{act_idx}",
                              on_click=lambda: (
                                  _save_feedback(last_msg, "up"),
                                  setattr(st.session_state, f"voted_{act_idx}", "up"),
                                  st.toast("感谢反馈")))
-                ac[2].button("👎 踩", key=f"dn{act_idx}",
+                ac[1].button("👎 踩", key=f"dn{act_idx}",
                              on_click=lambda: (
                                  _save_feedback(last_msg, "down"),
                                  setattr(st.session_state, f"voted_{act_idx}", "down"),
