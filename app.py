@@ -596,6 +596,9 @@ else:
             st.session_state._skip_onchange = True
             st.session_state.user_input = ""
             st.session_state.pending_q = None
+            # 删掉最后一条用户消息（如果没有助手回答）
+            if st.session_state.chat_history and st.session_state.chat_history[-1]["role"] == "user":
+                st.session_state.chat_history.pop()
         _has_input = bool(st.session_state.get("user_input", "").strip())
         if ic[2].button("发送", type="primary", key="send_btn", disabled=not _has_input):
             _on_send()
