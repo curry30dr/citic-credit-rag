@@ -555,19 +555,11 @@ else:
                     st.session_state.pending_q = real
                     st.rerun()
 
-    # 输入区：输入框 | 清空 | 红色发送（同一form同一行，回车发送+自动清空）
-    with st.container(key="s-input"):
-        with st.form(key="chat_form", clear_on_submit=True):
-            ic = st.columns([12, 1.5, 1.7])
-            q = ic[0].text_input("问题", placeholder="请输入您的信用卡问题，回车发送…", label_visibility="collapsed")
-            clear_clicked = ic[1].form_submit_button("🗑 清空")
-            send_clicked = ic[2].form_submit_button("发送", type="primary")
-            if send_clicked and q:
-                st.session_state.pending_q = q
-                st.rerun()
-            if clear_clicked:
-                st.session_state.chat_history = []
-                st.rerun()
+    # 输入区：用 st.chat_input 替代 form（避免云端清空 session 的 bug）
+    q_input = st.chat_input("请输入您的信用卡问题，回车发送…")
+    if q_input:
+        st.session_state.pending_q = q_input
+        st.rerun()
 
     # 免责声明（全宽白底）
     st.markdown('<div class="s-disclaimer">以上信息依据《领用合约》《信用卡章程》及收费价格表整理，仅供参考，具体以中信银行官方公告为准。</div>', unsafe_allow_html=True)
