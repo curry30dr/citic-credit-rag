@@ -567,7 +567,7 @@ else:
         ic[0].text_input("问题", key="user_input",
                          placeholder="请输入您的信用卡问题，回车发送…",
                          label_visibility="collapsed", on_change=_on_send)
-        if ic[1].button("🗑", key="clear_input"):
+        if ic[1].button("🗑 清空", key="clear_input"):
             st.session_state.user_input = ""
         if ic[2].button("发送", type="primary", key="send_btn"):
             _on_send()
