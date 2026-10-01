@@ -21,7 +21,7 @@ def emb_online(texts):
             "https://dashscope.aliyuncs.com/compatible-mode/v1/embeddings",
             headers=HEADERS,
             json={"model": "text-embedding-v3", "input": batch},
-            timeout=30,
+            timeout=60,
             proxies=NO_PROXY)
         data = resp.json()
         if "data" not in data:
