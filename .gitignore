@@ -20,7 +20,15 @@ Thumbs.db
 # Runtime cache
 .ipynb_checkpoints/
 .gradio/
+_emb_cache.npy
+feedback.csv
 
 # 答辩内部材料（不上传）
 答辩PPT大纲.md
 答辩讲稿.md
+feedback.csv
+.agents/
+fix4.py
+precompute_emb.py
+streamlit_screenshot.png
+_emb_cache.npy

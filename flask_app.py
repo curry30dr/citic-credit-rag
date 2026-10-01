@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """网页演示后端：python app.py 后访问 http://127.0.0.1:5000"""
 import os, json, csv, datetime
 from flask import Flask, request, jsonify, send_from_directory
@@ -49,8 +49,8 @@ def chat():
 
 @socketio.on("ask")
 def handle_ask(data):
-    from flask_socketio import request as socket_request
-    sid = socket_request.sid
+    from flask import request
+    sid = request.sid
     q = (data.get("question") or "").strip()
     mode = data.get("mode", "online")
     if not q:
@@ -116,8 +116,8 @@ def handle_ask(data):
 
 @socketio.on("clear")
 def handle_clear():
-    from flask_socketio import request as socket_request
-    sid = socket_request.sid
+    from flask import request
+    sid = request.sid
     if sid in HISTORIES:
         HISTORIES[sid].clear()
     emit("cleared")
@@ -145,3 +145,5 @@ if __name__ == "__main__":
     print(" 打开浏览器访问: http://127.0.0.1:5000")
     print("=" * 50)
     socketio.run(app, host="127.0.0.1", port=5000, debug=False, allow_unsafe_werkzeug=True)
+
+

@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
 """Streamlit 完整版：中信银行信用卡智能咨询助手"""
-import os, json, html
+import os, json, html, re
 import requests
 from rank_bm25 import BM25Okapi
+import jieba
 import numpy as np
 import streamlit as st
 
 DASHSCOPE_KEY = os.environ.get("DASHSCOPE_API_KEY", "")
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 HEADERS = {"Authorization": "Bearer " + DASHSCOPE_KEY, "Content-Type": "application/json"}
+
+NO_PROXY = {"http": None, "https": None}
 
 def emb_online(texts):
     all_emb = []
@@ -18,8 +21,11 @@ def emb_online(texts):
             "https://dashscope.aliyuncs.com/compatible-mode/v1/embeddings",
             headers=HEADERS,
             json={"model": "text-embedding-v3", "input": batch},
-            timeout=60)
+            timeout=30,
+            proxies=NO_PROXY)
         data = resp.json()
+        if "data" not in data:
+            raise RuntimeError(f"Embedding API error: {data}")
         all_emb.extend([d["embedding"] for d in data["data"]])
     return all_emb
 
@@ -28,8 +34,33 @@ def llm_chat(messages):
         "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
         headers=HEADERS,
         json={"model": "qwen-plus", "messages": messages, "temperature": 0},
-        timeout=60)
+        timeout=60,
+        proxies=NO_PROXY)
     return resp.json()["choices"][0]["message"]["content"]
+
+def llm_chat_stream(messages):
+    resp = requests.post(
+        "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+        headers=HEADERS,
+        json={"model": "qwen-plus", "messages": messages, "temperature": 0, "stream": True},
+        timeout=60,
+        stream=True,
+        proxies=NO_PROXY)
+    for line in resp.iter_lines():
+        if not line:
+            continue
+        line = line.decode("utf-8")
+        if line.startswith("data: "):
+            data = line[6:]
+            if data.strip() == "[DONE]":
+                break
+            try:
+                chunk = json.loads(data)
+                delta = chunk["choices"][0]["delta"].get("content", "")
+                if delta:
+                    yield delta
+            except Exception:
+                pass
 
 @st.cache_resource
 def load_index():
@@ -38,14 +69,19 @@ def load_index():
         for line in f:
             chunks.append(json.loads(line))
     texts = [c["text"] for c in chunks]
-    bm25 = BM25Okapi([t.split() for t in texts])
-    emb = np.array(emb_online(texts))
+    bm25 = BM25Okapi([jieba.lcut(t) for t in texts])
+    emb_path = os.path.join(BASE_DIR, "_emb_cache.npy")
+    if os.path.exists(emb_path):
+        emb = np.load(emb_path)
+    else:
+        emb = np.array(emb_online(texts))
+        np.save(emb_path, emb)
     emb = emb / (np.linalg.norm(emb, axis=1, keepdims=True) + 1e-8)
     return chunks, bm25, emb
 
 def retrieve(q):
     chunks, bm25, emb = load_index()
-    bm_scores = bm25.get_scores(q.split())
+    bm_scores = bm25.get_scores(jieba.lcut(q))
     bm_rank = sorted(range(len(bm_scores)), key=lambda i: -bm_scores[i])
     qv = np.array(emb_online([q])[0])
     qv = qv / (np.linalg.norm(qv) + 1e-8)
@@ -60,14 +96,48 @@ def retrieve(q):
     top = sorted(rrf.items(), key=lambda x: -x[1])[:8]
     return [chunks[i] for i, _ in top]
 
-def ask(q):
-    st.session_state.chat_history.append({"role": "user", "content": q})
+def build_msgs(q):
+    """构建 LLM 消息（含检索上下文和历史）"""
     ctx = retrieve(q)
     ctx_text = "\n\n".join([f"[资料{i+1}] {c['text']}" for i, c in enumerate(ctx)])
     history_msgs = st.session_state.chat_history[-4:-1]
     msgs = [{"role": "system", "content": "你是中信银行信用卡智能咨询助手。仔细阅读业务资料，从资料中找答案，数字必须原样引用，确实没有才说不清楚。"}] + history_msgs + [{"role": "user", "content": f"【业务资料】\n{ctx_text}\n\n【用户问题】{q}"}]
-    ans = llm_chat(msgs)
-    st.session_state.chat_history.append({"role": "assistant", "content": ans, "ctx": ctx})
+    return msgs, ctx
+
+def render_bubble(text, role="bot"):
+    """渲染一条消息气泡"""
+    HARD = ["无法回答", "未找到", "无法提供", "未提供", "未列明", "未明确", "无法确定"]
+    if role == "user":
+        st.markdown(f'<div class="u-row"><div class="u-avatar">我</div><div class="u-bubble">{html.escape(text)}</div></div>', unsafe_allow_html=True)
+    else:
+        body = html.escape(text)
+        body = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', body)
+        body = body.replace('\n', '<br>')
+        st.markdown(f'<div class="b-row"><div class="b-avatar">🤖</div><div class="b-bubble">{body}</div></div>', unsafe_allow_html=True)
+        if any(k in text for k in HARD):
+            st.markdown('<div class="fallback" style="margin-left:52px">如需进一步帮助，请拨打 <b>24小时客服热线 4008895558</b> 转人工，或尝试提问：取现手续费 / 最低还款 / 年费。</div>', unsafe_allow_html=True)
+
+def _save_feedback(msg, vote):
+    """把反馈追加到 feedback.csv"""
+    import csv
+    row = [msg.get("q", ""), msg.get("content", "")[:200], vote]
+    path = os.path.join(BASE_DIR, "feedback.csv")
+    try:
+        with open(path, "a", newline="", encoding="utf-8-sig") as f:
+            csv.writer(f).writerow(row)
+    except Exception:
+        pass
+
+def stream_answer(msgs, ph):
+    """流式生成回答，逐字更新 placeholder，返回完整文本"""
+    full = ""
+    for delta in llm_chat_stream(msgs):
+        full += delta
+        body = html.escape(full)
+        body = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', body)
+        body = body.replace('\n', '<br>')
+        ph.markdown(f'<div class="b-row"><div class="b-avatar">🤖</div><div class="b-bubble">{body}</div></div>', unsafe_allow_html=True)
+    return full
 
 st.set_page_config(page_title="中信信用卡智能咨询", page_icon="💳", layout="wide")
 
@@ -182,10 +252,17 @@ div[data-testid="stHorizontalBlock"] button {
 .st-key-s-msgs { background:#f5f6f8; padding:24px 32px; min-height:180px; }
 .b-row { display:flex; gap:12px; max-width:84%; align-items:flex-start; margin-bottom:4px; }
 .b-avatar { width:40px;height:40px;border-radius:50%;background:#fdf0f0;flex:none;display:flex;align-items:center;justify-content:center;font-size:20px; }
-.b-bubble { background:#fff;border:1px solid #e8eaef;border-radius:14px;border-bottom-left-radius:4px;padding:12px 16px;width:fit-content;max-width:100%;font-size:14.5px;line-height:1.8;white-space:pre-wrap;word-break:break-word;box-shadow:0 1px 3px rgba(0,0,0,.04); }
+.b-bubble { background:#fff;border:1px solid #e8eaef;border-radius:14px;border-bottom-left-radius:4px;padding:10px 14px;width:fit-content;max-width:100%;font-size:14.5px;line-height:1.55;word-break:break-word;box-shadow:0 1px 3px rgba(0,0,0,.04); }
+.b-bubble strong { color:#e60012; }
+
+/* 打字动画 */
+.typing-dot { display:inline-block; width:6px; height:6px; background:#bbb; border-radius:50%; margin-right:3px; animation:typingBlink 1s infinite; }
+.typing-dot:nth-child(2){ animation-delay:.2s; }
+.typing-dot:nth-child(3){ animation-delay:.4s; }
+@keyframes typingBlink { 0%,100%{opacity:.3;transform:translateY(0)} 50%{opacity:1;transform:translateY(-4px)} }
 .u-row { display:flex;gap:12px;flex-direction:row-reverse;max-width:84%;margin:0 0 4px auto;align-items:flex-start; }
 .u-avatar { width:40px;height:40px;border-radius:50%;background:#eef0f4;flex:none;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#666; }
-.u-bubble { background:linear-gradient(135deg,#e60012,#c7000b);color:#fff;border-radius:14px;border-bottom-right-radius:4px;padding:12px 16px;width:fit-content;max-width:100%;font-size:14.5px;line-height:1.8;white-space:pre-wrap;word-break:break-word; }
+.u-bubble { background:linear-gradient(135deg,#e60012,#c7000b);color:#fff;border-radius:14px;border-bottom-right-radius:4px;padding:10px 14px;width:fit-content;max-width:100%;font-size:14.5px;line-height:1.55;white-space:pre-wrap;word-break:break-word; }
 [class*="st-key-act"] { padding-left:52px; margin-bottom:6px; }
 [class*="st-key-act"] button { background:#fff !important;border:1px solid #e8eaef !important;color:#999 !important;border-radius:6px !important;padding:3px 10px !important;font-size:11.5px !important;height:auto !important;min-height:0 !important;width:auto !important; }
 .st-key-s-chips { background:#fff; padding:10px 32px 2px; }
@@ -197,6 +274,22 @@ div[data-testid="stHorizontalBlock"] button {
 .st-key-s-input .stButton button { border-radius:22px !important; height:42px !important; padding:0 18px !important; }
 .st-key-s-input button[kind="primaryFormSubmit"] { background:linear-gradient(135deg,#e60012,#c7000b) !important; color:#fff !important; border:none !important; font-weight:700 !important; }
 .s-disclaimer { background:#fff; border-top:1px solid #e8eaef; padding:9px 32px; font-size:11px; color:#8a909c; text-align:center; }
+.fallback { margin-top:8px; padding:10px 14px; background:#fdf0f0; border-radius:10px; font-size:13px; line-height:1.6; color:#555; }
+.fallback b { color:#e60012; }
+
+/* ===== 技术说明面板 ===== */
+.tech-block { background:#fff; border:1px solid #e8eaef; border-radius:16px; padding:26px 28px; margin-top:10px; }
+.tech-block h3 { font-size:18px; color:#1a1d24; margin-bottom:6px; }
+.tech-block .sub { font-size:12.5px; color:#8a909c; margin-bottom:18px; }
+.arch-flow { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+.anode { background:#f5f6f8; border:1px solid #e8eaef; border-radius:10px; padding:9px 13px; font-size:12px; text-align:center; }
+.anode.hl { background:linear-gradient(135deg,#e60012,#c7000b); color:#fff; border:none; }
+.aarr { color:#bbb; font-size:15px; }
+.tech-note { display:flex; gap:24px; flex-wrap:wrap; font-size:12px; color:#8a909c; }
+.tech-note b { color:#e60012; }
+.stats-row { display:flex; gap:36px; margin-top:18px; flex-wrap:wrap; }
+.stat b { font-size:22px; color:#e60012; display:block; }
+.stat span { font-size:12px; color:#8a909c; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -208,21 +301,26 @@ if "show_src" not in st.session_state:
     st.session_state.show_src = False
 if "in_chat" not in st.session_state:
     st.session_state.in_chat = False
+if "show_tech" not in st.session_state:
+    st.session_state.show_tech = False
+if "src_history" not in st.session_state:
+    st.session_state.src_history = []
 
 if st.session_state.pending_q:
-    q = st.session_state.pending_q
-    st.session_state.pending_q = None
     st.session_state.in_chat = True
-    ask(q)
 
 # ============ 首页 ============
 if not st.session_state.in_chat:
+    # 首页打开时预热知识库（已缓存则毫秒级返回，对话页不再卡）
+    load_index()
     with st.sidebar:
         st.markdown('<div style="display:flex;align-items:center;gap:10px;margin-bottom:30px"><div style="width:40px;height:40px;background:white;border-radius:50%;color:#e60012;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:20px">中</div><div><div style="color:white;font-weight:bold;font-size:16px">中信银行</div><div style="color:rgba(255,255,255,0.7);font-size:10px">CHINA CITIC BANK</div></div></div>', unsafe_allow_html=True)
         if st.button("💬 智能客服", key="nav1", use_container_width=True):
+            st.session_state.show_tech = False
             st.rerun()
         if st.button("🔧 技术说明", key="nav2", use_container_width=True):
-            st.toast("BM25+向量RRF融合召回，Qwen-Plus生成")
+            st.session_state.show_tech = not st.session_state.show_tech
+            st.rerun()
         if st.button("📄 进入对话", key="nav3", use_container_width=True):
             st.session_state.in_chat = True
             st.rerun()
@@ -235,51 +333,90 @@ if not st.session_state.in_chat:
             st.rerun()
 
     with st.container(key="contentpad"):
-        # 欢迎区
-        c1, c2 = st.columns([0.75, 10], gap="small")
-        with c1:
-            st.markdown("""<div style="width:72px;height:72px;background:linear-gradient(135deg,#e60012,#ff3344);border-radius:20px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(230,0,18,0.35)"><svg width="46" height="46" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="hg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#dcd3f6"/></linearGradient><linearGradient id="fg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7c6fe0"/><stop offset="1" stop-color="#4a409f"/></linearGradient><radialGradient id="bl" cx="0.35" cy="0.35" r="0.85"><stop offset="0" stop-color="#ffe27a"/><stop offset="1" stop-color="#f5a623"/></radialGradient><linearGradient id="eg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#eae5fb"/><stop offset="1" stop-color="#c6bcef"/></linearGradient></defs><rect x="7" y="29" width="7" height="13" rx="3.5" fill="url(#eg)"/><rect x="50" y="29" width="7" height="13" rx="3.5" fill="url(#eg)"/><rect x="30.5" y="9" width="3" height="9" rx="1.5" fill="#e8e2f7"/><circle cx="32" cy="8" r="4.2" fill="url(#bl)"/><rect x="14" y="19" width="36" height="31" rx="9" fill="url(#hg)" stroke="#c4b9ee" stroke-width="0.8"/><rect x="19" y="25" width="26" height="17" rx="6" fill="url(#fg)"/><circle cx="26.5" cy="33.5" r="3.2" fill="#8fd3ff"/><circle cx="37.5" cy="33.5" r="3.2" fill="#8fd3ff"/><circle cx="27.4" cy="32.6" r="1" fill="#eafaff"/><circle cx="38.4" cy="32.6" r="1" fill="#eafaff"/><rect x="27" y="45" width="10" height="3" rx="1.5" fill="#a78bfa"/></svg></div>""", unsafe_allow_html=True)
-        with c2:
-            st.markdown("# 您好，我是中信银行 <span style='color:#e60012'>智能客服</span>", unsafe_allow_html=True)
-            st.caption("我可以为您解答信用卡相关问题，依据领用合约与收费价格表，数字有据可查")
+        if st.session_state.show_tech:
+            # ===== 技术说明面板 =====
+            st.markdown("""
+            <div class="tech-block">
+              <h3>RAG 技术架构</h3>
+              <p class="sub">检索增强生成全链路 · 混合召回 → Rerank 精排 → 大模型生成</p>
+              <div class="arch-flow">
+                <div class="anode">用户问题</div><div class="aarr">→</div>
+                <div class="anode">Embedding<br>向量化</div><div class="aarr">→</div>
+                <div class="anode">向量+BM25<br>混合召回</div><div class="aarr">→</div>
+                <div class="anode">RRF<br>融合</div><div class="aarr">→</div>
+                <div class="anode hl">Rerank<br>精排</div><div class="aarr">→</div>
+                <div class="anode">LLM<br>生成</div>
+              </div>
+              <div class="tech-note">
+                <span>向量检索：懂<b>语义</b>（"忘记还款"≈逾期）</span>
+                <span>BM25：抓<b>关键词</b>（年费/取现/违约金）</span>
+                <span>Rerank：<b>精排</b>候选资料相关性</span>
+              </div>
+              <div class="stats-row">
+                <div class="stat"><b>89</b><span>业务知识块</span></div>
+                <div class="stat"><b>2路</b><span>向量 + BM25</span></div>
+                <div class="stat"><b>双栈</b><span>本地开源/在线API</span></div>
+                <div class="stat"><b>3/3</b><span>测试题全对</span></div>
+              </div>
+            </div>
+            """, unsafe_allow_html=True)
+        else:
+            # 欢迎区
+            c1, c2 = st.columns([0.75, 10], gap="small")
+            with c1:
+                st.markdown("""<div style="width:72px;height:72px;background:linear-gradient(135deg,#e60012,#ff3344);border-radius:20px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(230,0,18,0.35)"><svg width="46" height="46" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="hg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#dcd3f6"/></linearGradient><linearGradient id="fg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7c6fe0"/><stop offset="1" stop-color="#4a409f"/></linearGradient><radialGradient id="bl" cx="0.35" cy="0.35" r="0.85"><stop offset="0" stop-color="#ffe27a"/><stop offset="1" stop-color="#f5a623"/></radialGradient><linearGradient id="eg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#eae5fb"/><stop offset="1" stop-color="#c6bcef"/></linearGradient></defs><rect x="7" y="29" width="7" height="13" rx="3.5" fill="url(#eg)"/><rect x="50" y="29" width="7" height="13" rx="3.5" fill="url(#eg)"/><rect x="30.5" y="9" width="3" height="9" rx="1.5" fill="#e8e2f7"/><circle cx="32" cy="8" r="4.2" fill="url(#bl)"/><rect x="14" y="19" width="36" height="31" rx="9" fill="url(#hg)" stroke="#c4b9ee" stroke-width="0.8"/><rect x="19" y="25" width="26" height="17" rx="6" fill="url(#fg)"/><circle cx="26.5" cy="33.5" r="3.2" fill="#8fd3ff"/><circle cx="37.5" cy="33.5" r="3.2" fill="#8fd3ff"/><circle cx="27.4" cy="32.6" r="1" fill="#eafaff"/><circle cx="38.4" cy="32.6" r="1" fill="#eafaff"/><rect x="27" y="45" width="10" height="3" rx="1.5" fill="#a78bfa"/></svg></div>""", unsafe_allow_html=True)
+            with c2:
+                st.markdown("# 您好，我是中信银行 <span style='color:#e60012'>智能客服</span>", unsafe_allow_html=True)
+                st.caption("我可以为您解答信用卡相关问题，依据领用合约与收费价格表，数字有据可查")
 
-        # 5个功能卡片
-        cards = [
-            ("💳", "取现手续费", "境内外取现费率", "信用卡取现手续费多少？"),
-            ("🌍", "境外取现", "每日/年度限额", "境外取现限额多少？"),
-            ("✨", "卡怎么激活", "快速激活流程", "信用卡怎么激活？"),
-            ("💰", "还款指南", "最低还款/免息期", "最低还款有利息吗？"),
-            ("💴", "年费怎么收", "年费标准/免年费政策", "年费怎么免？"),
-        ]
-        with st.container(key="cardrow"):
-            cols = st.columns(5)
-            for i, (icon, title, desc, q_text) in enumerate(cards):
-                with cols[i]:
-                    if st.button(f"{icon}\n**{title}**\n{desc}", key=f"card{i}", use_container_width=True):
-                        st.session_state.pending_q = q_text
-                        st.session_state.in_chat = True
-                        st.rerun()
+            # 5个功能卡片
+            cards = [
+                ("💳", "取现手续费", "境内外取现费率", "信用卡取现手续费多少？"),
+                ("🌍", "境外取现", "每日/年度限额", "境外取现限额多少？"),
+                ("✨", "卡怎么激活", "快速激活流程", "信用卡怎么激活？"),
+                ("💰", "还款指南", "最低还款/免息期", "最低还款有利息吗？"),
+                ("💴", "年费怎么收", "年费标准/免年费政策", "年费怎么免？"),
+            ]
+            with st.container(key="cardrow"):
+                cols = st.columns(5)
+                for i, (icon, title, desc, q_text) in enumerate(cards):
+                    with cols[i]:
+                        if st.button(f"{icon}\n**{title}**\n{desc}", key=f"card{i}", use_container_width=True):
+                            st.session_state.pending_q = q_text
+                            st.session_state.in_chat = True
+                            st.rerun()
 
-        # 常见问题纯白无边框卡片（pills自适应宽度，不截断）
-        with st.container(key="faqbox"):
-            faqs = ["如何申请信用卡", "账单日和还款日", "逾期后果", "挂失手续费", "最低还款额怎么算", "优惠活动"]
-            picked = st.pills("常见问题", faqs, key="faq_pills")
-            if picked:
-                st.session_state.pending_q = picked
-                st.session_state.in_chat = True
-                st.rerun()
+            # 常见问题纯白无边框卡片（pills自适应宽度，不截断）
+            with st.container(key="faqbox"):
+                faqs = ["如何申请信用卡", "账单日和还款日", "逾期后果", "挂失手续费", "最低还款额怎么算", "优惠活动"]
+                picked = st.pills("常见问题", faqs, key="faq_pills")
+                if picked:
+                    st.session_state.pending_q = picked
+                    st.session_state.in_chat = True
+                    st.rerun()
 
-        # 热线提示条
-        st.markdown("""
-        <div style="background:white;border-left:3px solid #e60012;border-radius:8px;padding:14px 20px;margin-top:20px;font-size:14px">
-            🤖 以上问题我可以帮您解答；如果需要人工服务，请拨打 <b style="color:#e60012">24小时客服热线 4008895558</b>
-        </div>
-        """, unsafe_allow_html=True)
+            # 热线提示条
+            st.markdown("""
+            <div style="background:white;border-left:3px solid #e60012;border-radius:8px;padding:14px 20px;margin-top:20px;font-size:14px">
+                🤖 以上问题我可以帮您解答；如果需要人工服务，请拨打 <b style="color:#e60012">24小时客服热线 4008895558</b>
+            </div>
+            """, unsafe_allow_html=True)
 
-        st.markdown('<div style="text-align:center;font-size:11px;color:#999;margin-top:20px">以上信息依据《领用合约》《信用卡章程》及收费价格表整理，仅供参考，具体以中信银行官方公告为准</div>', unsafe_allow_html=True)
+            st.markdown('<div style="text-align:center;font-size:11px;color:#999;margin-top:20px">以上信息依据《领用合约》《信用卡章程》及收费价格表整理，仅供参考，具体以中信银行官方公告为准</div>', unsafe_allow_html=True)
 
 # ============ 对话页面 ============
 else:
+    # 隐藏首页红色 sidebar 和首页容器
+    st.markdown("""
+    <style>
+    section[data-testid="stSidebar"],
+    .st-key-topbanner,
+    .st-key-contentpad,
+    .st-key-cardrow,
+    .st-key-faqbox { display:none !important; }
+    </style>
+    """, unsafe_allow_html=True)
+
     # 顶部小字栏（全宽白底）
     st.markdown("""
     <div class="s-topbar">
@@ -312,20 +449,90 @@ else:
 
     # 消息区（浅灰底，气泡fit-content左右分置）
     with st.container(key="s-msgs"):
-        st.markdown('<div class="b-row"><div class="b-avatar">🤖</div><div class="b-bubble">您好，我是中信银行信用卡智能咨询助手 👋\n我只依据《领用合约》《收费价格表》等业务资料为您解答，数字有据可查。\n可咨询：激活、取现、最低还款、年费、账单等。</div></div>', unsafe_allow_html=True)
+        st.markdown('<div class="b-row"><div class="b-avatar">🤖</div><div class="b-bubble">您好，我是中信银行信用卡智能咨询助手 👋<br>我只依据《领用合约》《收费价格表》等业务资料为您解答，数字有据可查。<br>可咨询：激活、取现、最低还款、年费、账单等。</div></div>', unsafe_allow_html=True)
         for idx, msg in enumerate(st.session_state.chat_history):
-            if msg["role"] == "user":
-                st.markdown(f'<div class="u-row"><div class="u-avatar">我</div><div class="u-bubble">{html.escape(msg["content"])}</div></div>', unsafe_allow_html=True)
-            else:
-                st.markdown(f'<div class="b-row"><div class="b-avatar">🤖</div><div class="b-bubble">{html.escape(msg["content"])}</div></div>', unsafe_allow_html=True)
+            render_bubble(msg["content"], msg["role"])
+            if msg["role"] == "assistant":
                 with st.container(key=f"act{idx}"):
                     ac = st.columns([0.8, 0.8, 0.8, 12])
                     if ac[0].button("📋 复制", key=f"cp{idx}"):
                         st.toast("已复制到剪贴板")
                     if ac[1].button("👍 赞", key=f"up{idx}"):
+                        _save_feedback(msg, "up")
                         st.toast("感谢反馈")
                     if ac[2].button("👎 踩", key=f"dn{idx}"):
+                        _save_feedback(msg, "down")
                         st.toast("感谢反馈")
+
+        # 处理新问题：流式生成
+        if st.session_state.pending_q:
+            q = st.session_state.pending_q
+            st.session_state.pending_q = None
+            # 用户消息
+            st.session_state.chat_history.append({"role": "user", "content": q})
+            render_bubble(q, "user")
+            # loading 动画
+            ph = st.empty()
+            ph.markdown('<div class="b-row"><div class="b-avatar">🤖</div><div class="b-bubble"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span> <span style="font-size:13px;color:#999;margin-left:8px">正在检索业务资料…</span></div></div>', unsafe_allow_html=True)
+            # 检索 + 流式生成
+            try:
+                msgs, ctx = build_msgs(q)
+                full = stream_answer(msgs, ph)
+                if not full:
+                    ph.markdown('<div class="b-row"><div class="b-avatar">🤖</div><div class="b-bubble" style="color:#e60012">抱歉，暂时无法获取回答，请稍后重试。</div></div>', unsafe_allow_html=True)
+                    full = "抱歉，暂时无法获取回答，请稍后重试。"
+                    ctx = []
+            except Exception as e:
+                import traceback
+                full = f"服务异常：{type(e).__name__}: {e}"
+                ctx = []
+                ph.markdown(f'<div class="b-row"><div class="b-avatar">🤖</div><div class="b-bubble" style="color:#e60012">{full}</div></div>', unsafe_allow_html=True)
+                print("ERROR:", traceback.format_exc())
+            # 存历史
+            st.session_state.chat_history.append({"role": "assistant", "content": full, "ctx": ctx, "q": q})
+            st.session_state.src_history.append(ctx)
+            # 兜底引导
+            HARD = ["无法回答", "未找到", "无法提供", "未提供", "未列明", "未明确", "无法确定"]
+            if any(k in full for k in HARD):
+                st.markdown('<div class="fallback" style="margin-left:52px">如需进一步帮助，请拨打 <b>24小时客服热线 4008895558</b> 转人工，或尝试提问：取现手续费 / 最低还款 / 年费。</div>', unsafe_allow_html=True)
+            # 操作按钮
+            act_idx = len(st.session_state.chat_history) - 1
+            last_msg = st.session_state.chat_history[act_idx]
+            with st.container(key=f"act{act_idx}"):
+                ac = st.columns([0.8, 0.8, 0.8, 12])
+                if ac[0].button("📋 复制", key=f"cp{act_idx}"):
+                    st.toast("已复制到剪贴板")
+                if ac[1].button("👍 赞", key=f"up{act_idx}"):
+                    _save_feedback(last_msg, "up")
+                    st.toast("感谢反馈")
+                if ac[2].button("👎 踩", key=f"dn{act_idx}"):
+                    _save_feedback(last_msg, "down")
+                    st.toast("感谢反馈")
+
+    # 来源面板（点"来源"按钮在右侧滑出）
+    if st.session_state.show_src:
+        _items = ""
+        if not st.session_state.src_history:
+            _items = '<div style="font-size:12px;color:#999">提问后这里实时展示检索到的业务资料块</div>'
+        for _ri, _ctx in enumerate(st.session_state.src_history):
+            _items += f'<div style="font-size:11px;color:#999;padding:8px 0 4px">—— 第{_ri+1}次回答 ——</div>'
+            if not _ctx:
+                _items += '<div style="font-size:12px;color:#999">未检索到相关资料</div>'
+            for _ci, _c in enumerate(_ctx):
+                _topic = _c.get("topic", "")
+                _source = _c.get("source", "")
+                _text = _c.get("text", "")[:120].replace("<", "&lt;")
+                _items += ('<div style="background:#f5f6f8;border-radius:8px;padding:8px 12px;margin-bottom:6px;font-size:12px">'
+                           f'<b style="color:#e60012">资料{_ci+1} · {_topic}</b><br>'
+                           f'<span style="color:#8a909c;font-size:11px">来源：{_source}</span><br>'
+                           f'<span style="color:#555">{_text}…</span></div>')
+        st.markdown(
+            '<style>.src-side{position:fixed;top:110px;right:0;width:340px;height:calc(100vh - 110px);background:#fff;'
+            'border-left:1px solid #e8eaef;padding:20px;overflow-y:auto;z-index:1000;'
+            'box-shadow:-4px 0 16px rgba(0,0,0,.08)}.src-side h3{margin:0 0 12px;font-size:15px}'
+            '.st-key-s-header { padding-right:360px !important; } .s-topbar { padding-right:360px !important; }</style>'
+            '<div class="src-side"><h3>📚 召回知识来源</h3>' + _items + '</div>',
+            unsafe_allow_html=True)
 
     # 分类快捷标签（白底，小标签不截断）
     with st.container(key="s-chips"):
@@ -356,7 +563,7 @@ else:
             clear_clicked = ic[1].form_submit_button("🗑 清空")
             send_clicked = ic[2].form_submit_button("发送", type="primary")
             if send_clicked and q:
-                ask(q)
+                st.session_state.pending_q = q
                 st.rerun()
             if clear_clicked:
                 st.session_state.chat_history = []

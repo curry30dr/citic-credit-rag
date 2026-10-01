@@ -2,3 +2,5 @@
 numpy
 rank_bm25
 requests
+jieba
+
