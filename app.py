@@ -536,11 +536,6 @@ else:
 
     # 分类快捷标签（白底，小标签不截断）
     with st.container(key="s-chips"):
-        cc = st.columns([0.8, 12])
-        if cc[0].button("🗑 清空对话", key="clear_chat"):
-            st.session_state.chat_history = []
-            st.session_state.src_history = []
-            st.rerun()
         qgroups = [
             ("卡片服务", [("卡到了怎么用", "信用卡收到后怎么激活使用？"),
                          ("挂失手续费", "信用卡挂失手续费多少？"),
