@@ -263,6 +263,14 @@ div[data-testid="stHorizontalBlock"] button {
 .u-row { display:flex;gap:12px;flex-direction:row-reverse;max-width:84%;margin:0 0 4px auto;align-items:flex-start; }
 .u-avatar { width:40px;height:40px;border-radius:50%;background:#eef0f4;flex:none;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#666; }
 .u-bubble { background:linear-gradient(135deg,#e60012,#c7000b);color:#fff;border-radius:14px;border-bottom-right-radius:4px;padding:10px 14px;width:fit-content;max-width:100%;font-size:14.5px;line-height:1.55;white-space:pre-wrap;word-break:break-word; }
+/* 输入框圆角胶囊 */
+.st-key-s-input input { border-radius:22px !important; border:1px solid #e8eaef !important; background:#f5f6f8 !important; padding:11px 18px !important; }
+.st-key-s-input input:focus { border-color:#e60012 !important; background:#fff !important; }
+.st-key-s-input button[kind="primary"] { border-radius:22px !important; padding:11px 26px !important; }
+.st-key-s-input button:not([kind="primary"]) { border-radius:22px !important; }
+/* 操作按钮半透明 hover */
+.st-key-act button { opacity:.5; transition:opacity .2s; }
+.st-key-act button:hover { opacity:1; }
 [class*="st-key-act"] { padding-left:52px; margin-bottom:6px; }
 [class*="st-key-act"] button { background:#fff !important;border:1px solid #e8eaef !important;color:#999 !important;border-radius:6px !important;padding:3px 10px !important;font-size:11.5px !important;height:auto !important;min-height:0 !important;width:auto !important; }
 .st-key-s-chips { background:#fff; padding:10px 32px 2px; }
@@ -526,8 +534,10 @@ else:
                            f'<b style="color:#e60012">资料{_ci+1} · {_topic}</b><br>'
                            f'<span style="color:#8a909c;font-size:11px">来源：{_source}</span><br>'
                            f'<span style="color:#555">{_text}…</span></div>')
+        sc = st.columns([10, 1])
+        sc[1].button("✕ 关闭", key="close_src", on_click=lambda: setattr(st.session_state, "show_src", False))
         st.markdown(
-            '<style>.src-side{position:fixed;top:110px;right:0;width:340px;height:calc(100vh - 110px);background:#fff;'
+            '<style>.src-side{position:fixed;top:140px;right:0;width:340px;height:calc(100vh - 140px);background:#fff;'
             'border-left:1px solid #e8eaef;padding:20px;overflow-y:auto;z-index:1000;'
             'box-shadow:-4px 0 16px rgba(0,0,0,.08)}.src-side h3{margin:0 0 12px;font-size:15px}'
             '.st-key-s-header { padding-right:360px !important; } .s-topbar { padding-right:360px !important; }</style>'
