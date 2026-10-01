@@ -576,22 +576,20 @@ else:
                     st.session_state.pending_q = real
                     st.rerun()
 
-    # 输入区：输入框 | 清空 | 发送
+    # 输入区：输入框 | 清空 | 发送（用 form 实现，避免 widget 状态冲突）
     with st.container(key="s-input"):
-        ic = st.columns([11, 1, 1.5])
-        ic[0].text_input("问题", key="user_input",
-                         placeholder="请输入您的信用卡问题，点发送…",
+        with st.form(key="chat_form", clear_on_submit=True):
+            c1, c2, c3 = st.columns([11, 1, 1.5])
+            user_input = c1.text_input("问题",
+                         placeholder="请输入您的信用卡问题…",
                          label_visibility="collapsed")
-        if ic[1].button("🗑 清空", key="clear_input"):
-            st.session_state.user_input = ""
-            st.session_state.pending_q = None
+            clear_clicked = c2.form_submit_button("🗑 清空")
+            send_clicked = c3.form_submit_button("发送", type="primary")
+
+        if send_clicked and user_input and user_input.strip():
+            st.session_state.pending_q = user_input.strip()
             st.rerun()
-        if ic[2].button("发送", type="primary", key="send_btn"):
-            v = st.session_state.get("user_input", "").strip()
-            if v:
-                st.session_state.pending_q = v
-                st.session_state.user_input = ""
-                st.rerun()
+        # clear_clicked 不需要额外操作，clear_on_submit 已自动清空
 
     # 免责声明（全宽白底）
     st.markdown('<div class="s-disclaimer">以上信息依据《领用合约》《信用卡章程》及收费价格表整理，仅供参考，具体以中信银行官方公告为准。</div>', unsafe_allow_html=True)
