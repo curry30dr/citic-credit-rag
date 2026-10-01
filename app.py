@@ -119,11 +119,16 @@ def render_bubble(text, role="bot"):
 
 import streamlit.components.v1 as components
 
-def _copy_btn(text, container_width=80):
-    """复制提示（Streamlit限制，真复制需JS组件）"""
-    pass
-
-def _save_feedback(msg, vote):
+def _copy_btn(text, width=90):
+    """嵌入一个真复制到剪贴板的小按钮，inline 浮动"""
+    safe = text.replace("\\", "\\\\").replace("`", "\\`").replace("'", "\\'")
+    components.html(f"""
+    <style>
+      .cp-btn{{background:#fff;border:1px solid #e8eaef;color:#888;border-radius:6px;padding:2px 10px;font-size:12px;cursor:pointer;line-height:1.6}}
+      .cp-btn:hover{{color:#e60012;border-color:#e60012}}
+    </style>
+    <button class="cp-btn" onclick="navigator.clipboard.writeText(`{safe}`).then(()=>{{this.textContent='✓ 已复制';setTimeout(()=>this.textContent='📋 复制',2000)}})">📋 复制</button>
+    """, height=32, width=width)def _save_feedback(msg, vote):
     """把反馈追加到 feedback.csv"""
     import csv
     row = [msg.get("q", ""), msg.get("content", "")[:200], vote]
@@ -277,6 +282,9 @@ div[data-testid="stHorizontalBlock"] button {
 /* 操作按钮半透明 hover */
 .st-key-act button { opacity:.5; transition:opacity .2s; }
 .st-key-act button:hover { opacity:1; }
+/* 复制按钮iframe和赞踩并排 */
+.st-key-act .stHtml { float:left; width:90px !important; margin-right:4px; }
+.st-key-act [data-testid="stHorizontalBlock"] { float:left; width:200px; }
 [class*="st-key-act"] { padding-left:52px; margin-bottom:6px; }
 [class*="st-key-act"] button { background:#fff !important;border:1px solid #e8eaef !important;color:#999 !important;border-radius:6px !important;padding:3px 10px !important;font-size:11.5px !important;height:auto !important;min-height:0 !important;width:auto !important; }
 .st-key-s-chips { background:#fff; padding:10px 32px 2px; }
@@ -470,21 +478,22 @@ else:
                 with st.container(key=f"act{idx}"):
                     voted_up = st.session_state.get(f"voted_{idx}") == "up"
                     voted_down = st.session_state.get(f"voted_{idx}") == "down"
-                    ac = st.columns([0.7, 0.7, 0.7, 10])
-                    if ac[0].button("📋 复制", key=f"cp{idx}"):
-                        st.toast("已复制到剪贴板")
+                    # 复制按钮（真复制，JS iframe）
+                    _copy_btn(msg["content"])
+                    # 赞/踩按钮（Streamlit原生）
+                    ac = st.columns([0.7, 0.7, 10])
                     if voted_up:
-                        ac[1].button("✓ 已赞", key=f"up{idx}", disabled=True)
+                        ac[0].button("✓ 已赞", key=f"up{idx}", disabled=True)
                     else:
-                        if ac[1].button("👍 赞", key=f"up{idx}"):
+                        if ac[0].button("👍 赞", key=f"up{idx}"):
                             _save_feedback(msg, "up")
                             st.session_state[f"voted_{idx}"] = "up"
                             st.toast("感谢反馈")
                             st.rerun()
                     if voted_down:
-                        ac[2].button("✓ 已踩", key=f"dn{idx}", disabled=True)
+                        ac[1].button("✓ 已踩", key=f"dn{idx}", disabled=True)
                     else:
-                        if ac[2].button("👎 踩", key=f"dn{idx}"):
+                        if ac[1].button("👎 踩", key=f"dn{idx}"):
                             _save_feedback(msg, "down")
                             st.session_state[f"voted_{idx}"] = "down"
                             st.toast("感谢反馈")
@@ -525,15 +534,14 @@ else:
             act_idx = len(st.session_state.chat_history) - 1
             last_msg = st.session_state.chat_history[act_idx]
             with st.container(key=f"act{act_idx}"):
-                ac = st.columns([0.7, 0.7, 0.7, 10])
-                if ac[0].button("📋 复制", key=f"cp{act_idx}"):
-                    st.toast("已复制到剪贴板")
-                if ac[1].button("👍 赞", key=f"up{act_idx}"):
+                _copy_btn(last_msg["content"])
+                ac = st.columns([0.7, 0.7, 10])
+                if ac[0].button("👍 赞", key=f"up{act_idx}"):
                     _save_feedback(last_msg, "up")
                     st.session_state[f"voted_{act_idx}"] = "up"
                     st.toast("感谢反馈")
                     st.rerun()
-                if ac[2].button("👎 踩", key=f"dn{act_idx}"):
+                if ac[1].button("👎 踩", key=f"dn{act_idx}"):
                     _save_feedback(last_msg, "down")
                     st.session_state[f"voted_{act_idx}"] = "down"
                     st.toast("感谢反馈")
