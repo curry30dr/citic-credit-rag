@@ -579,7 +579,8 @@ else:
                          label_visibility="collapsed", on_change=_on_send)
         if ic[1].button("🗑 清空", key="clear_input"):
             st.session_state.user_input = ""
-        if ic[2].button("发送", type="primary", key="send_btn"):
+        _has_input = bool(st.session_state.get("user_input", "").strip())
+        if ic[2].button("发送", type="primary", key="send_btn", disabled=not _has_input):
             _on_send()
             st.rerun()
 
