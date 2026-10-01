@@ -555,11 +555,23 @@ else:
                     st.session_state.pending_q = real
                     st.rerun()
 
-    # 输入区：用 st.chat_input 替代 form（避免云端清空 session 的 bug）
-    q_input = st.chat_input("请输入您的信用卡问题，回车发送…")
-    if q_input:
-        st.session_state.pending_q = q_input
-        st.rerun()
+    # 输入区：输入框 | 清空 | 发送（支持回车发送 + 手动清空）
+    def _on_send():
+        v = st.session_state.get("user_input", "")
+        if v:
+            st.session_state.pending_q = v
+            st.session_state.user_input = ""
+
+    with st.container(key="s-input"):
+        ic = st.columns([11, 1, 1.5])
+        ic[0].text_input("问题", key="user_input",
+                         placeholder="请输入您的信用卡问题，回车发送…",
+                         label_visibility="collapsed", on_change=_on_send)
+        if ic[1].button("🗑", key="clear_input"):
+            st.session_state.user_input = ""
+        if ic[2].button("发送", type="primary", key="send_btn"):
+            _on_send()
+            st.rerun()
 
     # 免责声明（全宽白底）
     st.markdown('<div class="s-disclaimer">以上信息依据《领用合约》《信用卡章程》及收费价格表整理，仅供参考，具体以中信银行官方公告为准。</div>', unsafe_allow_html=True)
