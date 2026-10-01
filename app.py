@@ -128,7 +128,9 @@ def _copy_btn(text, width=90):
       .cp-btn:hover{{color:#e60012;border-color:#e60012}}
     </style>
     <button class="cp-btn" onclick="navigator.clipboard.writeText(`{safe}`).then(()=>{{this.textContent='✓ 已复制';setTimeout(()=>this.textContent='📋 复制',2000)}})">📋 复制</button>
-    """, height=32, width=width)def _save_feedback(msg, vote):
+    """, height=32, width=width)
+
+def _save_feedback(msg, vote):
     """把反馈追加到 feedback.csv"""
     import csv
     row = [msg.get("q", ""), msg.get("content", "")[:200], vote]
