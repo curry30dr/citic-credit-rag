@@ -576,34 +576,22 @@ else:
                     st.session_state.pending_q = real
                     st.rerun()
 
-    # 输入区：输入框 | 清空 | 发送（支持回车发送 + 手动清空）
-    def _on_send():
-        # 清空按钮触发的回调，跳过
-        if st.session_state.get("_skip_onchange"):
-            st.session_state._skip_onchange = False
-            return
-        v = st.session_state.get("user_input", "")
-        if v:
-            st.session_state.pending_q = v
-            st.session_state.user_input = ""
-
+    # 输入区：输入框 | 清空 | 发送
     with st.container(key="s-input"):
         ic = st.columns([11, 1, 1.5])
         ic[0].text_input("问题", key="user_input",
-                         placeholder="请输入您的信用卡问题，回车发送…",
-                         label_visibility="collapsed", on_change=_on_send)
+                         placeholder="请输入您的信用卡问题，点发送…",
+                         label_visibility="collapsed")
         if ic[1].button("🗑 清空", key="clear_input"):
-            st.session_state._skip_onchange = True
             st.session_state.user_input = ""
             st.session_state.pending_q = None
-            # 彻底重置对话：只保留欢迎语
-            st.session_state.chat_history = []
-            st.session_state.src_history = []
             st.rerun()
-        _has_input = bool(st.session_state.get("user_input", "").strip())
-        if ic[2].button("发送", type="primary", key="send_btn", disabled=not _has_input):
-            _on_send()
-            st.rerun()
+        if ic[2].button("发送", type="primary", key="send_btn"):
+            v = st.session_state.get("user_input", "").strip()
+            if v:
+                st.session_state.pending_q = v
+                st.session_state.user_input = ""
+                st.rerun()
 
     # 免责声明（全宽白底）
     st.markdown('<div class="s-disclaimer">以上信息依据《领用合约》《信用卡章程》及收费价格表整理，仅供参考，具体以中信银行官方公告为准。</div>', unsafe_allow_html=True)
