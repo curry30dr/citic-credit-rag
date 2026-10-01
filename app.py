@@ -578,6 +578,10 @@ else:
 
     # 输入区：输入框 | 清空 | 发送（支持回车发送 + 手动清空）
     def _on_send():
+        # 清空按钮触发的回调，跳过
+        if st.session_state.get("_skip_onchange"):
+            st.session_state._skip_onchange = False
+            return
         v = st.session_state.get("user_input", "")
         if v:
             st.session_state.pending_q = v
@@ -589,6 +593,7 @@ else:
                          placeholder="请输入您的信用卡问题，回车发送…",
                          label_visibility="collapsed", on_change=_on_send)
         if ic[1].button("🗑 清空", key="clear_input"):
+            st.session_state._skip_onchange = True
             st.session_state.user_input = ""
             st.session_state.pending_q = None
         _has_input = bool(st.session_state.get("user_input", "").strip())
