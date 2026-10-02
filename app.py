@@ -603,17 +603,19 @@ else:
     });
     function ciSend() {
       const v = ciEl.value.trim();
-      if (v) { parent.postMessage({type:'streamlit:setComponentValue', value: v}, '*'); ciEl.value=''; }
+      if (v) {
+        window.parent.postMessage({isStreamlitMessage:true, type:'streamlit:setComponentValue', value: v}, '*');
+        ciEl.value='';
+      }
     }
     function ciClear() {
       ciEl.value='';
-      parent.postMessage({type:'streamlit:setComponentValue', value: '__CLEAR__'}, '*');
     }
     </script>
     """
     _input_val = st.components.v1.html(_input_html, height=64)
-    if _input_val and _input_val != "__CLEAR__":
-        st.session_state.pending_q = _input_val
+    if _input_val and isinstance(_input_val, str) and _input_val.strip():
+        st.session_state.pending_q = _input_val.strip()
         st.rerun()
 
     # 免责声明（全宽白底）
