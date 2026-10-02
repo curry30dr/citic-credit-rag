@@ -576,20 +576,44 @@ else:
                     st.session_state.pending_q = real
                     st.rerun()
 
-    # 输入区：输入框 | 清空 | 发送（用 form 实现，避免 widget 状态冲突）
-    with st.container(key="s-input"):
-        with st.form(key="chat_form", clear_on_submit=True):
-            c1, c2, c3 = st.columns([11, 1, 1.5])
-            user_input = c1.text_input("问题",
-                         placeholder="请输入您的信用卡问题…",
-                         label_visibility="collapsed")
-            clear_clicked = c2.form_submit_button("🗑 清空")
-            send_clicked = c3.form_submit_button("发送", type="primary")
-
-        if send_clicked and user_input and user_input.strip():
-            st.session_state.pending_q = user_input.strip()
-            st.rerun()
-        # clear_clicked 不需要额外操作，clear_on_submit 已自动清空
+    # 输入区：自定义 HTML 输入框（Enter发送 / Shift+Enter换行）
+    _input_html = """
+    <style>
+    .chat-input-wrap { display:flex; gap:8px; align-items:flex-end; padding:4px 0; }
+    .chat-input-wrap textarea {
+      flex:1; border:1px solid #e5e7eb; border-radius:10px; padding:10px 14px;
+      font-size:14px; resize:none; outline:none; min-height:42px; max-height:100px;
+      font-family: inherit; line-height:1.5;
+    }
+    .chat-input-wrap textarea:focus { border-color:#e60012; }
+    .ci-btn { padding:10px 16px; border-radius:10px; border:none; cursor:pointer; font-size:14px; white-space:nowrap; }
+    .ci-btn-clear { background:#f3f4f6; color:#555; }
+    .ci-btn-send { background:#e60012; color:#fff; }
+    </style>
+    <div class="chat-input-wrap">
+      <textarea id="chat-input" placeholder="请输入您的信用卡问题… （Enter发送，Shift+Enter换行）" rows="1"></textarea>
+      <button class="ci-btn ci-btn-clear" onclick="ciClear()">🗑 清空</button>
+      <button class="ci-btn ci-btn-send" onclick="ciSend()">发送</button>
+    </div>
+    <script>
+    const ciEl = document.getElementById('chat-input');
+    ciEl.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); ciSend(); }
+    });
+    function ciSend() {
+      const v = ciEl.value.trim();
+      if (v) { parent.postMessage({type:'streamlit:setComponentValue', value: v}, '*'); ciEl.value=''; }
+    }
+    function ciClear() {
+      ciEl.value='';
+      parent.postMessage({type:'streamlit:setComponentValue', value: '__CLEAR__'}, '*');
+    }
+    </script>
+    """
+    _input_val = st.components.v1.html(_input_html, height=64)
+    if _input_val and _input_val != "__CLEAR__":
+        st.session_state.pending_q = _input_val
+        st.rerun()
 
     # 免责声明（全宽白底）
     st.markdown('<div class="s-disclaimer">以上信息依据《领用合约》《信用卡章程》及收费价格表整理，仅供参考，具体以中信银行官方公告为准。</div>', unsafe_allow_html=True)
