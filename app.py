@@ -548,13 +548,21 @@ else:
 
     # 消息区（浅灰底，气泡fit-content左右分置）
     with st.container(key="s-msgs"):
-        # 自动滚到底部的JS
+        # 持续自动滚到底部
         st.markdown("""
         <script>
-        window.addEventListener('load', function() {
-            const msgs = document.querySelector('[data-testid="stMainBlockContainer"]');
-            if (msgs) msgs.scrollTop = msgs.scrollHeight;
-        });
+        (function() {
+            function scrollDown() {
+                window.scrollTo(0, document.body.scrollHeight);
+            }
+            // 首次加载
+            setTimeout(scrollDown, 100);
+            // 监听DOM变化（流式输出）
+            const obs = new MutationObserver(function() {
+                scrollDown();
+            });
+            obs.observe(document.body, {childList: true, subtree: true});
+        })();
         </script>
         """, unsafe_allow_html=True)
         st.markdown('<div class="b-row"><div class="b-avatar">🤖</div><div class="b-bubble">您好，我是中信银行信用卡智能咨询助手 👋<br>我只依据《领用合约》《收费价格表》等业务资料为您解答，数字有据可查。<br>可咨询：激活、取现、最低还款、年费、账单等。</div></div>', unsafe_allow_html=True)
