@@ -107,6 +107,7 @@ def build_msgs(q):
 def render_bubble(text, role="bot"):
     """渲染一条消息气泡"""
     HARD = ["无法回答", "未找到", "无法提供", "未提供", "未列明", "未明确", "无法确定"]
+    text = str(text) if text is not None else ""
     if role == "user":
         st.markdown(f'<div class="u-row"><div class="u-avatar">我</div><div class="u-bubble">{html.escape(text)}</div></div>', unsafe_allow_html=True)
     else:
