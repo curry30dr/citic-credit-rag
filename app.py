@@ -120,26 +120,30 @@ def render_bubble(text, role="bot"):
 
 import streamlit.components.v1 as components
 
-def _action_bar(text, idx, voted_up, voted_down):
-    """一行三个按钮：真复制+赞+踩"""
+def _action_bar(text, idx, voted_up, voted_down, q=""):
+    """一行三个按钮：真复制+赞+踩（hover才显示，赞踩记录feedback）"""
     safe = text.replace("\\", "\\\\").replace("`", "\\`").replace("'", "\\'")
-    up_label = "✓ 已赞" if voted_up else "👍 赞"
-    dn_label = "✓ 已踩" if voted_down else "👎 踩"
-    up_disabled = "disabled" if voted_up else ""
-    dn_disabled = "disabled" if voted_down else ""
-    components.html(f"""
+    c1, c2, c3 = st.columns([1.3, 0.7, 0.7], gap="small")
+    # 复制按钮（JS真复制）
+    c1.components.html(f"""
     <style>
-      .ab-wrap{{display:flex;gap:6px;align-items:center;margin-top:4px;margin-left:52px}}
-      .ab-btn{{background:#fff;border:1px solid #e8eaef;color:#888;border-radius:6px;padding:2px 10px;font-size:12px;cursor:pointer;line-height:1.6}}
-      .ab-btn:hover{{color:#e60012;border-color:#e60012}}
-      .ab-btn[disabled]{{opacity:.5;cursor:default}}
+      .cp-btn{{background:#fff;border:1px solid #e8eaef;color:#888;border-radius:6px;padding:2px 10px;font-size:12px;cursor:pointer;line-height:1.6}}
+      .cp-btn:hover{{color:#e60012;border-color:#e60012}}
     </style>
-    <div class="ab-wrap">
-      <button class="ab-btn" onclick="navigator.clipboard.writeText(`{safe}`).then(()=>{{this.textContent='✓ 已复制';setTimeout(()=>this.textContent='📋 复制',2000)}})">📋 复制</button>
-      <button class="ab-btn" {up_disabled} onclick="this.disabled=true;this.textContent='✓ 已赞'">👍 赞</button>
-      <button class="ab-btn" {dn_disabled} onclick="this.disabled=true;this.textContent='✓ 已踩'">👎 踩</button>
-    </div>
-    """, height=36)
+    <button class="cp-btn" onclick="navigator.clipboard.writeText(`{safe}`).then(()=>{{this.textContent='✓ 已复制';setTimeout(()=>this.textContent='📋 复制',2000)}})">📋 复制</button>
+    """, height=30)
+    # 赞按钮（原生button，记录feedback）
+    up_label = "✓ 已赞" if voted_up else "👍"
+    if c2.button(up_label, key=f"up_{idx}", disabled=voted_up, use_container_width=True):
+        st.session_state[f"voted_{idx}"] = "up"
+        _save_feedback({"q": q, "content": text, "vote": "up"})
+        st.rerun()
+    # 踩按钮（原生button，记录feedback）
+    dn_label = "✓ 已踩" if voted_down else "👎"
+    if c3.button(dn_label, key=f"down_{idx}", disabled=voted_down, use_container_width=True):
+        st.session_state[f"voted_{idx}"] = "down"
+        _save_feedback({"q": q, "content": text, "vote": "down"})
+        st.rerun()
 
 def _save_feedback(msg, vote):
     """把反馈追加到 feedback.csv"""
@@ -312,6 +316,15 @@ div[data-testid="stHorizontalBlock"] button {
 .s-disclaimer { background:#fff; border-top:1px solid #e8eaef; padding:9px 32px; font-size:11px; color:#8a909c; text-align:center; }
 .fallback { margin-top:8px; padding:10px 14px; background:#fdf0f0; border-radius:10px; font-size:13px; line-height:1.6; color:#555; }
 .fallback b { color:#e60012; }
+
+/* 操作按钮默认半透明，hover 时全显示 */
+.st-key-s-msgs ~ div button[kind="secondary"] {
+    opacity: 0.35;
+    transition: opacity 0.2s;
+}
+.st-key-s-msgs ~ div button[kind="secondary"]:hover {
+    opacity: 1;
+}
 
 /* ===== 技术说明面板 ===== */
 .tech-block { background:#fff; border:1px solid #e8eaef; border-radius:16px; padding:26px 28px; margin-top:10px; }
@@ -491,7 +504,7 @@ else:
             if msg["role"] == "assistant":
                 voted_up = st.session_state.get(f"voted_{idx}") == "up"
                 voted_down = st.session_state.get(f"voted_{idx}") == "down"
-                _action_bar(msg["content"], idx, voted_up, voted_down)
+                _action_bar(msg["content"], idx, voted_up, voted_down, msg.get("q", ""))
 
         # 处理新问题：流式生成
         if st.session_state.pending_q:
@@ -527,7 +540,7 @@ else:
             # 操作按钮
             act_idx = len(st.session_state.chat_history) - 1
             last_msg = st.session_state.chat_history[act_idx]
-            _action_bar(last_msg["content"], act_idx, False, False)
+            _action_bar(last_msg["content"], act_idx, False, False, last_msg.get("q", ""))
 
     # 来源面板（点"来源"按钮在右侧滑出）
     if st.session_state.show_src:
