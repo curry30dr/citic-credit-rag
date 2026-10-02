@@ -548,20 +548,15 @@ else:
 
     # 消息区（浅灰底，气泡fit-content左右分置）
     with st.container(key="s-msgs"):
-        # 持续自动滚到底部
+        # 新消息出现时自动滚到底部
         st.markdown("""
         <script>
         (function() {
             function scrollDown() {
-                window.scrollTo(0, document.body.scrollHeight);
+                const msgs = document.querySelector('.st-key-s-msgs');
+                if (msgs) msgs.scrollIntoView({block: 'end', behavior: 'smooth'});
             }
-            // 首次加载
-            setTimeout(scrollDown, 100);
-            // 监听DOM变化（流式输出）
-            const obs = new MutationObserver(function() {
-                scrollDown();
-            });
-            obs.observe(document.body, {childList: true, subtree: true});
+            setTimeout(scrollDown, 200);
         })();
         </script>
         """, unsafe_allow_html=True)
