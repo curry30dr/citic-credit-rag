@@ -445,15 +445,6 @@ if not st.session_state.in_chat:
                                 st.session_state.in_chat = True
                                 st.rerun()
 
-                # 常见问题
-                with st.container(key="faqbox"):
-                    faqs = ["如何申请信用卡", "账单日和还款日", "逾期后果", "挂失手续费", "最低还款额怎么算", "优惠活动"]
-                    picked = st.pills("常见问题", faqs, key="faq_pills")
-                    if picked:
-                        st.session_state.pending_q = picked
-                        st.session_state.in_chat = True
-                        st.rerun()
-
                 # 热线提示条
                 st.markdown("""
                 <div style="background:white;border-left:3px solid #e60012;border-radius:8px;padding:14px 20px;margin-top:20px;font-size:14px">
