@@ -636,15 +636,21 @@ else:
     # 输入区：form 实现（Enter提交发送，清空按钮只清空输入框）
     with st.container(key="s-input"):
         with st.form(key="chat_form", clear_on_submit=True):
-            c1, c2, c3 = st.columns([11, 1.5, 1])
+            c1, c2, c3, c4 = st.columns([9, 1.2, 1.5, 1.5])
             user_input = c1.text_input("问题",
                          placeholder="请输入您的信用卡问题… （按 Enter 发送）",
                          label_visibility="collapsed")
             send_clicked = c2.form_submit_button("发送", type="primary")
             clear_clicked = c3.form_submit_button("🗑 清空")
+            reset_clicked = c4.form_submit_button("🔄 清空对话")
 
         if send_clicked and user_input and user_input.strip():
             st.session_state.pending_q = user_input.strip()
+            st.rerun()
+        if reset_clicked:
+            st.session_state.chat_history = []
+            st.session_state.src_history = []
+            st.session_state.pending_q = None
             st.rerun()
 
     # 免责声明（全宽白底）
