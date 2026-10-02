@@ -467,6 +467,16 @@ if not st.session_state.in_chat:
                 </div>
                 """, unsafe_allow_html=True)
 
+                # 首页直接输入框
+                with st.form(key="home_form", clear_on_submit=True):
+                    h1, h2 = st.columns([4, 1])
+                    home_q = h1.text_input("", placeholder="输入您的信用卡问题，直接开始咨询…", label_visibility="collapsed")
+                    home_send = h2.form_submit_button("开始咨询 →", type="primary")
+                    if home_send and home_q and home_q.strip():
+                        st.session_state.pending_q = home_q.strip()
+                        st.session_state.in_chat = True
+                        st.rerun()
+
             # 右侧FAQ栏
             with right:
                 st.markdown("### 常见问题")
