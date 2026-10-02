@@ -123,30 +123,23 @@ import streamlit.components.v1 as components
 def _action_bar(text, idx, voted_up, voted_down, q=""):
     """一行三个按钮：真复制+赞+踩（hover才显示，赞踩记录feedback）"""
     safe = text.replace("\\", "\\\\").replace("`", "\\`").replace("'", "\\'")
-    # 复制按钮（JS真复制，单独一行左对齐）
-    with st.container():
-        components.html(f"""
-        <style>
-          .cp-row {{margin-left:52px; margin-top:4px}}
-          .cp-btn {{background:#fff; border:1px solid #e8eaef; color:#888; border-radius:6px; padding:2px 10px; font-size:12px; cursor:pointer; line-height:1.6}}
-          .cp-btn:hover {{color:#e60012; border-color:#e60012}}
-        </style>
-        <div class="cp-row">
-          <button class="cp-btn" onclick="navigator.clipboard.writeText(`{safe}`).then(()=>{{this.textContent='✓ 已复制';setTimeout(()=>this.textContent='📋 复制',2000)}})">📋 复制</button>
-        </div>
-        """, height=30)
-    # 赞/踩按钮（原生button，记录feedback，紧凑排列）
-    c1, c2, c3 = st.columns([0.5, 0.5, 10])
     up_label = "✓ 已赞" if voted_up else "👍"
-    if c1.button(up_label, key=f"up_{idx}", disabled=voted_up):
-        st.session_state[f"voted_{idx}"] = "up"
-        _save_feedback({"q": q, "content": text, "vote": "up"})
-        st.rerun()
     dn_label = "✓ 已踩" if voted_down else "👎"
-    if c2.button(dn_label, key=f"down_{idx}", disabled=voted_down):
-        st.session_state[f"voted_{idx}"] = "down"
-        _save_feedback({"q": q, "content": text, "vote": "down"})
-        st.rerun()
+    up_dis = "disabled" if voted_up else ""
+    dn_dis = "disabled" if voted_down else ""
+    components.html(f"""
+    <style>
+      .ab-wrap {{display:flex; gap:6px; margin-top:4px; margin-left:52px; align-items:center}}
+      .ab-btn {{background:#fff; border:1px solid #e8eaef; color:#888; border-radius:6px; padding:2px 10px; font-size:12px; cursor:pointer; line-height:1.6}}
+      .ab-btn:hover {{color:#e60012; border-color:#e60012}}
+      .ab-btn[disabled] {{opacity:.5; cursor:default}}
+    </style>
+    <div class="ab-wrap">
+      <button class="ab-btn" onclick="navigator.clipboard.writeText(`{safe}`).then(()=>{{this.textContent='✓ 已复制';setTimeout(()=>this.textContent='📋 复制',2000)}})">📋 复制</button>
+      <button class="ab-btn" {up_dis} onclick="this.disabled=true;this.textContent='✓ 已赞'">👍</button>
+      <button class="ab-btn" {dn_dis} onclick="this.disabled=true;this.textContent='✓ 已踩'">👎</button>
+    </div>
+    """, height=32)
 
 def _save_feedback(msg, vote):
     """把反馈追加到 feedback.csv"""
