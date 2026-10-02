@@ -123,25 +123,27 @@ import streamlit.components.v1 as components
 def _action_bar(text, idx, voted_up, voted_down, q=""):
     """一行三个按钮：真复制+赞+踩（hover才显示，赞踩记录feedback）"""
     safe = text.replace("\\", "\\\\").replace("`", "\\`").replace("'", "\\'")
-    c1, c2, c3 = st.columns([1.3, 0.7, 0.7], gap="small")
-    # 复制按钮（JS真复制）
-    with c1:
+    # 复制按钮（JS真复制，单独一行左对齐）
+    with st.container():
         components.html(f"""
         <style>
-          .cp-btn{{background:#fff;border:1px solid #e8eaef;color:#888;border-radius:6px;padding:2px 10px;font-size:12px;cursor:pointer;line-height:1.6}}
-          .cp-btn:hover{{color:#e60012;border-color:#e60012}}
+          .cp-row {{margin-left:52px; margin-top:4px}}
+          .cp-btn {{background:#fff; border:1px solid #e8eaef; color:#888; border-radius:6px; padding:2px 10px; font-size:12px; cursor:pointer; line-height:1.6}}
+          .cp-btn:hover {{color:#e60012; border-color:#e60012}}
         </style>
-        <button class="cp-btn" onclick="navigator.clipboard.writeText(`{safe}`).then(()=>{{this.textContent='✓ 已复制';setTimeout(()=>this.textContent='📋 复制',2000)}})">📋 复制</button>
+        <div class="cp-row">
+          <button class="cp-btn" onclick="navigator.clipboard.writeText(`{safe}`).then(()=>{{this.textContent='✓ 已复制';setTimeout(()=>this.textContent='📋 复制',2000)}})">📋 复制</button>
+        </div>
         """, height=30)
-    # 赞按钮（原生button，记录feedback）
+    # 赞/踩按钮（原生button，记录feedback，紧凑排列）
+    c1, c2, c3 = st.columns([0.5, 0.5, 10])
     up_label = "✓ 已赞" if voted_up else "👍"
-    if c2.button(up_label, key=f"up_{idx}", disabled=voted_up):
+    if c1.button(up_label, key=f"up_{idx}", disabled=voted_up):
         st.session_state[f"voted_{idx}"] = "up"
         _save_feedback({"q": q, "content": text, "vote": "up"})
         st.rerun()
-    # 踩按钮（原生button，记录feedback）
     dn_label = "✓ 已踩" if voted_down else "👎"
-    if c3.button(dn_label, key=f"down_{idx}", disabled=voted_down):
+    if c2.button(dn_label, key=f"down_{idx}", disabled=voted_down):
         st.session_state[f"voted_{idx}"] = "down"
         _save_feedback({"q": q, "content": text, "vote": "down"})
         st.rerun()
