@@ -135,13 +135,13 @@ def _action_bar(text, idx, voted_up, voted_down, q=""):
         """, height=30)
     # 赞按钮（原生button，记录feedback）
     up_label = "✓ 已赞" if voted_up else "👍"
-    if c2.button(up_label, key=f"up_{idx}", disabled=voted_up, use_container_width=True):
+    if c2.button(up_label, key=f"up_{idx}", disabled=voted_up):
         st.session_state[f"voted_{idx}"] = "up"
         _save_feedback({"q": q, "content": text, "vote": "up"})
         st.rerun()
     # 踩按钮（原生button，记录feedback）
     dn_label = "✓ 已踩" if voted_down else "👎"
-    if c3.button(dn_label, key=f"down_{idx}", disabled=voted_down, use_container_width=True):
+    if c3.button(dn_label, key=f"down_{idx}", disabled=voted_down):
         st.session_state[f"voted_{idx}"] = "down"
         _save_feedback({"q": q, "content": text, "vote": "down"})
         st.rerun()
@@ -314,7 +314,7 @@ div[data-testid="stHorizontalBlock"] button {
 .st-key-s-input input { background:#f5f6f8 !important; border-radius:22px !important; }
 .st-key-s-input .stButton button { border-radius:22px !important; height:42px !important; padding:0 18px !important; }
 .st-key-s-input button[kind="primaryFormSubmit"] { background:linear-gradient(135deg,#e60012,#c7000b) !important; color:#fff !important; border:none !important; font-weight:700 !important; }
-.s-disclaimer { background:#fff; border-top:1px solid #e8eaef; padding:9px 32px; font-size:11px; color:#8a909c; text-align:center; }
+.s-disclaimer { background:#fff; border-top:1px solid #e8eaef; padding:9px 32px 60px; font-size:11px; color:#8a909c; text-align:center; }
 .fallback { margin-top:8px; padding:10px 14px; background:#fdf0f0; border-radius:10px; font-size:13px; line-height:1.6; color:#555; }
 .fallback b { color:#e60012; }
 
