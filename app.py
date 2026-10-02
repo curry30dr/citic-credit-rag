@@ -101,7 +101,7 @@ def build_msgs(q):
     ctx = retrieve(q)
     ctx_text = "\n\n".join([f"[资料{i+1}] {c['text']}" for i, c in enumerate(ctx)])
     history_msgs = st.session_state.chat_history[-4:-1]
-    msgs = [{"role": "system", "content": "你是中信银行信用卡智能咨询助手。仔细阅读业务资料，从资料中找答案，数字必须原样引用，确实没有才说不清楚。"}] + history_msgs + [{"role": "user", "content": f"【业务资料】\n{ctx_text}\n\n【用户问题】{q}"}]
+    msgs = [{"role": "system", "content": "你是中信银行信用卡智能咨询助手。仔细阅读业务资料，从资料中找答案，数字必须原样引用，确实没有才说不清楚。回答中引用资料时用[1][2]标注出处。"}] + history_msgs + [{"role": "user", "content": f"【业务资料】\n{ctx_text}\n\n【用户问题】{q}"}]
     return msgs, ctx
 
 def render_bubble(text, role="bot"):
@@ -113,6 +113,7 @@ def render_bubble(text, role="bot"):
     else:
         body = html.escape(text)
         body = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', body)
+        body = re.sub(r'\[(\d+)\]', r'<span style="color:#e60012;font-weight:600">[<a href="#src-\1" style="color:#e60012;text-decoration:none">\1</a>]</span>', body)
         body = body.replace('\n', '<br>')
         st.markdown(f'<div class="b-row"><div class="b-avatar">🤖</div><div class="b-bubble">{body}</div></div>', unsafe_allow_html=True)
         if any(k in text for k in HARD):
@@ -547,6 +548,15 @@ else:
 
     # 消息区（浅灰底，气泡fit-content左右分置）
     with st.container(key="s-msgs"):
+        # 自动滚到底部的JS
+        st.markdown("""
+        <script>
+        window.addEventListener('load', function() {
+            const msgs = document.querySelector('[data-testid="stMainBlockContainer"]');
+            if (msgs) msgs.scrollTop = msgs.scrollHeight;
+        });
+        </script>
+        """, unsafe_allow_html=True)
         st.markdown('<div class="b-row"><div class="b-avatar">🤖</div><div class="b-bubble">您好，我是中信银行信用卡智能咨询助手 👋<br>我只依据《领用合约》《收费价格表》等业务资料为您解答，数字有据可查。<br>可咨询：激活、取现、最低还款、年费、账单等。</div></div>', unsafe_allow_html=True)
         for idx, msg in enumerate(st.session_state.chat_history):
             render_bubble(msg["content"], msg["role"])
