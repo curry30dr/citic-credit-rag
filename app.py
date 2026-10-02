@@ -324,6 +324,21 @@ div[data-testid="stHorizontalBlock"] button {
 .fallback { margin-top:8px; padding:10px 14px; background:#fdf0f0; border-radius:10px; font-size:13px; line-height:1.6; color:#555; }
 .fallback b { color:#e60012; }
 
+/* 首页功能卡片 hover 上浮 */
+.st-key-cardrow button {
+    transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s !important;
+}
+.st-key-cardrow button:hover {
+    transform: translateY(-3px) !important;
+    box-shadow: 0 8px 20px rgba(230,0,18,0.12) !important;
+    border-color: #e60012 !important;
+}
+
+/* 来源面板滑出动画 */
+.src-side {
+    transition: right 0.3s ease-in-out !important;
+}
+
 /* 操作按钮默认半透明，hover 时全显示 */
 .st-key-s-msgs ~ div button[kind="secondary"] {
     opacity: 0.35;
