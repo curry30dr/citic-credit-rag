@@ -127,19 +127,30 @@ def _action_bar(text, idx, voted_up, voted_down, q=""):
     dn_label = "✓ 已踩" if voted_down else "👎"
     up_dis = "disabled" if voted_up else ""
     dn_dis = "disabled" if voted_down else ""
-    components.html(f"""
+    _val = components.html(f"""
     <style>
-      .ab-wrap {{display:flex; gap:6px; margin-top:4px; margin-left:52px; align-items:center}}
+      .ab-wrap {{display:flex; gap:6px; margin-top:4px; margin-left:52px; align-items:center; opacity:0.35; transition:opacity 0.2s}}
+      .ab-wrap:hover {{opacity:1}}
       .ab-btn {{background:#fff; border:1px solid #e8eaef; color:#888; border-radius:6px; padding:2px 10px; font-size:12px; cursor:pointer; line-height:1.6}}
       .ab-btn:hover {{color:#e60012; border-color:#e60012}}
       .ab-btn[disabled] {{opacity:.5; cursor:default}}
     </style>
     <div class="ab-wrap">
       <button class="ab-btn" onclick="navigator.clipboard.writeText(`{safe}`).then(()=>{{this.textContent='✓ 已复制';setTimeout(()=>this.textContent='📋 复制',2000)}})">📋 复制</button>
-      <button class="ab-btn" {up_dis} onclick="this.disabled=true;this.textContent='✓ 已赞'">👍</button>
-      <button class="ab-btn" {dn_dis} onclick="this.disabled=true;this.textContent='✓ 已踩'">👎</button>
+      <button class="ab-btn" {up_dis} onclick="this.disabled=true;this.textContent='✓ 已赞';parent.postMessage({{isStreamlitMessage:true,type:'streamlit:setComponentValue',value:'__UP_{idx}'}},'*')">👍</button>
+      <button class="ab-btn" {dn_dis} onclick="this.disabled=true;this.textContent='✓ 已踩';parent.postMessage({{isStreamlitMessage:true,type:'streamlit:setComponentValue',value:'__DOWN_{idx}'}},'*')">👎</button>
     </div>
     """, height=32)
+    # 处理赞/踩反馈
+    if _val and isinstance(_val, str):
+        if _val == f"__UP_{idx}":
+            st.session_state[f"voted_{idx}"] = "up"
+            _save_feedback({"q": q, "content": text, "vote": "up"})
+            st.rerun()
+        elif _val == f"__DOWN_{idx}":
+            st.session_state[f"voted_{idx}"] = "down"
+            _save_feedback({"q": q, "content": text, "vote": "down"})
+            st.rerun()
 
 def _save_feedback(msg, vote):
     """把反馈追加到 feedback.csv"""
@@ -406,46 +417,66 @@ if not st.session_state.in_chat:
             </div>
             """, unsafe_allow_html=True)
         else:
-            # 欢迎区
-            c1, c2 = st.columns([0.75, 10], gap="small")
-            with c1:
-                st.markdown("""<div style="width:72px;height:72px;background:linear-gradient(135deg,#e60012,#ff3344);border-radius:20px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(230,0,18,0.35)"><svg width="46" height="46" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="hg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#dcd3f6"/></linearGradient><linearGradient id="fg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7c6fe0"/><stop offset="1" stop-color="#4a409f"/></linearGradient><radialGradient id="bl" cx="0.35" cy="0.35" r="0.85"><stop offset="0" stop-color="#ffe27a"/><stop offset="1" stop-color="#f5a623"/></radialGradient><linearGradient id="eg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#eae5fb"/><stop offset="1" stop-color="#c6bcef"/></linearGradient></defs><rect x="7" y="29" width="7" height="13" rx="3.5" fill="url(#eg)"/><rect x="50" y="29" width="7" height="13" rx="3.5" fill="url(#eg)"/><rect x="30.5" y="9" width="3" height="9" rx="1.5" fill="#e8e2f7"/><circle cx="32" cy="8" r="4.2" fill="url(#bl)"/><rect x="14" y="19" width="36" height="31" rx="9" fill="url(#hg)" stroke="#c4b9ee" stroke-width="0.8"/><rect x="19" y="25" width="26" height="17" rx="6" fill="url(#fg)"/><circle cx="26.5" cy="33.5" r="3.2" fill="#8fd3ff"/><circle cx="37.5" cy="33.5" r="3.2" fill="#8fd3ff"/><circle cx="27.4" cy="32.6" r="1" fill="#eafaff"/><circle cx="38.4" cy="32.6" r="1" fill="#eafaff"/><rect x="27" y="45" width="10" height="3" rx="1.5" fill="#a78bfa"/></svg></div>""", unsafe_allow_html=True)
-            with c2:
-                st.markdown("# 您好，我是中信银行 <span style='color:#e60012'>智能客服</span>", unsafe_allow_html=True)
-                st.caption("我可以为您解答信用卡相关问题，依据领用合约与收费价格表，数字有据可查")
+            # 左侧主内容 + 右侧FAQ栏
+            left, right = st.columns([2.2, 1])
+            with left:
+                # 欢迎区
+                c1, c2 = st.columns([0.75, 10], gap="small")
+                with c1:
+                    st.markdown("""<div style="width:72px;height:72px;background:linear-gradient(135deg,#e60012,#ff3344);border-radius:20px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(230,0,18,0.35)"><svg width="46" height="46" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="hg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#dcd3f6"/></linearGradient><linearGradient id="fg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7c6fe0"/><stop offset="1" stop-color="#4a409f"/></linearGradient><radialGradient id="bl" cx="0.35" cy="0.35" r="0.85"><stop offset="0" stop-color="#ffe27a"/><stop offset="1" stop-color="#f5a623"/></radialGradient><linearGradient id="eg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#eae5fb"/><stop offset="1" stop-color="#c6bcef"/></linearGradient></defs><rect x="7" y="29" width="7" height="13" rx="3.5" fill="url(#eg)"/><rect x="50" y="29" width="7" height="13" rx="3.5" fill="url(#eg)"/><rect x="30.5" y="9" width="3" height="9" rx="1.5" fill="#e8e2f7"/><circle cx="32" cy="8" r="4.2" fill="url(#bl)"/><rect x="14" y="19" width="36" height="31" rx="9" fill="url(#hg)" stroke="#c4b9ee" stroke-width="0.8"/><rect x="19" y="25" width="26" height="17" rx="6" fill="url(#fg)"/><circle cx="26.5" cy="33.5" r="3.2" fill="#8fd3ff"/><circle cx="37.5" cy="33.5" r="3.2" fill="#8fd3ff"/><circle cx="27.4" cy="32.6" r="1" fill="#eafaff"/><circle cx="38.4" cy="32.6" r="1" fill="#eafaff"/><rect x="27" y="45" width="10" height="3" rx="1.5" fill="#a78bfa"/></svg></div>""", unsafe_allow_html=True)
+                with c2:
+                    st.markdown("# 您好，我是中信银行 <span style='color:#e60012'>智能客服</span>", unsafe_allow_html=True)
+                    st.caption("我可以为您解答信用卡相关问题，依据领用合约与收费价格表，数字有据可查")
 
-            # 5个功能卡片
-            cards = [
-                ("💳", "取现手续费", "境内外取现费率", "信用卡取现手续费多少？"),
-                ("🌍", "境外取现", "每日/年度限额", "境外取现限额多少？"),
-                ("✨", "卡怎么激活", "快速激活流程", "信用卡怎么激活？"),
-                ("💰", "还款指南", "最低还款/免息期", "最低还款有利息吗？"),
-                ("💴", "年费怎么收", "年费标准/免年费政策", "年费怎么免？"),
-            ]
-            with st.container(key="cardrow"):
-                cols = st.columns(5)
-                for i, (icon, title, desc, q_text) in enumerate(cards):
-                    with cols[i]:
-                        if st.button(f"{icon}\n**{title}**\n{desc}", key=f"card{i}", use_container_width=True):
-                            st.session_state.pending_q = q_text
-                            st.session_state.in_chat = True
-                            st.rerun()
+                # 5个功能卡片
+                cards = [
+                    ("💳", "取现手续费", "境内外取现费率", "信用卡取现手续费多少？"),
+                    ("🌍", "境外取现", "每日/年度限额", "境外取现限额多少？"),
+                    ("✨", "卡怎么激活", "快速激活流程", "信用卡怎么激活？"),
+                    ("💰", "还款指南", "最低还款/免息期", "最低还款有利息吗？"),
+                    ("💴", "年费怎么收", "年费标准/免年费政策", "年费怎么免？"),
+                ]
+                with st.container(key="cardrow"):
+                    cols = st.columns(5)
+                    for i, (icon, title, desc, q_text) in enumerate(cards):
+                        with cols[i]:
+                            if st.button(f"{icon}\n**{title}**\n{desc}", key=f"card{i}", use_container_width=True):
+                                st.session_state.pending_q = q_text
+                                st.session_state.in_chat = True
+                                st.rerun()
 
-            # 常见问题纯白无边框卡片（pills自适应宽度，不截断）
-            with st.container(key="faqbox"):
-                faqs = ["如何申请信用卡", "账单日和还款日", "逾期后果", "挂失手续费", "最低还款额怎么算", "优惠活动"]
-                picked = st.pills("常见问题", faqs, key="faq_pills")
-                if picked:
-                    st.session_state.pending_q = picked
-                    st.session_state.in_chat = True
-                    st.rerun()
+                # 常见问题
+                with st.container(key="faqbox"):
+                    faqs = ["如何申请信用卡", "账单日和还款日", "逾期后果", "挂失手续费", "最低还款额怎么算", "优惠活动"]
+                    picked = st.pills("常见问题", faqs, key="faq_pills")
+                    if picked:
+                        st.session_state.pending_q = picked
+                        st.session_state.in_chat = True
+                        st.rerun()
 
-            # 热线提示条
-            st.markdown("""
-            <div style="background:white;border-left:3px solid #e60012;border-radius:8px;padding:14px 20px;margin-top:20px;font-size:14px">
-                🤖 以上问题我可以帮您解答；如果需要人工服务，请拨打 <b style="color:#e60012">24小时客服热线 4008895558</b>
-            </div>
-            """, unsafe_allow_html=True)
+                # 热线提示条
+                st.markdown("""
+                <div style="background:white;border-left:3px solid #e60012;border-radius:8px;padding:14px 20px;margin-top:20px;font-size:14px">
+                    🤖 以上问题我可以帮您解答；如果需要人工服务，请拨打 <b style="color:#e60012">24小时客服热线 4008895558</b>
+                </div>
+                """, unsafe_allow_html=True)
+
+            # 右侧FAQ栏
+            with right:
+                st.markdown("### 常见问题")
+                faq_items = [
+                    ("信用卡取现手续费多少？", "信用卡取现手续费多少？"),
+                    ("信用卡怎么激活？", "信用卡怎么激活？"),
+                    ("最低还款有利息吗？", "只还最低还款额有利息吗？"),
+                    ("年费怎么收？", "信用卡年费怎么收？怎么免年费？"),
+                    ("挂失手续费多少？", "信用卡挂失手续费多少？"),
+                    ("逾期有什么后果？", "逾期有什么后果？"),
+                ]
+                for label, q_text in faq_items:
+                    if st.button(f"{label} →", key=f"faq_{label}", use_container_width=True):
+                        st.session_state.pending_q = q_text
+                        st.session_state.in_chat = True
+                        st.rerun()
 
             st.markdown('<div style="text-align:center;font-size:11px;color:#999;margin-top:20px">以上信息依据《领用合约》《信用卡章程》及收费价格表整理，仅供参考，具体以中信银行官方公告为准</div>', unsafe_allow_html=True)
 
