@@ -517,9 +517,9 @@ else:
     </div>
     """, unsafe_allow_html=True)
 
-    # 品牌栏：左品牌 右返回首页+来源（紧挨）
+    # 品牌栏：左品牌 右返回首页+清空对话+来源
     with st.container(key="s-header"):
-        hc = st.columns([9, 1.5, 1.5])
+        hc = st.columns([8, 1.5, 1.5, 1.5])
         with hc[0]:
             st.markdown("""
             <div class="s-brand">
@@ -535,6 +535,12 @@ else:
                 st.session_state.chat_history = []
                 st.rerun()
         with hc[2]:
+            if st.button("🔄 清空对话", key="reset_chat"):
+                st.session_state.chat_history = []
+                st.session_state.src_history = []
+                st.session_state.pending_q = None
+                st.rerun()
+        with hc[3]:
             if st.button("📚 来源", key="go_src"):
                 st.session_state.show_src = not st.session_state.show_src
                 st.rerun()
@@ -636,21 +642,15 @@ else:
     # 输入区：form 实现（Enter提交发送，清空按钮只清空输入框）
     with st.container(key="s-input"):
         with st.form(key="chat_form", clear_on_submit=True):
-            c1, c2, c3, c4 = st.columns([9, 1.2, 1.5, 1.5])
+            c1, c2, c3 = st.columns([11, 1.5, 1])
             user_input = c1.text_input("问题",
                          placeholder="请输入您的信用卡问题… （按 Enter 发送）",
                          label_visibility="collapsed")
             send_clicked = c2.form_submit_button("发送", type="primary")
             clear_clicked = c3.form_submit_button("🗑 清空")
-            reset_clicked = c4.form_submit_button("🔄 清空对话")
 
         if send_clicked and user_input and user_input.strip():
             st.session_state.pending_q = user_input.strip()
-            st.rerun()
-        if reset_clicked:
-            st.session_state.chat_history = []
-            st.session_state.src_history = []
-            st.session_state.pending_q = None
             st.rerun()
 
     # 免责声明（全宽白底）
