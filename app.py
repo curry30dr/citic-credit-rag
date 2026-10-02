@@ -125,13 +125,14 @@ def _action_bar(text, idx, voted_up, voted_down, q=""):
     safe = text.replace("\\", "\\\\").replace("`", "\\`").replace("'", "\\'")
     c1, c2, c3 = st.columns([1.3, 0.7, 0.7], gap="small")
     # 复制按钮（JS真复制）
-    c1.components.html(f"""
-    <style>
-      .cp-btn{{background:#fff;border:1px solid #e8eaef;color:#888;border-radius:6px;padding:2px 10px;font-size:12px;cursor:pointer;line-height:1.6}}
-      .cp-btn:hover{{color:#e60012;border-color:#e60012}}
-    </style>
-    <button class="cp-btn" onclick="navigator.clipboard.writeText(`{safe}`).then(()=>{{this.textContent='✓ 已复制';setTimeout(()=>this.textContent='📋 复制',2000)}})">📋 复制</button>
-    """, height=30)
+    with c1:
+        components.html(f"""
+        <style>
+          .cp-btn{{background:#fff;border:1px solid #e8eaef;color:#888;border-radius:6px;padding:2px 10px;font-size:12px;cursor:pointer;line-height:1.6}}
+          .cp-btn:hover{{color:#e60012;border-color:#e60012}}
+        </style>
+        <button class="cp-btn" onclick="navigator.clipboard.writeText(`{safe}`).then(()=>{{this.textContent='✓ 已复制';setTimeout(()=>this.textContent='📋 复制',2000)}})">📋 复制</button>
+        """, height=30)
     # 赞按钮（原生button，记录feedback）
     up_label = "✓ 已赞" if voted_up else "👍"
     if c2.button(up_label, key=f"up_{idx}", disabled=voted_up, use_container_width=True):
