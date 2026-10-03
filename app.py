@@ -553,7 +553,9 @@ else:
         <script>
         (function() {
             function scrollDown() {
-                window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'});
+                const main = window.parent.document.querySelector('[data-testid="stMainBlockContainer"]') || document.querySelector('[data-testid="stMainBlockContainer"]');
+                if (main) main.scrollTop = main.scrollHeight;
+                window.scrollTo(0, document.body.scrollHeight);
             }
             setTimeout(scrollDown, 300);
             const obs = new MutationObserver(function() {
