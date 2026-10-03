@@ -553,7 +553,7 @@ else:
         <script>
         (function() {
             function scrollDown() {
-                const main = window.parent.document.querySelector('[data-testid="stMainBlockContainer"]') || document.querySelector('[data-testid="stMainBlockContainer"]');
+                const main = document.querySelector('.stMain') || document.querySelector('[data-testid="stMain"]');
                 if (main) main.scrollTop = main.scrollHeight;
                 window.scrollTo(0, document.body.scrollHeight);
             }
