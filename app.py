@@ -548,23 +548,23 @@ else:
 
     # 消息区（浅灰底，气泡fit-content左右分置）
     with st.container(key="s-msgs"):
-        # 流式输出时持续自动滚到底部（能看见输入框）
-        st.markdown("""
+        # 用 components.html 注入自动滚动（st.markdown的script不执行）
+        components.html("""
         <script>
         (function() {
             function scrollDown() {
-                const main = document.querySelector('.stMain') || document.querySelector('[data-testid="stMain"]');
+                const doc = window.parent.document;
+                const main = doc.querySelector('.stMain') || doc.querySelector('[data-testid="stMain"]');
                 if (main) main.scrollTop = main.scrollHeight;
-                window.scrollTo(0, document.body.scrollHeight);
             }
-            setTimeout(scrollDown, 300);
+            scrollDown();
             const obs = new MutationObserver(function() {
                 scrollDown();
             });
-            obs.observe(document.body, {childList: true, subtree: true});
+            obs.observe(window.parent.document.body, {childList: true, subtree: true});
         })();
         </script>
-        """, unsafe_allow_html=True)
+        """, height=0)
         st.markdown('<div class="b-row"><div class="b-avatar">🤖</div><div class="b-bubble">您好，我是中信银行信用卡智能咨询助手 👋<br>我只依据《领用合约》《收费价格表》等业务资料为您解答，数字有据可查。<br>可咨询：激活、取现、最低还款、年费、账单等。</div></div>', unsafe_allow_html=True)
         for idx, msg in enumerate(st.session_state.chat_history):
             render_bubble(msg["content"], msg["role"])
