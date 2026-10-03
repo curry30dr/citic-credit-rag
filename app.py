@@ -593,7 +593,7 @@ else:
                     ctx = []
             except Exception as e:
                 import traceback
-                full = f"服务异常：{type(e).__name__}: {e}"
+                full = "抱歉，网络开小差了，请稍后重试。如持续出现，请拨打 24小时客服热线 4008895558。"
                 ctx = []
                 ph.markdown(f'<div class="b-row"><div class="b-avatar">🤖</div><div class="b-bubble" style="color:#e60012">{full}</div></div>', unsafe_allow_html=True)
                 print("ERROR:", traceback.format_exc())
@@ -670,6 +670,17 @@ else:
         if send_clicked and user_input and user_input.strip():
             st.session_state.pending_q = user_input.strip()
             st.rerun()
+
+    # 发送后自动聚焦输入框
+    components.html("""
+    <script>
+    setTimeout(function() {
+        const doc = window.parent.document;
+        const input = doc.querySelector('.st-key-s-input input');
+        if (input) input.focus();
+    }, 500);
+    </script>
+    """, height=0)
 
     # 免责声明（全宽白底）
     st.markdown('<div class="s-disclaimer">以上信息依据《领用合约》《信用卡章程》及收费价格表整理，仅供参考，具体以中信银行官方公告为准。</div>', unsafe_allow_html=True)
