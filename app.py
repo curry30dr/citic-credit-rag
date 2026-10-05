@@ -680,14 +680,12 @@ else:
         if (input) input.focus();
     }, 500);
 
-    // 定义openSrc函数：点[1]时打开来源面板并定位
-    window.openSrc = function(idx) {
+    // 把openSrc挂到父页面的window上
+    window.parent.openSrc = function(idx) {
         const doc = window.parent.document;
         // 如果来源面板没打开，点"来源"按钮
         const srcPanel = doc.querySelector('.src-side');
         if (!srcPanel) {
-            const srcBtn = doc.querySelector('[data-testid="stButton"][kind="secondary"]');
-            // 找"📚 来源"按钮
             const buttons = doc.querySelectorAll('button');
             for (const btn of buttons) {
                 if (btn.textContent.includes('来源')) {
