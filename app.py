@@ -127,7 +127,7 @@ def _action_bar(text, idx, voted_up, voted_down, q="", ctx=None):
     up_dis = "disabled" if voted_up else ""
     dn_dis = "disabled" if voted_down else ""
     cite_count = len(ctx) if ctx else 0
-    cite_btns = "".join([f'<button class="ab-btn cite-btn" data-idx="{i+1}" onclick="openSrc({i+1})">[{i+1}]</button>' for i in range(cite_count)])
+    cite_btns = "".join([f'<button class="ab-btn cite-btn" data-idx="{i+1}" onclick="parent.postMessage({{isStreamlitMessage:true,type:\'streamlit:setComponentValue\',value:\'__CITE_{idx}_{i+1}\'}},\'*\')">[{i+1}]</button>' for i in range(cite_count)])
     _val = components.html(f"""
     <style>
       .ab-wrap {{display:flex; gap:6px; margin-top:4px; margin-left:52px; align-items:center; opacity:0.35; transition:opacity 0.2s}}
@@ -699,7 +699,7 @@ else:
             st.session_state.pending_q = user_input.strip()
             st.rerun()
 
-    # 发送后自动聚焦输入框 + 定义openSrc函数
+    # 发送后自动聚焦输入框 + 引用点击监听
     components.html("""
     <script>
     // 自动聚焦输入框
@@ -709,13 +709,17 @@ else:
         if (input) input.focus();
     }, 500);
 
-    // 定义openSrc函数：点引用按钮时打开来源面板并定位
-    window.parent.openSrc = function(idx) {
-        const doc = window.parent.document;
+    // 全局监听引用点击
+    window.parent.document.addEventListener('click', function(e) {
+        const link = e.target.closest('.cite-link');
+        if (!link) return;
+        e.preventDefault();
+        const idx = parseInt(link.dataset.idx);
+        console.log('cite clicked:', idx);
         // 如果来源面板没打开，点"来源"按钮
-        const srcPanel = doc.querySelector('.src-side');
+        const srcPanel = window.parent.document.querySelector('.src-side');
         if (!srcPanel) {
-            const buttons = doc.querySelectorAll('button');
+            const buttons = window.parent.document.querySelectorAll('button');
             for (const btn of buttons) {
                 if (btn.textContent.includes('来源')) {
                     btn.click();
@@ -725,7 +729,7 @@ else:
         }
         // 等待面板出现后scroll到对应资料
         setTimeout(function() {
-            const panel = doc.querySelector('.src-side');
+            const panel = window.parent.document.querySelector('.src-side');
             if (panel) {
                 const items = panel.querySelectorAll('[style*="border-radius:8px"]');
                 if (items[idx-1]) {
@@ -735,7 +739,7 @@ else:
                 }
             }
         }, 500);
-    };
+    });
     </script>
     """, height=1)
 
