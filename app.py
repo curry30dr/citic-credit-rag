@@ -618,25 +618,26 @@ else:
         _items = ""
         if not st.session_state.src_history:
             _items = '<div style="font-size:12px;color:#999">提问后这里实时展示检索到的业务资料块</div>'
-        for _ri, _ctx in enumerate(st.session_state.src_history):
-            _items += f'<div style="font-size:11px;color:#999;padding:8px 0 4px">—— 第{_ri+1}次回答 ——</div>'
-            if not _ctx:
+        else:
+            # 只显示最近一次回答的来源
+            last_ctx = st.session_state.src_history[-1]
+            if not last_ctx:
                 _items += '<div style="font-size:12px;color:#999">未检索到相关资料</div>'
-            for _ci, _c in enumerate(_ctx):
+            for _ci, _c in enumerate(last_ctx):
                 _topic = _c.get("topic", "")
                 _source = _c.get("source", "")
-                _text = _c.get("text", "")[:120].replace("<", "&lt;")
-                _items += ('<div style="background:#f5f6f8;border-radius:8px;padding:8px 12px;margin-bottom:6px;font-size:12px">'
-                           f'<b style="color:#e60012">资料{_ci+1} · {_topic}</b><br>'
+                _text = _c.get("text", "")[:150].replace("<", "&lt;")
+                _items += (f'<div class="src-item" style="background:#f5f6f8;border-radius:8px;padding:10px 14px;margin-bottom:8px;font-size:12px;border-left:3px solid #e60012">'
+                           f'<b style="color:#e60012">[{_ci+1}] · {_topic}</b><br>'
                            f'<span style="color:#8a909c;font-size:11px">来源：{_source}</span><br>'
-                           f'<span style="color:#555">{_text}…</span></div>')
+                           f'<span style="color:#555;line-height:1.6">{_text}…</span></div>')
         sc = st.columns([10, 1])
         sc[1].button("✕ 关闭", key="close_src", on_click=lambda: setattr(st.session_state, "show_src", False))
         st.markdown(
-            '<style>.src-side{position:fixed;top:140px;right:0;width:340px;height:calc(100vh - 140px);background:#fff;'
+            '<style>.src-side{position:fixed;top:140px;right:0;width:360px;height:calc(100vh - 140px);background:#fff;'
             'border-left:1px solid #e8eaef;padding:20px;overflow-y:auto;z-index:1000;'
             'box-shadow:-4px 0 16px rgba(0,0,0,.08)}.src-side h3{margin:0 0 12px;font-size:15px}'
-            '.st-key-s-header { padding-right:360px !important; } .s-topbar { padding-right:360px !important; }</style>'
+            '.st-key-s-header { padding-right:380px !important; } .s-topbar { padding-right:380px !important; }</style>'
             '<div class="src-side"><h3>📚 召回知识来源</h3>' + _items + '</div>',
             unsafe_allow_html=True)
 
@@ -650,7 +651,7 @@ else:
                 const doc = window.parent.document;
                 const panel = doc.querySelector('.src-side');
                 if (panel) {{
-                    const items = panel.querySelectorAll('[style*="border-radius:8px"]');
+                    const items = panel.querySelectorAll('.src-item');
                     if (items[{cite_idx-1}]) {{
                         items[{cite_idx-1}].scrollIntoView({{behavior: 'smooth', block: 'center'}});
                         items[{cite_idx-1}].style.outline = '2px solid #e60012';
@@ -728,7 +729,7 @@ else:
         setTimeout(function() {
             const panel = window.parent.document.querySelector('.src-side');
             if (panel) {
-                const items = panel.querySelectorAll('[style*="border-radius:8px"]');
+                const items = panel.querySelectorAll('.src-item');
                 if (items[idx-1]) {
                     items[idx-1].scrollIntoView({behavior: 'smooth', block: 'center'});
                     items[idx-1].style.outline = '2px solid #e60012';
