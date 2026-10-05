@@ -707,13 +707,12 @@ else:
         if (input) input.focus();
     }, 500);
 
-    // 全局监听引用点击
+    // 全局监听引用点击（文字里的[1][2]）
     window.parent.document.addEventListener('click', function(e) {
         const link = e.target.closest('.cite-link');
         if (!link) return;
         e.preventDefault();
         const idx = parseInt(link.dataset.idx);
-        console.log('cite clicked:', idx);
         // 如果来源面板没打开，点"来源"按钮
         const srcPanel = window.parent.document.querySelector('.src-side');
         if (!srcPanel) {
@@ -739,7 +738,7 @@ else:
         }, 500);
     });
     </script>
-    """, height=1)
+    """, height=30)
 
     # 免责声明（全宽白底）
     st.markdown('<div class="s-disclaimer">以上信息依据《领用合约》《信用卡章程》及收费价格表整理，仅供参考，具体以中信银行官方公告为准。</div>', unsafe_allow_html=True)
