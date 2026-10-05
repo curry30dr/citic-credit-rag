@@ -113,7 +113,7 @@ def render_bubble(text, role="bot"):
     else:
         body = html.escape(text)
         body = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', body)
-        body = re.sub(r'\[(\d+)\]', r'<span style="color:#e60012;font-weight:600">[<a href="#src-\1" style="color:#e60012;text-decoration:none">\1</a>]</span>', body)
+        body = re.sub(r'\[(\d+)\]', r'<a href="javascript:void(0)" onclick="openSrc(\1)" style="color:#e60012;font-weight:600;text-decoration:none">[<span>\1</span>]</a>', body)
         body = body.replace('\n', '<br>')
         st.markdown(f'<div class="b-row"><div class="b-avatar">🤖</div><div class="b-bubble">{body}</div></div>', unsafe_allow_html=True)
         if any(k in text for k in HARD):
@@ -671,7 +671,7 @@ else:
             st.session_state.pending_q = user_input.strip()
             st.rerun()
 
-    # 发送后自动聚焦输入框
+    # 发送后自动聚焦输入框 + 定义openSrc函数
     components.html("""
     <script>
     setTimeout(function() {
@@ -679,6 +679,36 @@ else:
         const input = doc.querySelector('.st-key-s-input input');
         if (input) input.focus();
     }, 500);
+
+    // 定义openSrc函数：点[1]时打开来源面板并定位
+    window.openSrc = function(idx) {
+        const doc = window.parent.document;
+        // 如果来源面板没打开，点"来源"按钮
+        const srcPanel = doc.querySelector('.src-side');
+        if (!srcPanel) {
+            const srcBtn = doc.querySelector('[data-testid="stButton"][kind="secondary"]');
+            // 找"📚 来源"按钮
+            const buttons = doc.querySelectorAll('button');
+            for (const btn of buttons) {
+                if (btn.textContent.includes('来源')) {
+                    btn.click();
+                    break;
+                }
+            }
+        }
+        // 等待面板出现后scroll到对应资料
+        setTimeout(function() {
+            const panel = doc.querySelector('.src-side');
+            if (panel) {
+                const items = panel.querySelectorAll('[style*="border-radius:8px"]');
+                if (items[idx-1]) {
+                    items[idx-1].scrollIntoView({behavior: 'smooth', block: 'center'});
+                    items[idx-1].style.outline = '2px solid #e60012';
+                    setTimeout(function() { items[idx-1].style.outline = ''; }, 2000);
+                }
+            }
+        }, 500);
+    };
     </script>
     """, height=0)
 
