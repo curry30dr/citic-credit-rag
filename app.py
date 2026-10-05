@@ -104,7 +104,7 @@ def build_msgs(q):
     msgs = [{"role": "system", "content": "你是中信银行信用卡智能咨询助手。仔细阅读业务资料，从资料中找答案，数字必须原样引用，确实没有才说不清楚。回答中引用资料时用[1][2]标注出处。"}] + history_msgs + [{"role": "user", "content": f"【业务资料】\n{ctx_text}\n\n【用户问题】{q}"}]
     return msgs, ctx
 
-def render_bubble(text, role="bot"):
+def render_bubble(text, role="bot", msg_idx=None):
     """渲染一条消息气泡"""
     HARD = ["无法回答", "未找到", "无法提供", "未提供", "未列明", "未明确", "无法确定"]
     text = str(text) if text is not None else ""
@@ -113,7 +113,10 @@ def render_bubble(text, role="bot"):
     else:
         body = html.escape(text)
         body = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', body)
-        body = re.sub(r'\[(\d+)\]', r'<a href="javascript:void(0)" class="cite-link" data-idx="\1" style="color:#e60012;font-weight:600;text-decoration:none;cursor:pointer">[<span>\1</span>]</a>', body)
+        if msg_idx is not None:
+            body = re.sub(r'\[(\d+)\]', r'<a href="javascript:void(0)" onclick="parent.openSrc(' + str(msg_idx) + r',\1)" style="color:#e60012;font-weight:600;text-decoration:none;cursor:pointer">[<span>\1</span>]</a>', body)
+        else:
+            body = re.sub(r'\[(\d+)\]', r'<a href="javascript:void(0)" onclick="parent.openSrc(0,\1)" style="color:#e60012;font-weight:600;text-decoration:none;cursor:pointer">[<span>\1</span>]</a>', body)
         body = body.replace('\n', '<br>')
         st.markdown(f'<div class="b-row"><div class="b-avatar">🤖</div><div class="b-bubble">{body}</div></div>', unsafe_allow_html=True)
         if any(k in text for k in HARD):
@@ -174,7 +177,7 @@ def stream_answer(msgs, ph):
         full += delta
         body = html.escape(full)
         body = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', body)
-        body = re.sub(r'\[(\d+)\]', r'<a href="javascript:void(0)" class="cite-link" data-idx="\1" style="color:#e60012;font-weight:600;text-decoration:none;cursor:pointer">[<span>\1</span>]</a>', body)
+        body = re.sub(r'\[(\d+)\]', r'<a href="javascript:void(0)" onclick="parent.openSrc(\1)" style="color:#e60012;font-weight:600;text-decoration:none;cursor:pointer">[<span>\1</span>]</a>', body)
         body = body.replace('\n', '<br>')
         ph.markdown(f'<div class="b-row"><div class="b-avatar">🤖</div><div class="b-bubble">{body}</div></div>', unsafe_allow_html=True)
     return full
@@ -571,7 +574,7 @@ else:
         """, height=0)
         st.markdown('<div class="b-row"><div class="b-avatar">🤖</div><div class="b-bubble">您好，我是中信银行信用卡智能咨询助手 👋<br>我只依据《领用合约》《收费价格表》等业务资料为您解答，数字有据可查。<br>可咨询：激活、取现、最低还款、年费、账单等。</div></div>', unsafe_allow_html=True)
         for idx, msg in enumerate(st.session_state.chat_history):
-            render_bubble(msg["content"], msg["role"])
+            render_bubble(msg["content"], msg["role"], idx if msg["role"] == "assistant" else None)
             if msg["role"] == "assistant":
                 voted_up = st.session_state.get(f"voted_{idx}") == "up"
                 voted_down = st.session_state.get(f"voted_{idx}") == "down"
@@ -616,14 +619,16 @@ else:
     # 来源面板（点"来源"按钮在右侧滑出）
     if st.session_state.show_src:
         _items = ""
-        if not st.session_state.src_history:
-            _items = '<div style="font-size:12px;color:#999">提问后这里实时展示检索到的业务资料块</div>'
+        # 确定显示哪个回答的来源
+        show_msg_idx = st.session_state.get("show_src_msg_idx", -1)
+        if show_msg_idx >= 0 and show_msg_idx < len(st.session_state.src_history):
+            ctx = st.session_state.src_history[show_msg_idx]
         else:
-            # 只显示最近一次回答的来源
-            last_ctx = st.session_state.src_history[-1]
-            if not last_ctx:
-                _items += '<div style="font-size:12px;color:#999">未检索到相关资料</div>'
-            for _ci, _c in enumerate(last_ctx):
+            ctx = st.session_state.src_history[-1] if st.session_state.src_history else []
+        if not ctx:
+            _items = '<div style="font-size:12px;color:#999">未检索到相关资料</div>'
+        else:
+            for _ci, _c in enumerate(ctx):
                 _topic = _c.get("topic", "")
                 _source = _c.get("source", "")
                 _text = _c.get("text", "")[:150].replace("<", "&lt;")
@@ -697,7 +702,7 @@ else:
             st.session_state.pending_q = user_input.strip()
             st.rerun()
 
-    # 发送后自动聚焦输入框 + 引用点击监听
+    # 发送后自动聚焦输入框 + 定义openSrc函数
     components.html("""
     <script>
     // 自动聚焦输入框
@@ -707,16 +712,13 @@ else:
         if (input) input.focus();
     }, 500);
 
-    // 全局监听引用点击（文字里的[1][2]）
-    window.parent.document.addEventListener('click', function(e) {
-        const link = e.target.closest('.cite-link');
-        if (!link) return;
-        e.preventDefault();
-        const idx = parseInt(link.dataset.idx);
+    // 定义openSrc函数：点引用按钮时打开来源面板并定位
+    window.parent.openSrc = function(msgIdx, idx) {
+        const doc = window.parent.document;
         // 如果来源面板没打开，点"来源"按钮
-        const srcPanel = window.parent.document.querySelector('.src-side');
+        const srcPanel = doc.querySelector('.src-side');
         if (!srcPanel) {
-            const buttons = window.parent.document.querySelectorAll('button');
+            const buttons = doc.querySelectorAll('button');
             for (const btn of buttons) {
                 if (btn.textContent.includes('来源')) {
                     btn.click();
@@ -726,7 +728,7 @@ else:
         }
         // 等待面板出现后scroll到对应资料
         setTimeout(function() {
-            const panel = window.parent.document.querySelector('.src-side');
+            const panel = doc.querySelector('.src-side');
             if (panel) {
                 const items = panel.querySelectorAll('.src-item');
                 if (items[idx-1]) {
@@ -736,7 +738,7 @@ else:
                 }
             }
         }, 500);
-    });
+    };
     </script>
     """, height=30)
 
