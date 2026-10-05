@@ -113,7 +113,7 @@ def render_bubble(text, role="bot"):
     else:
         body = html.escape(text)
         body = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', body)
-        body = re.sub(r'\[(\d+)\]', r'<a href="javascript:void(0)" class="cite-link" data-idx="\1" style="color:#e60012;font-weight:600;text-decoration:none">[<span>\1</span>]</a>', body)
+        body = re.sub(r'\[(\d+)\]', r'<a href="javascript:void(0)" class="cite-link" data-idx="\1" style="color:#e60012;font-weight:600;text-decoration:none;cursor:pointer">[<span>\1</span>]</a>', body)
         body = body.replace('\n', '<br>')
         st.markdown(f'<div class="b-row"><div class="b-avatar">🤖</div><div class="b-bubble">{body}</div></div>', unsafe_allow_html=True)
         if any(k in text for k in HARD):
@@ -122,12 +122,10 @@ def render_bubble(text, role="bot"):
 import streamlit.components.v1 as components
 
 def _action_bar(text, idx, voted_up, voted_down, q="", ctx=None):
-    """一行按钮：引用[1][2]+复制+赞+踩（hover才显示）"""
+    """一行按钮：复制+赞+踩（hover才显示）"""
     safe = text.replace("\\", "\\\\").replace("`", "\\`").replace("'", "\\'")
     up_dis = "disabled" if voted_up else ""
     dn_dis = "disabled" if voted_down else ""
-    cite_count = len(ctx) if ctx else 0
-    cite_btns = "".join([f'<button class="ab-btn cite-btn" data-idx="{i+1}" onclick="parent.postMessage({{isStreamlitMessage:true,type:\'streamlit:setComponentValue\',value:\'__CITE_{idx}_{i+1}\'}},\'*\')">[{i+1}]</button>' for i in range(cite_count)])
     _val = components.html(f"""
     <style>
       .ab-wrap {{display:flex; gap:6px; margin-top:4px; margin-left:52px; align-items:center; opacity:0.35; transition:opacity 0.2s}}
@@ -135,10 +133,8 @@ def _action_bar(text, idx, voted_up, voted_down, q="", ctx=None):
       .ab-btn {{background:#fff; border:1px solid #e8eaef; color:#888; border-radius:6px; padding:2px 10px; font-size:12px; cursor:pointer; line-height:1.6}}
       .ab-btn:hover {{color:#e60012; border-color:#e60012}}
       .ab-btn[disabled] {{opacity:.5; cursor:default}}
-      .cite-btn {{color:#e60012 !important; font-weight:600; padding:2px 7px !important}}
     </style>
     <div class="ab-wrap">
-      {cite_btns}
       <button class="ab-btn" onclick="navigator.clipboard.writeText(`{safe}`).then(()=>{{this.textContent='✓ 已复制';setTimeout(()=>this.textContent='📋 复制',2000)}})">📋 复制</button>
       <button class="ab-btn" {up_dis} onclick="this.disabled=true;this.textContent='✓ 已赞';parent.postMessage({{isStreamlitMessage:true,type:'streamlit:setComponentValue',value:'__UP_{idx}'}},'*')">👍</button>
       <button class="ab-btn" {dn_dis} onclick="this.disabled=true;this.textContent='✓ 已踩';parent.postMessage({{isStreamlitMessage:true,type:'streamlit:setComponentValue',value:'__DOWN_{idx}'}},'*')">👎</button>
