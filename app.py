@@ -174,6 +174,7 @@ def stream_answer(msgs, ph):
         full += delta
         body = html.escape(full)
         body = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', body)
+        body = re.sub(r'\[(\d+)\]', r'<a href="javascript:void(0)" class="cite-link" data-idx="\1" style="color:#e60012;font-weight:600;text-decoration:none;cursor:pointer">[<span>\1</span>]</a>', body)
         body = body.replace('\n', '<br>')
         ph.markdown(f'<div class="b-row"><div class="b-avatar">🤖</div><div class="b-bubble">{body}</div></div>', unsafe_allow_html=True)
     return full
