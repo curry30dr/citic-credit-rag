@@ -113,7 +113,7 @@ def render_bubble(text, role="bot"):
     else:
         body = html.escape(text)
         body = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', body)
-        body = re.sub(r'\[(\d+)\]', r'<a href="javascript:void(0)" onclick="openSrc(\1)" style="color:#e60012;font-weight:600;text-decoration:none">[<span>\1</span>]</a>', body)
+        body = re.sub(r'\[(\d+)\]', r'<a href="javascript:void(0)" class="cite-link" data-idx="\1" style="color:#e60012;font-weight:600;text-decoration:none">[<span>\1</span>]</a>', body)
         body = body.replace('\n', '<br>')
         st.markdown(f'<div class="b-row"><div class="b-avatar">🤖</div><div class="b-bubble">{body}</div></div>', unsafe_allow_html=True)
         if any(k in text for k in HARD):
@@ -671,22 +671,26 @@ else:
             st.session_state.pending_q = user_input.strip()
             st.rerun()
 
-    # 发送后自动聚焦输入框 + 定义openSrc函数
+    # 发送后自动聚焦输入框 + 引用点击监听
     components.html("""
     <script>
+    // 自动聚焦输入框
     setTimeout(function() {
         const doc = window.parent.document;
         const input = doc.querySelector('.st-key-s-input input');
         if (input) input.focus();
     }, 500);
 
-    // 把openSrc挂到父页面的window上
-    window.parent.openSrc = function(idx) {
-        const doc = window.parent.document;
+    // 全局监听引用点击
+    window.parent.document.addEventListener('click', function(e) {
+        const link = e.target.closest('.cite-link');
+        if (!link) return;
+        e.preventDefault();
+        const idx = parseInt(link.dataset.idx);
         // 如果来源面板没打开，点"来源"按钮
-        const srcPanel = doc.querySelector('.src-side');
+        const srcPanel = window.parent.document.querySelector('.src-side');
         if (!srcPanel) {
-            const buttons = doc.querySelectorAll('button');
+            const buttons = window.parent.document.querySelectorAll('button');
             for (const btn of buttons) {
                 if (btn.textContent.includes('来源')) {
                     btn.click();
@@ -696,7 +700,7 @@ else:
         }
         // 等待面板出现后scroll到对应资料
         setTimeout(function() {
-            const panel = doc.querySelector('.src-side');
+            const panel = window.parent.document.querySelector('.src-side');
             if (panel) {
                 const items = panel.querySelectorAll('[style*="border-radius:8px"]');
                 if (items[idx-1]) {
@@ -706,7 +710,7 @@ else:
                 }
             }
         }, 500);
-    };
+    });
     </script>
     """, height=0)
 
