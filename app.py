@@ -114,9 +114,9 @@ def render_bubble(text, role="bot", msg_idx=None):
         body = html.escape(text)
         body = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', body)
         if msg_idx is not None:
-            body = re.sub(r'\[(\d+)\]', r'<a href="javascript:void(0)" onclick="var b=document.querySelectorAll(\'button\');for(var i=0;i<b.length;i++){if(b[i].textContent.includes(\'来源\')){b[i].click();break}}" style="color:#e60012;font-weight:600;text-decoration:none;cursor:pointer">[<span>\1</span>]</a>', body)
+            body = re.sub(r'\[(\d+)\]', r'<a href="javascript:void(0)" class="cite-link" data-idx="\1" style="color:#e60012;font-weight:600;text-decoration:none;cursor:pointer">[<span>\1</span>]</a>', body)
         else:
-            body = re.sub(r'\[(\d+)\]', r'<a href="javascript:void(0)" onclick="var b=document.querySelectorAll(\'button\');for(var i=0;i<b.length;i++){if(b[i].textContent.includes(\'来源\')){b[i].click();break}}" style="color:#e60012;font-weight:600;text-decoration:none;cursor:pointer">[<span>\1</span>]</a>', body)
+            body = re.sub(r'\[(\d+)\]', r'<a href="javascript:void(0)" class="cite-link" data-idx="\1" style="color:#e60012;font-weight:600;text-decoration:none;cursor:pointer">[<span>\1</span>]</a>', body)
         body = body.replace('\n', '<br>')
         st.markdown(f'<div class="b-row"><div class="b-avatar">🤖</div><div class="b-bubble">{body}</div></div>', unsafe_allow_html=True)
         if any(k in text for k in HARD):
@@ -177,7 +177,7 @@ def stream_answer(msgs, ph):
         full += delta
         body = html.escape(full)
         body = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', body)
-        body = re.sub(r'\[(\d+)\]', r'<a href="javascript:void(0)" onclick="var b=document.querySelectorAll(\'button\');for(var i=0;i<b.length;i++){if(b[i].textContent.includes(\'来源\')){b[i].click();break}}" style="color:#e60012;font-weight:600;text-decoration:none;cursor:pointer">[<span>\1</span>]</a>', body)
+        body = re.sub(r'\[(\d+)\]', r'<a href="javascript:void(0)" class="cite-link" data-idx="\1" style="color:#e60012;font-weight:600;text-decoration:none;cursor:pointer">[<span>\1</span>]</a>', body)
         body = body.replace('\n', '<br>')
         ph.markdown(f'<div class="b-row"><div class="b-avatar">🤖</div><div class="b-bubble">{body}</div></div>', unsafe_allow_html=True)
     return full
@@ -702,7 +702,7 @@ else:
             st.session_state.pending_q = user_input.strip()
             st.rerun()
 
-    # 发送后自动聚焦输入框 + 定义openSrc函数
+    # 发送后自动聚焦输入框 + 引用点击监听
     components.html("""
     <script>
     // 自动聚焦输入框
@@ -712,33 +712,37 @@ else:
         if (input) input.focus();
     }, 500);
 
-    // 定义openSrc函数：点引用按钮时打开来源面板并定位
-    window.parent.openSrc = function(msgIdx, idx) {
-        const doc = window.parent.document;
-        // 如果来源面板没打开，点"来源"按钮
-        const srcPanel = doc.querySelector('.src-side');
-        if (!srcPanel) {
-            const buttons = doc.querySelectorAll('button');
+    // 全局监听引用点击
+    function bindCite() {
+        window.parent.document.addEventListener('click', function(e) {
+            const link = e.target.closest('.cite-link');
+            if (!link) return;
+            e.preventDefault();
+            const idx = parseInt(link.dataset.idx);
+            // 找"来源"按钮并点击
+            const buttons = window.parent.document.querySelectorAll('button');
             for (const btn of buttons) {
                 if (btn.textContent.includes('来源')) {
                     btn.click();
                     break;
                 }
             }
-        }
-        // 等待面板出现后scroll到对应资料
-        setTimeout(function() {
-            const panel = doc.querySelector('.src-side');
-            if (panel) {
-                const items = panel.querySelectorAll('.src-item');
-                if (items[idx-1]) {
-                    items[idx-1].scrollIntoView({behavior: 'smooth', block: 'center'});
-                    items[idx-1].style.outline = '2px solid #e60012';
-                    setTimeout(function() { items[idx-1].style.outline = ''; }, 2000);
+            // 等待面板出现后scroll到对应资料
+            setTimeout(function() {
+                const panel = window.parent.document.querySelector('.src-side');
+                if (panel) {
+                    const items = panel.querySelectorAll('.src-item');
+                    if (items[idx-1]) {
+                        items[idx-1].scrollIntoView({behavior: 'smooth', block: 'center'});
+                        items[idx-1].style.outline = '2px solid #e60012';
+                        setTimeout(function() { items[idx-1].style.outline = ''; }, 2000);
+                    }
                 }
-            }
-        }, 500);
-    };
+            }, 500);
+        });
+    }
+    // 页面加载后绑定
+    bindCite();
     </script>
     """, height=30)
 
