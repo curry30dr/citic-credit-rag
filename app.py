@@ -121,13 +121,13 @@ def render_bubble(text, role="bot"):
 
 import streamlit.components.v1 as components
 
-def _action_bar(text, idx, voted_up, voted_down, q=""):
-    """一行三个按钮：真复制+赞+踩（hover才显示，赞踩记录feedback）"""
+def _action_bar(text, idx, voted_up, voted_down, q="", ctx=None):
+    """一行按钮：引用[1][2]+复制+赞+踩（hover才显示）"""
     safe = text.replace("\\", "\\\\").replace("`", "\\`").replace("'", "\\'")
-    up_label = "✓ 已赞" if voted_up else "👍"
-    dn_label = "✓ 已踩" if voted_down else "👎"
     up_dis = "disabled" if voted_up else ""
     dn_dis = "disabled" if voted_down else ""
+    cite_count = len(ctx) if ctx else 0
+    cite_btns = "".join([f'<button class="ab-btn cite-btn" data-idx="{i+1}" onclick="parent.postMessage({{isStreamlitMessage:true,type:\'streamlit:setComponentValue\',value:\'__CITE_{idx}_{i+1}\'}},\'*\')">[{i+1}]</button>' for i in range(cite_count)])
     _val = components.html(f"""
     <style>
       .ab-wrap {{display:flex; gap:6px; margin-top:4px; margin-left:52px; align-items:center; opacity:0.35; transition:opacity 0.2s}}
@@ -135,22 +135,29 @@ def _action_bar(text, idx, voted_up, voted_down, q=""):
       .ab-btn {{background:#fff; border:1px solid #e8eaef; color:#888; border-radius:6px; padding:2px 10px; font-size:12px; cursor:pointer; line-height:1.6}}
       .ab-btn:hover {{color:#e60012; border-color:#e60012}}
       .ab-btn[disabled] {{opacity:.5; cursor:default}}
+      .cite-btn {{color:#e60012 !important; font-weight:600; padding:2px 7px !important}}
     </style>
     <div class="ab-wrap">
+      {cite_btns}
       <button class="ab-btn" onclick="navigator.clipboard.writeText(`{safe}`).then(()=>{{this.textContent='✓ 已复制';setTimeout(()=>this.textContent='📋 复制',2000)}})">📋 复制</button>
       <button class="ab-btn" {up_dis} onclick="this.disabled=true;this.textContent='✓ 已赞';parent.postMessage({{isStreamlitMessage:true,type:'streamlit:setComponentValue',value:'__UP_{idx}'}},'*')">👍</button>
       <button class="ab-btn" {dn_dis} onclick="this.disabled=true;this.textContent='✓ 已踩';parent.postMessage({{isStreamlitMessage:true,type:'streamlit:setComponentValue',value:'__DOWN_{idx}'}},'*')">👎</button>
     </div>
     """, height=32)
-    # 处理赞/踩反馈
+    # 处理赞/踩/引用反馈
     if _val and isinstance(_val, str):
         if _val == f"__UP_{idx}":
             st.session_state[f"voted_{idx}"] = "up"
-            _save_feedback({"q": q, "content": text, "vote": "up"})
+            _save_feedback({"q": q, "content": text}, "up")
             st.rerun()
         elif _val == f"__DOWN_{idx}":
             st.session_state[f"voted_{idx}"] = "down"
-            _save_feedback({"q": q, "content": text, "vote": "down"})
+            _save_feedback({"q": q, "content": text}, "down")
+            st.rerun()
+        elif _val.startswith(f"__CITE_{idx}_"):
+            cite_idx = int(_val.split("_")[-1])
+            st.session_state.show_src = True
+            st.session_state.cite_scroll = cite_idx
             st.rerun()
 
 def _save_feedback(msg, vote):
@@ -571,7 +578,7 @@ else:
             if msg["role"] == "assistant":
                 voted_up = st.session_state.get(f"voted_{idx}") == "up"
                 voted_down = st.session_state.get(f"voted_{idx}") == "down"
-                _action_bar(msg["content"], idx, voted_up, voted_down, msg.get("q", ""))
+                _action_bar(msg["content"], idx, voted_up, voted_down, msg.get("q", ""), msg.get("ctx"))
 
         # 处理新问题：流式生成
         if st.session_state.pending_q:
@@ -607,7 +614,7 @@ else:
             # 操作按钮
             act_idx = len(st.session_state.chat_history) - 1
             last_msg = st.session_state.chat_history[act_idx]
-            _action_bar(last_msg["content"], act_idx, False, False, last_msg.get("q", ""))
+            _action_bar(last_msg["content"], act_idx, False, False, last_msg.get("q", ""), ctx)
 
     # 来源面板（点"来源"按钮在右侧滑出）
     if st.session_state.show_src:
@@ -635,6 +642,27 @@ else:
             '.st-key-s-header { padding-right:360px !important; } .s-topbar { padding-right:360px !important; }</style>'
             '<div class="src-side"><h3>📚 召回知识来源</h3>' + _items + '</div>',
             unsafe_allow_html=True)
+
+        # 如果需要滚动到指定引用
+        if st.session_state.get("cite_scroll"):
+            cite_idx = st.session_state.cite_scroll
+            st.session_state.cite_scroll = None
+            components.html(f"""
+            <script>
+            setTimeout(function() {{
+                const doc = window.parent.document;
+                const panel = doc.querySelector('.src-side');
+                if (panel) {{
+                    const items = panel.querySelectorAll('[style*="border-radius:8px"]');
+                    if (items[{cite_idx-1}]) {{
+                        items[{cite_idx-1}].scrollIntoView({{behavior: 'smooth', block: 'center'}});
+                        items[{cite_idx-1}].style.outline = '2px solid #e60012';
+                        setTimeout(function() {{ items[{cite_idx-1}].style.outline = ''; }}, 2000);
+                    }}
+                }}
+            }}, 300);
+            </script>
+            """, height=0)
 
     # 分类快捷标签（白底，小标签不截断）
     with st.container(key="s-chips"):
