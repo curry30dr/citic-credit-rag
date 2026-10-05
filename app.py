@@ -687,6 +687,7 @@ else:
         if (!link) return;
         e.preventDefault();
         const idx = parseInt(link.dataset.idx);
+        console.log('cite clicked:', idx);
         // 如果来源面板没打开，点"来源"按钮
         const srcPanel = window.parent.document.querySelector('.src-side');
         if (!srcPanel) {
@@ -712,7 +713,7 @@ else:
         }, 500);
     });
     </script>
-    """, height=0)
+    """, height=1)
 
     # 免责声明（全宽白底）
     st.markdown('<div class="s-disclaimer">以上信息依据《领用合约》《信用卡章程》及收费价格表整理，仅供参考，具体以中信银行官方公告为准。</div>', unsafe_allow_html=True)
