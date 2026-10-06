@@ -738,7 +738,7 @@ else:
                         setTimeout(function() { items[idx-1].style.outline = ''; }, 2000);
                     }
                 }
-            }, 500);
+            }, 200);
         });
     }
     // 页面加载后绑定
