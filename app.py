@@ -573,12 +573,16 @@ else:
         </script>
         """, height=0)
         st.markdown('<div class="b-row"><div class="b-avatar">🤖</div><div class="b-bubble">您好，我是中信银行信用卡智能咨询助手 👋<br>我只依据《领用合约》《收费价格表》等业务资料为您解答，数字有据可查。<br>可咨询：激活、取现、最低还款、年费、账单等。</div></div>', unsafe_allow_html=True)
+        bot_idx = 0
         for idx, msg in enumerate(st.session_state.chat_history):
-            render_bubble(msg["content"], msg["role"], idx if msg["role"] == "assistant" else None)
             if msg["role"] == "assistant":
+                render_bubble(msg["content"], msg["role"], bot_idx)
                 voted_up = st.session_state.get(f"voted_{idx}") == "up"
                 voted_down = st.session_state.get(f"voted_{idx}") == "down"
                 _action_bar(msg["content"], idx, voted_up, voted_down, msg.get("q", ""), msg.get("ctx"))
+                bot_idx += 1
+            else:
+                render_bubble(msg["content"], msg["role"])
 
         # 处理新问题：流式生成
         if st.session_state.pending_q:
