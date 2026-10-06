@@ -114,9 +114,9 @@ def render_bubble(text, role="bot", msg_idx=None):
         body = html.escape(text)
         body = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', body)
         if msg_idx is not None:
-            body = re.sub(r'\[(\d+)\]', r'<a href="javascript:void(0)" class="cite-link" data-idx="\1" style="color:#e60012;font-weight:600;text-decoration:none;cursor:pointer">[<span>\1</span>]</a>', body)
+            body = re.sub(r'\[(\d+)\]', r'<a href="javascript:void(0)" class="cite-link" data-msg="' + str(msg_idx) + r'" data-idx="\1" style="color:#e60012;font-weight:600;text-decoration:none;cursor:pointer">[<span>\1</span>]</a>', body)
         else:
-            body = re.sub(r'\[(\d+)\]', r'<a href="javascript:void(0)" class="cite-link" data-idx="\1" style="color:#e60012;font-weight:600;text-decoration:none;cursor:pointer">[<span>\1</span>]</a>', body)
+            body = re.sub(r'\[(\d+)\]', r'<a href="javascript:void(0)" class="cite-link" data-msg="0" data-idx="\1" style="color:#e60012;font-weight:600;text-decoration:none;cursor:pointer">[<span>\1</span>]</a>', body)
         body = body.replace('\n', '<br>')
         st.markdown(f'<div class="b-row"><div class="b-avatar">🤖</div><div class="b-bubble">{body}</div></div>', unsafe_allow_html=True)
         if any(k in text for k in HARD):
@@ -619,20 +619,17 @@ else:
     # 来源面板（点"来源"按钮在右侧滑出）
     if st.session_state.show_src:
         _items = ""
-        # 确定显示哪个回答的来源
-        show_msg_idx = st.session_state.get("show_src_msg_idx", -1)
-        if show_msg_idx >= 0 and show_msg_idx < len(st.session_state.src_history):
-            ctx = st.session_state.src_history[show_msg_idx]
-        else:
-            ctx = st.session_state.src_history[-1] if st.session_state.src_history else []
-        if not ctx:
-            _items = '<div style="font-size:12px;color:#999">未检索到相关资料</div>'
-        else:
-            for _ci, _c in enumerate(ctx):
+        if not st.session_state.src_history:
+            _items = '<div style="font-size:12px;color:#999">提问后这里实时展示检索到的业务资料块</div>'
+        for _ri, _ctx in enumerate(st.session_state.src_history):
+            _items += f'<div style="font-size:11px;color:#999;padding:8px 0 4px">—— 第{_ri+1}次回答 ——</div>'
+            if not _ctx:
+                _items += '<div style="font-size:12px;color:#999">未检索到相关资料</div>'
+            for _ci, _c in enumerate(_ctx):
                 _topic = _c.get("topic", "")
                 _source = _c.get("source", "")
                 _text = _c.get("text", "")[:150].replace("<", "&lt;")
-                _items += (f'<div class="src-item" style="background:#f5f6f8;border-radius:8px;padding:10px 14px;margin-bottom:8px;font-size:12px;border-left:3px solid #e60012">'
+                _items += (f'<div class="src-item" data-msg="{_ri}" data-cite="{_ci+1}" style="background:#f5f6f8;border-radius:8px;padding:10px 14px;margin-bottom:8px;font-size:12px;border-left:3px solid #e60012">'
                            f'<b style="color:#e60012">[{_ci+1}] · {_topic}</b><br>'
                            f'<span style="color:#8a909c;font-size:11px">来源：{_source}</span><br>'
                            f'<span style="color:#555;line-height:1.6">{_text}…</span></div>')
@@ -718,7 +715,8 @@ else:
             const link = e.target.closest('.cite-link');
             if (!link) return;
             e.preventDefault();
-            const idx = parseInt(link.dataset.idx);
+            const msgIdx = parseInt(link.dataset.msg);
+            const citeIdx = parseInt(link.dataset.idx);
             // 找"来源"按钮并点击
             const buttons = window.parent.document.querySelectorAll('button');
             for (const btn of buttons) {
@@ -732,10 +730,13 @@ else:
                 const panel = window.parent.document.querySelector('.src-side');
                 if (panel) {
                     const items = panel.querySelectorAll('.src-item');
-                    if (items[idx-1]) {
-                        items[idx-1].scrollIntoView({behavior: 'smooth', block: 'center'});
-                        items[idx-1].style.outline = '2px solid #e60012';
-                        setTimeout(function() { items[idx-1].style.outline = ''; }, 2000);
+                    for (const item of items) {
+                        if (parseInt(item.dataset.msg) === msgIdx && parseInt(item.dataset.cite) === citeIdx) {
+                            item.scrollIntoView({behavior: 'smooth', block: 'center'});
+                            item.style.outline = '2px solid #e60012';
+                            setTimeout(function() { item.style.outline = ''; }, 2000);
+                            break;
+                        }
                     }
                 }
             }, 200);
