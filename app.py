@@ -733,8 +733,15 @@ else:
                     for (const item of items) {
                         if (parseInt(item.dataset.msg) === msgIdx && parseInt(item.dataset.cite) === citeIdx) {
                             item.scrollIntoView({behavior: 'smooth', block: 'center'});
-                            item.style.outline = '2px solid #e60012';
-                            setTimeout(function() { item.style.outline = ''; }, 2000);
+                            // 高亮：背景变红+边框加粗
+                            item.style.background = '#fdecec';
+                            item.style.borderLeftWidth = '4px';
+                            item.style.boxShadow = '0 0 12px rgba(230,0,18,0.3)';
+                            setTimeout(function() {
+                                item.style.background = '#f5f6f8';
+                                item.style.borderLeftWidth = '3px';
+                                item.style.boxShadow = 'none';
+                            }, 3000);
                             break;
                         }
                     }
