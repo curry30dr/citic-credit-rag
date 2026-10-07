@@ -705,6 +705,7 @@ else:
                          label_visibility="collapsed")
             send_clicked = c2.form_submit_button("发送", type="primary")
             clear_clicked = c3.form_submit_button("🗑 清空")
+        st.markdown('<div style="text-align:right;font-size:11px;color:#999;margin-top:4px">Enter 发送 · Shift+Enter 换行</div>', unsafe_allow_html=True)
 
         if send_clicked and user_input and user_input.strip():
             st.session_state.pending_q = user_input.strip()
