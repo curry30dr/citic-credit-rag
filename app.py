@@ -712,7 +712,7 @@ else:
         if not st.session_state.src_history:
             _items = '<div style="font-size:12px;color:#999">提问后这里实时展示检索到的业务资料块</div>'
         for _ri, _ctx in enumerate(st.session_state.src_history):
-            _items += f'<div style="font-size:11px;color:#999;padding:8px 0 4px">—— 第{_ri+1}次回答（{len(_ctx)}条资料）——</div>'
+            _items += f'<div class="src-group-title" data-msg-group="{_ri}" style="font-size:11px;color:#999;padding:8px 0 4px">—— 第{_ri+1}次回答（{len(_ctx)}条资料）——</div>'
             if not _ctx:
                 _items += '<div style="font-size:12px;color:#999">未检索到相关资料</div>'
             for _ci, _c in enumerate(_ctx):
@@ -890,16 +890,10 @@ else:
             if (items.length === 0) return;
             // 先全部显示
             items.forEach(item => item.style.display = 'block');
-            // 给分组标题加上 class，方便识别
-            const allDivs = panel.querySelectorAll('div');
-            let msgCount = 0;
-            for (const d of allDivs) {
-                if (d.textContent.includes('第') && d.textContent.includes('次回答') && d.style.fontSize === '11px') {
-                    d.classList.add('src-group-title');
-                    d.dataset.msgGroup = msgCount;
-                    msgCount++;
-                }
-            }
+            // 显示所有分组标题
+            panel.querySelectorAll('.src-group-title').forEach(title => {
+                title.style.display = 'block';
+            });
             // 隐藏其他回答的资料
             items.forEach(item => {
                 if (parseInt(item.dataset.msg) !== msgIdx) {
