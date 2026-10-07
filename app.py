@@ -792,36 +792,23 @@ else:
                 }
             }
         }
-        // 等待面板出现后，只显示对应回答的资料
+        // 等待面板出现后，scroll到对应资料并高亮
         setTimeout(function() {
             const panel = window.parent.document.querySelector('.src-side');
             if (panel) {
                 const items = panel.querySelectorAll('.src-item');
-                const headers = panel.querySelectorAll('div[style*="第"][style*="次回答"]');
-                // 隐藏所有资料和分组标题
-                items.forEach(item => item.style.display = 'none');
-                headers.forEach(h => h.style.display = 'none');
-                // 显示对应回答的分组标题和资料
                 for (const item of items) {
-                    if (parseInt(item.dataset.msg) === msgIdx) {
-                        item.style.display = 'block';
-                        // 找到对应的分组标题
-                        const prev = item.previousElementSibling;
-                        if (prev && prev.textContent.includes('第') && prev.textContent.includes('次回答')) {
-                            prev.style.display = 'block';
-                        }
-                        // scroll到对应资料并高亮
-                        if (parseInt(item.dataset.cite) === citeIdx) {
-                            item.scrollIntoView({behavior: 'smooth', block: 'center'});
-                            item.style.background = '#fdecec';
-                            item.style.borderLeftWidth = '4px';
-                            item.style.boxShadow = '0 0 12px rgba(230,0,18,0.3)';
-                            setTimeout(function() {
-                                item.style.background = '#f5f6f8';
-                                item.style.borderLeftWidth = '3px';
-                                item.style.boxShadow = 'none';
-                            }, 3000);
-                        }
+                    if (parseInt(item.dataset.msg) === msgIdx && parseInt(item.dataset.cite) === citeIdx) {
+                        item.scrollIntoView({behavior: 'smooth', block: 'center'});
+                        item.style.background = '#fdecec';
+                        item.style.borderLeftWidth = '4px';
+                        item.style.boxShadow = '0 0 12px rgba(230,0,18,0.3)';
+                        setTimeout(function() {
+                            item.style.background = '#f5f6f8';
+                            item.style.borderLeftWidth = '3px';
+                            item.style.boxShadow = 'none';
+                        }, 3000);
+                        break;
                     }
                 }
             }
