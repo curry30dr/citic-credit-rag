@@ -107,7 +107,20 @@ python app.py
 
 ## 八、部署
 
-- 本地：`python app.py` → http://127.0.0.1:5000
-- 公网：代码推到 GitHub，接入 Streamlit Community Cloud，`DASHSCOPE_API_KEY` 以 Secret 方式托管，
-  不硬编码密钥。
-- 前端：中信红品牌风，右侧"召回来源"默认折叠，快捷问题按类分组，底部免责声明。
+### 本地 Flask 版
+- 运行：`python app.py` → http://127.0.0.1:5000
+- 技术栈：Flask + SocketIO 流式输出 + FAISS 本地向量检索
+
+### Streamlit 版（已上线）
+- 在线体验：https://citic-credit-rag-uwxrdns73aikhzqbqj6e77.streamlit.app/
+- 技术栈：Streamlit + DashScope 在线 API + 混合检索（BM25 + 向量）
+- 部署方式：GitHub 仓库自动部署到 Streamlit Community Cloud
+- 特点：
+  - 流式输出，打字动画效果
+  - 回答内引用 [1][2] 可点击，右侧来源面板精确定位
+  - 赞/踩反馈，复制回答，清空对话
+  - 中信红品牌风，PC 端优化
+
+### 安全
+- `DASHSCOPE_API_KEY` 以 Secret 方式托管在 Streamlit Cloud，不硬编码
+- `.gitignore` 已排除 `.env`、`feedback.csv` 等敏感文件
