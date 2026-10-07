@@ -114,9 +114,9 @@ def render_bubble(text, role="bot", msg_idx=None):
         body = html.escape(text)
         body = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', body)
         if msg_idx is not None:
-            body = re.sub(r'\[(\d+)\]', r'<a href="javascript:void(0)" class="cite-link" data-msg="' + str(msg_idx) + r'" data-idx="\1" onclick="citeClick(this)" style="color:#e60012;font-weight:600;text-decoration:none;cursor:pointer">[<span>\1</span>]</a>', body)
+            body = re.sub(r'\[(\d+)\]', r'<a href="javascript:void(0)" class="cite-link" data-msg="' + str(msg_idx) + r'" data-idx="\1" style="color:#e60012;font-weight:600;text-decoration:none;cursor:pointer">[<span>\1</span>]</a>', body)
         else:
-            body = re.sub(r'\[(\d+)\]', r'<a href="javascript:void(0)" class="cite-link" data-msg="0" data-idx="\1" onclick="citeClick(this)" style="color:#e60012;font-weight:600;text-decoration:none;cursor:pointer">[<span>\1</span>]</a>', body)
+            body = re.sub(r'\[(\d+)\]', r'<a href="javascript:void(0)" class="cite-link" data-msg="0" data-idx="\1" style="color:#e60012;font-weight:600;text-decoration:none;cursor:pointer">[<span>\1</span>]</a>', body)
         body = body.replace('\n', '<br>')
         st.markdown(f'<div class="b-row"><div class="b-avatar">🤖</div><div class="b-bubble">{body}</div></div>', unsafe_allow_html=True)
         if any(k in text for k in HARD):
@@ -703,35 +703,18 @@ else:
             st.session_state.pending_q = user_input.strip()
             st.rerun()
 
-    # 发送后自动聚焦输入框 + 定义citeClick函数
+    # 发送后自动聚焦输入框 + 绑定引用点击
     components.html("""
     <script>
-    // 自动聚焦输入框
+    // 页面加载时检查是否需要scroll到指定引用
     setTimeout(function() {
-        const doc = window.parent.document;
-        const input = doc.querySelector('.st-key-s-input input');
-        if (input) input.focus();
-    }, 500);
-
-    // 定义citeClick函数并挂到父页面
-    window.parent.citeClick = function(el) {
-        const msgIdx = parseInt(el.dataset.msg);
-        const citeIdx = parseInt(el.dataset.idx);
-        // 找"来源"按钮并点击
-        const buttons = window.parent.document.querySelectorAll('button');
-        for (const btn of buttons) {
-            if (btn.textContent.includes('来源')) {
-                btn.click();
-                break;
-            }
-        }
-        // 等待面板出现后scroll到对应资料
-        setTimeout(function() {
+        const target = window.parent.__citeTarget;
+        if (target) {
             const panel = window.parent.document.querySelector('.src-side');
             if (panel) {
                 const items = panel.querySelectorAll('.src-item');
                 for (const item of items) {
-                    if (parseInt(item.dataset.msg) === msgIdx && parseInt(item.dataset.cite) === citeIdx) {
+                    if (parseInt(item.dataset.msg) === target.msg && parseInt(item.dataset.cite) === target.idx) {
                         item.scrollIntoView({behavior: 'smooth', block: 'center'});
                         item.style.background = '#fdecec';
                         item.style.borderLeftWidth = '4px';
@@ -744,11 +727,52 @@ else:
                         break;
                     }
                 }
+                window.parent.__citeTarget = null;
             }
-        }, 200);
-    };
+        }
+    }, 300);
+
+    // 绑定点击事件到父页面
+    window.parent.document.addEventListener('click', function(e) {
+        const link = e.target.closest('.cite-link');
+        if (!link) return;
+        e.preventDefault();
+        const msgIdx = parseInt(link.dataset.msg);
+        const citeIdx = parseInt(link.dataset.idx);
+        // 保存目标位置
+        window.parent.__citeTarget = {msg: msgIdx, idx: citeIdx};
+        // 检查来源面板是否已打开
+        const panel = window.parent.document.querySelector('.src-side');
+        if (!panel) {
+            // 没打开，点"来源"按钮
+            const buttons = window.parent.document.querySelectorAll('button');
+            for (const btn of buttons) {
+                if (btn.textContent.includes('来源')) {
+                    btn.click();
+                    break;
+                }
+            }
+        } else {
+            // 已经打开，直接scroll
+            const items = panel.querySelectorAll('.src-item');
+            for (const item of items) {
+                if (parseInt(item.dataset.msg) === msgIdx && parseInt(item.dataset.cite) === citeIdx) {
+                    item.scrollIntoView({behavior: 'smooth', block: 'center'});
+                    item.style.background = '#fdecec';
+                    item.style.borderLeftWidth = '4px';
+                    item.style.boxShadow = '0 0 12px rgba(230,0,18,0.3)';
+                    setTimeout(function() {
+                        item.style.background = '#f5f6f8';
+                        item.style.borderLeftWidth = '3px';
+                        item.style.boxShadow = 'none';
+                    }, 3000);
+                    break;
+                }
+            }
+        }
+    });
     </script>
-    """, height=30)
+    """, height=50)
 
     # 免责声明（全宽白底）
     st.markdown('<div class="s-disclaimer">以上信息依据《领用合约》《信用卡章程》及收费价格表整理，仅供参考，具体以中信银行官方公告为准。</div>', unsafe_allow_html=True)
