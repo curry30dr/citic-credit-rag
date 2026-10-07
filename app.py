@@ -138,7 +138,7 @@ def _action_bar(text, idx, voted_up, voted_down, q="", ctx=None):
       .ab-btn[disabled] {{opacity:.5; cursor:default}}
     </style>
     <div class="ab-wrap">
-      <button class="ab-btn" onclick="navigator.clipboard.writeText(`{safe}`).then(()=>{{this.textContent='✓ 已复制';setTimeout(()=>this.textContent='📋 复制',2000)}})">📋 复制</button>
+      <button class="ab-btn" onclick="var ta=document.createElement('textarea');ta.value=`{safe}`;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{{document.execCommand('copy');this.textContent='✓ 已复制';setTimeout(()=>this.textContent='📋 复制',2000)}}catch(e){{this.textContent='✗ 复制失败'}}document.body.removeChild(ta)">📋 复制</button>
       <button class="ab-btn" {up_dis} onclick="this.disabled=true;this.textContent='✓ 已赞';parent.postMessage({{isStreamlitMessage:true,type:'streamlit:setComponentValue',value:'__UP_{idx}'}},'*')">👍</button>
       <button class="ab-btn" {dn_dis} onclick="this.disabled=true;this.textContent='✓ 已踩';parent.postMessage({{isStreamlitMessage:true,type:'streamlit:setComponentValue',value:'__DOWN_{idx}'}},'*')">👎</button>
     </div>
@@ -195,6 +195,9 @@ section[data-testid="stSidebar"] { background: linear-gradient(180deg,#e60012,#c
 section[data-testid="stSidebar"] .stMarkdown { color: white; }
 section[data-testid="stSidebar"] button { background: rgba(255,255,255,0.1) !important; color: white !important; border: none !important; text-align: left !important; border-radius: 8px !important; }
 section[data-testid="stSidebar"] button:hover { background: rgba(255,255,255,0.2) !important; }
+
+/* 引用样式 */
+.cite-link:hover { text-decoration: underline !important; opacity: 0.8; }
 
 /* 气泡 */
 .user-bubble { background: linear-gradient(135deg,#e60012,#c7000b); color: white; padding: 10px 14px; border-radius: 14px; border-bottom-right-radius: 4px; margin: 6px 0; width: fit-content; max-width: 100%; display: table; font-size: 14px; line-height: 1.7; }
@@ -731,6 +734,22 @@ else:
             }
         }
     }, 300);
+
+    // Esc键关闭来源面板
+    window.parent.document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const panel = window.parent.document.querySelector('.src-side');
+            if (panel) {
+                const buttons = window.parent.document.querySelectorAll('button');
+                for (const btn of buttons) {
+                    if (btn.textContent.includes('关闭')) {
+                        btn.click();
+                        break;
+                    }
+                }
+            }
+        }
+    });
 
     // 绑定点击事件到父页面
     window.parent.document.addEventListener('click', function(e) {
