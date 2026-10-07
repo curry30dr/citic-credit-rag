@@ -543,7 +543,7 @@ if not st.session_state.in_chat:
 
 # ============ 对话页面 ============
 else:
-    # 页面切换 loading（从首页过来时显示，对话页加载完后自动消失）
+    # 页面切换 loading（从首页过来时显示，1秒后自动淡出）
     if "page_loading" not in st.session_state or st.session_state.page_loading:
         st.markdown("""
         <style>
@@ -552,22 +552,32 @@ else:
             background: #f5f6f8;
             display: flex; align-items: center; justify-content: center;
             z-index: 9998;
+            animation: fadeOut 0.3s ease 0.8s forwards;
+        }
+        .page-loading .dots {
+            display: flex; gap: 8px;
         }
         .page-loading .dot {
             width: 12px; height: 12px; background: #e60012; border-radius: 50%;
-            margin: 0 4px; animation: bounce 1.4s infinite ease-in-out both;
+            animation: bounce 1.4s infinite ease-in-out both;
         }
         .page-loading .dot:nth-child(1) { animation-delay: -0.32s; }
         .page-loading .dot:nth-child(2) { animation-delay: -0.16s; }
+        .page-loading .dot:nth-child(3) { animation-delay: 0; }
         @keyframes bounce {
             0%, 80%, 100% { transform: scale(0); }
             40% { transform: scale(1); }
         }
+        @keyframes fadeOut {
+            to { opacity: 0; visibility: hidden; }
+        }
         </style>
         <div class="page-loading">
-            <div class="dot"></div>
-            <div class="dot"></div>
-            <div class="dot"></div>
+            <div class="dots">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
         </div>
         """, unsafe_allow_html=True)
         st.session_state.page_loading = False
