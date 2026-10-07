@@ -792,24 +792,49 @@ else:
                 }
             }
         }
-        // 等待面板出现后，scroll到对应资料并高亮
+        // 等待面板出现后，只显示对应回答的资料
         setTimeout(function() {
             const panel = window.parent.document.querySelector('.src-side');
-            if (panel) {
-                const items = panel.querySelectorAll('.src-item');
-                for (const item of items) {
-                    if (parseInt(item.dataset.msg) === msgIdx && parseInt(item.dataset.cite) === citeIdx) {
-                        item.scrollIntoView({behavior: 'smooth', block: 'center'});
-                        item.style.background = '#fdecec';
-                        item.style.borderLeftWidth = '4px';
-                        item.style.boxShadow = '0 0 12px rgba(230,0,18,0.3)';
-                        setTimeout(function() {
-                            item.style.background = '#f5f6f8';
-                            item.style.borderLeftWidth = '3px';
-                            item.style.boxShadow = 'none';
-                        }, 3000);
-                        break;
+            if (!panel) return;
+            const items = panel.querySelectorAll('.src-item');
+            if (items.length === 0) return;
+            // 先全部显示
+            items.forEach(item => item.style.display = 'block');
+            panel.querySelectorAll('div').forEach(d => {
+                if (d.textContent.includes('第') && d.textContent.includes('次回答') && d.style.fontSize === '11px') {
+                    d.style.display = 'block';
+                }
+            });
+            // 然后隐藏其他回答的
+            items.forEach(item => {
+                if (parseInt(item.dataset.msg) !== msgIdx) {
+                    item.style.display = 'none';
+                }
+            });
+            // 隐藏其他回答的分组标题
+            const allDivs = panel.querySelectorAll('div');
+            let currentMsg = -1;
+            for (const d of allDivs) {
+                if (d.textContent.includes('第') && d.textContent.includes('次回答') && d.style.fontSize === '11px') {
+                    currentMsg++;
+                    if (currentMsg !== msgIdx) {
+                        d.style.display = 'none';
                     }
+                }
+            }
+            // scroll到对应资料并高亮
+            for (const item of items) {
+                if (parseInt(item.dataset.msg) === msgIdx && parseInt(item.dataset.cite) === citeIdx) {
+                    item.scrollIntoView({behavior: 'smooth', block: 'center'});
+                    item.style.background = '#fdecec';
+                    item.style.borderLeftWidth = '4px';
+                    item.style.boxShadow = '0 0 12px rgba(230,0,18,0.3)';
+                    setTimeout(function() {
+                        item.style.background = '#f5f6f8';
+                        item.style.borderLeftWidth = '3px';
+                        item.style.boxShadow = 'none';
+                    }, 3000);
+                    break;
                 }
             }
         }, 600);
