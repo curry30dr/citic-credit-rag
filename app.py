@@ -890,28 +890,28 @@ else:
             if (items.length === 0) return;
             // 先全部显示
             items.forEach(item => item.style.display = 'block');
-            panel.querySelectorAll('div').forEach(d => {
+            // 给分组标题加上 class，方便识别
+            const allDivs = panel.querySelectorAll('div');
+            let msgCount = 0;
+            for (const d of allDivs) {
                 if (d.textContent.includes('第') && d.textContent.includes('次回答') && d.style.fontSize === '11px') {
-                    d.style.display = 'block';
+                    d.classList.add('src-group-title');
+                    d.dataset.msgGroup = msgCount;
+                    msgCount++;
                 }
-            });
-            // 然后隐藏其他回答的
+            }
+            // 隐藏其他回答的资料
             items.forEach(item => {
                 if (parseInt(item.dataset.msg) !== msgIdx) {
                     item.style.display = 'none';
                 }
             });
             // 隐藏其他回答的分组标题
-            const allDivs = panel.querySelectorAll('div');
-            let currentMsg = -1;
-            for (const d of allDivs) {
-                if (d.textContent.includes('第') && d.textContent.includes('次回答') && d.style.fontSize === '11px') {
-                    currentMsg++;
-                    if (currentMsg !== msgIdx) {
-                        d.style.display = 'none';
-                    }
+            panel.querySelectorAll('.src-group-title').forEach(title => {
+                if (parseInt(title.dataset.msgGroup) !== msgIdx) {
+                    title.style.display = 'none';
                 }
-            }
+            });
             // scroll到对应资料并高亮
             for (const item of items) {
                 if (parseInt(item.dataset.msg) === msgIdx && parseInt(item.dataset.cite) === citeIdx) {
