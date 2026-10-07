@@ -791,9 +791,6 @@ else:
     </script>
     """, height=50)
 
-    # 调试信息
-    st.markdown(f'<div style="background:#fff3cd;padding:8px 16px;font-size:12px;text-align:center">调试：src_history长度={len(st.session_state.src_history)}</div>', unsafe_allow_html=True)
-
     # 免责声明（全宽白底）
     st.markdown('<div class="s-disclaimer">以上信息依据《领用合约》《信用卡章程》及收费价格表整理，仅供参考，具体以中信银行官方公告为准。</div>', unsafe_allow_html=True)
 
