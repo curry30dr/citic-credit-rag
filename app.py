@@ -213,7 +213,7 @@ section[data-testid="stSidebar"] button:hover { background: rgba(255,255,255,0.2
 .stMainBlockContainer.block-container { padding: 0 0 0 0 !important; }
 [data-testid="stSidebarUserContent"] { padding-top: 0 !important; margin-top: 0 !important; }
 .stSidebar .stSidebarContent { padding-top: 0 !important; }
-.stApp section[data-testid="stSidebar"], section[data-testid="stSidebar"] { top: 3.5rem !important; height: calc(100vh - 3.5rem) !important; margin-top: 0 !important; }
+.stApp section[data-testid="stSidebar"], section[data-testid="stSidebar"] { top: 0 !important; height: 100vh !important; margin-top: 0 !important; }
 
 /* 首页顶部全宽红条（width100%，无负margin） */
 .st-key-topbanner {
