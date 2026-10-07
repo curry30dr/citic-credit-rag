@@ -184,6 +184,35 @@ def stream_answer(msgs, ph):
 
 st.set_page_config(page_title="中信银行信用卡智能客服 - RAG 演示", page_icon="🏦", layout="wide")
 
+# 首次加载 loading 动画
+if "loaded" not in st.session_state:
+    st.markdown("""
+    <style>
+    .loading-screen {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: linear-gradient(135deg,#e60012,#c7000b);
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        z-index: 9999; animation: fadeOut 0.5s ease 1.5s forwards;
+    }
+    .loading-logo {
+        font-size: 48px; color: white; font-weight: bold; margin-bottom: 20px;
+    }
+    .loading-text {
+        color: rgba(255,255,255,0.8); font-size: 14px;
+    }
+    @keyframes fadeOut {
+        to { opacity: 0; visibility: hidden; }
+    }
+    </style>
+    <div class="loading-screen">
+        <div class="loading-logo">中信银行</div>
+        <div class="loading-text">智能客服加载中...</div>
+    </div>
+    """, unsafe_allow_html=True)
+    st.session_state.loaded = True
+    import time
+    time.sleep(1.5)
+
 st.markdown("""
 <style>
 .stApp { background: #f5f6f8; }
