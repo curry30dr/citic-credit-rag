@@ -187,6 +187,7 @@ st.set_page_config(page_title="中信银行信用卡智能客服 - RAG 演示", 
 st.markdown("""
 <style>
 .stApp { background: #f5f6f8; }
+body { margin: 0 !important; padding: 0 !important; }
 
 /* 隐藏 Streamlit 右上角的 Deploy、Main menu 按钮 */
 #MainMenu, [data-testid="stToolbar"], [data-testid="stStatusWidget"] { display: none !important; }
@@ -209,7 +210,7 @@ section[data-testid="stSidebar"] button:hover { background: rgba(255,255,255,0.2
 
 /* 顶部全宽红色通栏容器 */
 /* 主内容区左右padding归零，使红条可填满到边缘 */
-.stMainBlockContainer.block-container { padding: 3.5rem 0 0 0 !important; }
+.stMainBlockContainer.block-container { padding: 0 0 0 0 !important; }
 [data-testid="stSidebarUserContent"] { padding-top: 0 !important; margin-top: 0 !important; }
 .stSidebar .stSidebarContent { padding-top: 0 !important; }
 .stApp section[data-testid="stSidebar"], section[data-testid="stSidebar"] { top: 3.5rem !important; height: calc(100vh - 3.5rem) !important; margin-top: 0 !important; }
