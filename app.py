@@ -697,7 +697,7 @@ else:
         with st.form(key="chat_form", clear_on_submit=True):
             c1, c2, c3 = st.columns([11, 1.5, 1])
             user_input = c1.text_input("问题",
-                         placeholder="请输入您的信用卡问题… （按 Enter 发送）",
+                         placeholder="请输入您的信用卡问题… （Enter 发送，Shift+Enter 换行）",
                          label_visibility="collapsed")
             send_clicked = c2.form_submit_button("发送", type="primary")
             clear_clicked = c3.form_submit_button("🗑 清空")
@@ -705,6 +705,28 @@ else:
         if send_clicked and user_input and user_input.strip():
             st.session_state.pending_q = user_input.strip()
             st.rerun()
+
+    # 字数统计提示
+    components.html("""
+    <script>
+    setInterval(function() {
+        const doc = window.parent.document;
+        const input = doc.querySelector('.st-key-s-input input');
+        if (input) {
+            let hint = doc.getElementById('char-count-hint');
+            if (!hint) {
+                hint = document.createElement('div');
+                hint.id = 'char-count-hint';
+                hint.style.cssText = 'position:fixed;bottom:20px;right:420px;font-size:11px;color:#999;pointer-events:none;z-index:999';
+                document.body.appendChild(hint);
+            }
+            const len = input.value.length;
+            hint.textContent = len > 0 ? `已输入 ${len} 字` : '';
+            hint.style.color = len > 500 ? '#e60012' : '#999';
+        }
+    }, 300);
+    </script>
+    """, height=0)
 
     # 发送后自动聚焦输入框 + 绑定引用点击
     components.html("""
