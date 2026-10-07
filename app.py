@@ -190,7 +190,7 @@ st.markdown("""
 
 /* 隐藏 Streamlit 右上角的 Deploy、Main menu 按钮 */
 #MainMenu, [data-testid="stToolbar"], [data-testid="stStatusWidget"] { display: none !important; }
-header[data-testid="stHeader"] { background: transparent !important; }
+header[data-testid="stHeader"] { background: transparent !important; height: 0 !important; }
 div[data-testid="stVerticalBlock"] { gap: 6px !important; }
 .main .block-container { padding-top: 8px !important; padding-bottom: 8px !important; }
 
