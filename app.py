@@ -614,9 +614,11 @@ else:
                 full = "抱歉，网络开小差了，请稍后重试。如持续出现，请拨打 24小时客服热线 4008895558。"
                 ctx = []
                 # 重试按钮
-                if st.button("🔄 重试", key=f"retry_{len(st.session_state.chat_history)}"):
+                st.markdown('<div style="margin-left:52px;margin-top:4px">', unsafe_allow_html=True)
+                if st.button("🔄 重新尝试", key=f"retry_{len(st.session_state.chat_history)}"):
                     st.session_state.pending_q = q
                     st.rerun()
+                st.markdown('</div>', unsafe_allow_html=True)
                 ph.markdown(f'<div class="b-row"><div class="b-avatar">🤖</div><div class="b-bubble" style="color:#e60012">{full}</div></div>', unsafe_allow_html=True)
                 print("ERROR:", traceback.format_exc())
             # 存历史
