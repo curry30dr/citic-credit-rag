@@ -643,10 +643,10 @@ else:
         sc = st.columns([10, 1])
         sc[1].button("✕ 关闭", key="close_src", on_click=lambda: setattr(st.session_state, "show_src", False))
         st.markdown(
-            '<style>.src-side{position:fixed;top:80px;right:0;width:320px;height:calc(100vh - 80px);background:#fff;'
-            'border-left:1px solid #e8eaef;padding:20px;overflow-y:auto;z-index:1000;'
-            'box-shadow:-4px 0 16px rgba(0,0,0,.08)}.src-side h3{margin:0 0 12px;font-size:15px}'
-            '.st-key-s-header { padding-right:340px !important; } .s-topbar { padding-right:340px !important; }</style>'
+            '<style>.src-side{position:fixed;top:80px;right:20px;width:340px;max-height:60vh;background:#fff;'
+            'border:1px solid #e8eaef;border-radius:12px;padding:20px;overflow-y:auto;z-index:1000;'
+            'box-shadow:0 8px 24px rgba(0,0,0,.15)}.src-side h3{margin:0 0 12px;font-size:15px}'
+            '</style>'
             '<div class="src-side"><h3>📚 召回知识来源（共' + str(len(st.session_state.src_history)) + '次回答）</h3>' + _items + '</div>',
             unsafe_allow_html=True)
 
