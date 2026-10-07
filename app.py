@@ -613,6 +613,10 @@ else:
                 import traceback
                 full = "抱歉，网络开小差了，请稍后重试。如持续出现，请拨打 24小时客服热线 4008895558。"
                 ctx = []
+                # 重试按钮
+                if st.button("🔄 重试", key=f"retry_{len(st.session_state.chat_history)}"):
+                    st.session_state.pending_q = q
+                    st.rerun()
                 ph.markdown(f'<div class="b-row"><div class="b-avatar">🤖</div><div class="b-bubble" style="color:#e60012">{full}</div></div>', unsafe_allow_html=True)
                 print("ERROR:", traceback.format_exc())
             # 存历史
@@ -626,6 +630,10 @@ else:
             act_idx = len(st.session_state.chat_history) - 1
             last_msg = st.session_state.chat_history[act_idx]
             _action_bar(last_msg["content"], act_idx, False, False, last_msg.get("q", ""), ctx)
+            # 字数统计
+            char_count = len(full)
+            cite_count = len(ctx)
+            st.markdown(f'<div style="margin-left:52px;font-size:11px;color:#aaa;margin-top:2px">本次回答 {char_count} 字 · 引用 {cite_count} 条资料</div>', unsafe_allow_html=True)
 
     # 来源面板（点"来源"按钮在右侧滑出）
     if st.session_state.show_src:
@@ -775,6 +783,12 @@ else:
                     }
                 }
             }
+        }
+        // Ctrl+K 聚焦输入框
+        if (e.ctrlKey && e.key === 'k') {
+            e.preventDefault();
+            const input = window.parent.document.querySelector('.st-key-s-input input');
+            if (input) input.focus();
         }
     });
 
