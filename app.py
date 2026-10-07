@@ -643,10 +643,10 @@ else:
         sc = st.columns([10, 1])
         sc[1].button("✕ 关闭", key="close_src", on_click=lambda: setattr(st.session_state, "show_src", False))
         st.markdown(
-            '<style>.src-side{position:fixed;top:140px;right:0;width:360px;height:calc(100vh - 140px);background:#fff;'
+            '<style>.src-side{position:fixed;top:80px;right:0;width:320px;height:calc(100vh - 80px);background:#fff;'
             'border-left:1px solid #e8eaef;padding:20px;overflow-y:auto;z-index:1000;'
             'box-shadow:-4px 0 16px rgba(0,0,0,.08)}.src-side h3{margin:0 0 12px;font-size:15px}'
-            '.st-key-s-header { padding-right:380px !important; } .s-topbar { padding-right:380px !important; }</style>'
+            '.st-key-s-header { padding-right:340px !important; } .s-topbar { padding-right:340px !important; }</style>'
             '<div class="src-side"><h3>📚 召回知识来源（共' + str(len(st.session_state.src_history)) + '次回答）</h3>' + _items + '</div>',
             unsafe_allow_html=True)
 
@@ -802,7 +802,6 @@ else:
                 items.forEach(item => item.style.display = 'none');
                 headers.forEach(h => h.style.display = 'none');
                 // 显示对应回答的分组标题和资料
-                let headerShown = false;
                 for (const item of items) {
                     if (parseInt(item.dataset.msg) === msgIdx) {
                         item.style.display = 'block';
@@ -810,7 +809,6 @@ else:
                         const prev = item.previousElementSibling;
                         if (prev && prev.textContent.includes('第') && prev.textContent.includes('次回答')) {
                             prev.style.display = 'block';
-                            headerShown = true;
                         }
                         // scroll到对应资料并高亮
                         if (parseInt(item.dataset.cite) === citeIdx) {
@@ -827,7 +825,7 @@ else:
                     }
                 }
             }
-        }, 300);
+        }, 600);
     });
     </script>
     """, height=50)
