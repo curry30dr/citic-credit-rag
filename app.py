@@ -114,9 +114,9 @@ def render_bubble(text, role="bot", msg_idx=None):
         body = html.escape(text)
         body = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', body)
         if msg_idx is not None:
-            body = re.sub(r'\[(\d+)\]', r'<a href="javascript:void(0)" class="cite-link" data-msg="' + str(msg_idx) + r'" data-idx="\1" style="color:#e60012;font-weight:600;text-decoration:none;cursor:pointer">[<span>\1</span>]</a>', body)
+            body = re.sub(r'\[(\d+)\]', r'<a href="javascript:void(0)" class="cite-link" data-msg="' + str(msg_idx) + r'" data-idx="\1" onclick="citeClick(this)" style="color:#e60012;font-weight:600;text-decoration:none;cursor:pointer">[<span>\1</span>]</a>', body)
         else:
-            body = re.sub(r'\[(\d+)\]', r'<a href="javascript:void(0)" class="cite-link" data-msg="0" data-idx="\1" style="color:#e60012;font-weight:600;text-decoration:none;cursor:pointer">[<span>\1</span>]</a>', body)
+            body = re.sub(r'\[(\d+)\]', r'<a href="javascript:void(0)" class="cite-link" data-msg="0" data-idx="\1" onclick="citeClick(this)" style="color:#e60012;font-weight:600;text-decoration:none;cursor:pointer">[<span>\1</span>]</a>', body)
         body = body.replace('\n', '<br>')
         st.markdown(f'<div class="b-row"><div class="b-avatar">🤖</div><div class="b-bubble">{body}</div></div>', unsafe_allow_html=True)
         if any(k in text for k in HARD):
@@ -703,7 +703,7 @@ else:
             st.session_state.pending_q = user_input.strip()
             st.rerun()
 
-    # 发送后自动聚焦输入框 + 引用点击监听
+    # 发送后自动聚焦输入框 + 定义citeClick函数
     components.html("""
     <script>
     // 自动聚焦输入框
@@ -713,48 +713,40 @@ else:
         if (input) input.focus();
     }, 500);
 
-    // 全局监听引用点击
-    function bindCite() {
-        window.parent.document.addEventListener('click', function(e) {
-            const link = e.target.closest('.cite-link');
-            if (!link) return;
-            e.preventDefault();
-            const msgIdx = parseInt(link.dataset.msg);
-            const citeIdx = parseInt(link.dataset.idx);
-            // 找"来源"按钮并点击
-            const buttons = window.parent.document.querySelectorAll('button');
-            for (const btn of buttons) {
-                if (btn.textContent.includes('来源')) {
-                    btn.click();
-                    break;
-                }
+    // 定义citeClick函数并挂到父页面
+    window.parent.citeClick = function(el) {
+        const msgIdx = parseInt(el.dataset.msg);
+        const citeIdx = parseInt(el.dataset.idx);
+        // 找"来源"按钮并点击
+        const buttons = window.parent.document.querySelectorAll('button');
+        for (const btn of buttons) {
+            if (btn.textContent.includes('来源')) {
+                btn.click();
+                break;
             }
-            // 等待面板出现后scroll到对应资料
-            setTimeout(function() {
-                const panel = window.parent.document.querySelector('.src-side');
-                if (panel) {
-                    const items = panel.querySelectorAll('.src-item');
-                    for (const item of items) {
-                        if (parseInt(item.dataset.msg) === msgIdx && parseInt(item.dataset.cite) === citeIdx) {
-                            item.scrollIntoView({behavior: 'smooth', block: 'center'});
-                            // 高亮：背景变红+边框加粗
-                            item.style.background = '#fdecec';
-                            item.style.borderLeftWidth = '4px';
-                            item.style.boxShadow = '0 0 12px rgba(230,0,18,0.3)';
-                            setTimeout(function() {
-                                item.style.background = '#f5f6f8';
-                                item.style.borderLeftWidth = '3px';
-                                item.style.boxShadow = 'none';
-                            }, 3000);
-                            break;
-                        }
+        }
+        // 等待面板出现后scroll到对应资料
+        setTimeout(function() {
+            const panel = window.parent.document.querySelector('.src-side');
+            if (panel) {
+                const items = panel.querySelectorAll('.src-item');
+                for (const item of items) {
+                    if (parseInt(item.dataset.msg) === msgIdx && parseInt(item.dataset.cite) === citeIdx) {
+                        item.scrollIntoView({behavior: 'smooth', block: 'center'});
+                        item.style.background = '#fdecec';
+                        item.style.borderLeftWidth = '4px';
+                        item.style.boxShadow = '0 0 12px rgba(230,0,18,0.3)';
+                        setTimeout(function() {
+                            item.style.background = '#f5f6f8';
+                            item.style.borderLeftWidth = '3px';
+                            item.style.boxShadow = 'none';
+                        }, 3000);
+                        break;
                     }
                 }
-            }, 200);
-        });
-    }
-    // 页面加载后绑定
-    bindCite();
+            }
+        }, 200);
+    };
     </script>
     """, height=30)
 
