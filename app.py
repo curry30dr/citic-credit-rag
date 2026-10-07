@@ -543,6 +543,35 @@ if not st.session_state.in_chat:
 
 # ============ 对话页面 ============
 else:
+    # 页面切换 loading（从首页过来时显示，对话页加载完后自动消失）
+    if "page_loading" not in st.session_state or st.session_state.page_loading:
+        st.markdown("""
+        <style>
+        .page-loading {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #f5f6f8;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 9998;
+        }
+        .page-loading .dot {
+            width: 12px; height: 12px; background: #e60012; border-radius: 50%;
+            margin: 0 4px; animation: bounce 1.4s infinite ease-in-out both;
+        }
+        .page-loading .dot:nth-child(1) { animation-delay: -0.32s; }
+        .page-loading .dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+        </style>
+        <div class="page-loading">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+        """, unsafe_allow_html=True)
+        st.session_state.page_loading = False
+
     # 隐藏首页红色 sidebar 和首页容器
     st.markdown("""
     <style>
