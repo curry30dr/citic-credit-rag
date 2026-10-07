@@ -182,11 +182,15 @@ def stream_answer(msgs, ph):
         ph.markdown(f'<div class="b-row"><div class="b-avatar">🤖</div><div class="b-bubble">{body}</div></div>', unsafe_allow_html=True)
     return full
 
-st.set_page_config(page_title="中信信用卡智能咨询", page_icon="💳", layout="wide")
+st.set_page_config(page_title="中信银行信用卡智能客服 - RAG 演示", page_icon="🏦", layout="wide")
 
 st.markdown("""
 <style>
 .stApp { background: #f5f6f8; }
+
+/* 隐藏 Streamlit 右上角的 Deploy、Main menu 按钮 */
+#MainMenu, [data-testid="stToolbar"], [data-testid="stStatusWidget"] { display: none !important; }
+header[data-testid="stHeader"] { background: transparent !important; }
 div[data-testid="stVerticalBlock"] { gap: 6px !important; }
 .main .block-container { padding-top: 8px !important; padding-bottom: 8px !important; }
 
