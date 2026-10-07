@@ -626,7 +626,7 @@ else:
         if not st.session_state.src_history:
             _items = '<div style="font-size:12px;color:#999">提问后这里实时展示检索到的业务资料块</div>'
         for _ri, _ctx in enumerate(st.session_state.src_history):
-            _items += f'<div style="font-size:11px;color:#999;padding:8px 0 4px">—— 第{_ri+1}次回答 ——</div>'
+            _items += f'<div style="font-size:11px;color:#999;padding:8px 0 4px">—— 第{_ri+1}次回答（{len(_ctx)}条资料）——</div>'
             if not _ctx:
                 _items += '<div style="font-size:12px;color:#999">未检索到相关资料</div>'
             for _ci, _c in enumerate(_ctx):
@@ -644,7 +644,7 @@ else:
             'border-left:1px solid #e8eaef;padding:20px;overflow-y:auto;z-index:1000;'
             'box-shadow:-4px 0 16px rgba(0,0,0,.08)}.src-side h3{margin:0 0 12px;font-size:15px}'
             '.st-key-s-header { padding-right:380px !important; } .s-topbar { padding-right:380px !important; }</style>'
-            '<div class="src-side"><h3>📚 召回知识来源</h3>' + _items + '</div>',
+            '<div class="src-side"><h3>📚 召回知识来源（共' + str(len(st.session_state.src_history)) + '次回答）</h3>' + _items + '</div>',
             unsafe_allow_html=True)
 
         # 如果需要滚动到指定引用
@@ -774,24 +774,11 @@ else:
     </script>
     """, height=50)
 
+    # 调试信息
+    st.markdown(f'<div style="background:#fff3cd;padding:8px 16px;font-size:12px;text-align:center">调试：src_history长度={len(st.session_state.src_history)}</div>', unsafe_allow_html=True)
+
     # 免责声明（全宽白底）
     st.markdown('<div class="s-disclaimer">以上信息依据《领用合约》《信用卡章程》及收费价格表整理，仅供参考，具体以中信银行官方公告为准。</div>', unsafe_allow_html=True)
-
-    # 右侧来源抽屉（fixed）
-    if st.session_state.show_src:
-        last_ctx = None
-        for m in reversed(st.session_state.chat_history):
-            if "ctx" in m:
-                last_ctx = m["ctx"]
-                break
-        drawer = '<div class="src-drawer"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><b>📚 召回知识来源</b></div>'
-        if last_ctx:
-            for i, cc in enumerate(last_ctx):
-                drawer += f'<div class="src-card"><span class="src-tag">资料{i+1} · {html.escape(str(cc.get("topic","")))}</span><div style="color:#8a909c;font-size:10px;margin-bottom:4px">来源：{html.escape(str(cc.get("source","")))}</div><div style="color:#444;line-height:1.7">{html.escape(str(cc["text"][:200]))}</div></div>'
-        else:
-            drawer += '<div style="color:#999;text-align:center;margin-top:60px;font-size:13px">暂无来源</div>'
-        drawer += '</div>'
-        st.markdown(drawer, unsafe_allow_html=True)
 
 
 
