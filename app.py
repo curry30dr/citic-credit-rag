@@ -476,6 +476,65 @@ if not st.session_state.in_chat:
               </div>
             </div>
             """, unsafe_allow_html=True)
+
+            # 消融实验柱状图
+            import streamlit.components.v1 as components
+            components.html("""
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+            </head>
+            <body>
+                <div id="chart" style="width:100%;height:350px;"></div>
+                <script>
+                    var chart = echarts.init(document.getElementById('chart'));
+                    var option = {
+                        title: {
+                            text: '消融实验：检索配置 Recall@4 对比',
+                            left: 'center',
+                            textStyle: { fontSize: 14, color: '#333' }
+                        },
+                        tooltip: {
+                            trigger: 'axis',
+                            formatter: '{b}: {c}%'
+                        },
+                        xAxis: {
+                            type: 'category',
+                            data: ['纯向量', '纯BM25', '混合RRF', '混合+Rerank'],
+                            axisLabel: { fontSize: 12, color: '#666' }
+                        },
+                        yAxis: {
+                            type: 'value',
+                            min: 80,
+                            max: 100,
+                            axisLabel: { formatter: '{value}%', color: '#666' }
+                        },
+                        series: [{
+                            data: [
+                                { value: 85, itemStyle: { color: '#a8b0c0' } },
+                                { value: 90, itemStyle: { color: '#8a909c' } },
+                                { value: 90, itemStyle: { color: '#6b7280' } },
+                                { value: 95, itemStyle: { color: '#e60012' } }
+                            ],
+                            type: 'bar',
+                            barWidth: '50%',
+                            label: {
+                                show: true,
+                                position: 'top',
+                                formatter: '{c}%',
+                                fontSize: 12,
+                                fontWeight: 'bold'
+                            }
+                        }]
+                    };
+                    chart.setOption(option);
+                    window.addEventListener('resize', function() { chart.resize(); });
+                </script>
+            </body>
+            </html>
+            """, height=380)
+
         else:
             # 左侧主内容 + 右侧FAQ栏
             left, right = st.columns([2.2, 1])
