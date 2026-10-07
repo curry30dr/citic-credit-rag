@@ -550,7 +550,7 @@ else:
                 st.session_state.chat_history = []
                 st.rerun()
         with hc[2]:
-            if st.button("🔄 清空对话", key="reset_chat"):
+            if st.button("🗑 清空对话", key="reset_chat"):
                 st.session_state.chat_history = []
                 st.session_state.src_history = []
                 st.session_state.pending_q = None
@@ -714,7 +714,7 @@ else:
                          placeholder="请输入您的信用卡问题… （Enter 发送，Shift+Enter 换行）",
                          label_visibility="collapsed")
             send_clicked = c2.form_submit_button("发送", type="primary")
-            clear_clicked = c3.form_submit_button("🗑 清空")
+            clear_clicked = c3.form_submit_button("清空")
         st.markdown('<div style="text-align:right;font-size:11px;color:#999;margin-top:4px">Enter 发送 · Shift+Enter 换行</div>', unsafe_allow_html=True)
 
         if send_clicked and user_input and user_input.strip():
