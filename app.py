@@ -114,9 +114,9 @@ def render_bubble(text, role="bot", msg_idx=None):
         body = html.escape(text)
         body = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', body)
         if msg_idx is not None:
-            body = re.sub(r'\[资料?(\d+)\]', r'<a href="javascript:void(0)" class="cite-link" data-msg="' + str(msg_idx) + r'" data-idx="\1" style="color:#e60012;font-weight:600;text-decoration:none;cursor:pointer">[<span>\1</span>]</a>', body)
+            body = re.sub(r'\[(\d+)\]', r'<a href="javascript:void(0)" class="cite-link" data-msg="' + str(msg_idx) + r'" data-idx="\1" style="color:#e60012;font-weight:600;text-decoration:none;cursor:pointer">[<span>\1</span>]</a>', body)
         else:
-            body = re.sub(r'\[资料?(\d+)\]', r'<a href="javascript:void(0)" class="cite-link" data-msg="0" data-idx="\1" style="color:#e60012;font-weight:600;text-decoration:none;cursor:pointer">[<span>\1</span>]</a>', body)
+            body = re.sub(r'\[(\d+)\]', r'<a href="javascript:void(0)" class="cite-link" data-msg="0" data-idx="\1" style="color:#e60012;font-weight:600;text-decoration:none;cursor:pointer">[<span>\1</span>]</a>', body)
         body = body.replace('\n', '<br>')
         st.markdown(f'<div class="b-row"><div class="b-avatar">🤖</div><div class="b-bubble">{body}</div></div>', unsafe_allow_html=True)
         if any(k in text for k in HARD):
@@ -170,14 +170,14 @@ def _save_feedback(msg, vote):
     except Exception:
         pass
 
-def stream_answer(msgs, ph):
+def stream_answer(msgs, ph, msg_idx=0):
     """流式生成回答，逐字更新 placeholder，返回完整文本"""
     full = ""
     for delta in llm_chat_stream(msgs):
         full += delta
         body = html.escape(full)
         body = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', body)
-        body = re.sub(r'\[资料?(\d+)\]', r'<a href="javascript:void(0)" class="cite-link" data-idx="\1" style="color:#e60012;font-weight:600;text-decoration:none;cursor:pointer">[<span>\1</span>]</a>', body)
+        body = re.sub(r'\[(\d+)\]', r'<a href="javascript:void(0)" class="cite-link" data-msg="' + str(msg_idx) + r'" data-idx="\1" style="color:#e60012;font-weight:600;text-decoration:none;cursor:pointer">[<span>\1</span>]</a>', body)
         body = body.replace('\n', '<br>')
         ph.markdown(f'<div class="b-row"><div class="b-avatar">🤖</div><div class="b-bubble">{body}</div></div>', unsafe_allow_html=True)
     return full
@@ -732,7 +732,7 @@ else:
             # 检索 + 流式生成
             try:
                 msgs, ctx = build_msgs(q)
-                full = stream_answer(msgs, ph)
+                full = stream_answer(msgs, ph, bot_idx)
                 if not full:
                     ph.markdown('<div class="b-row"><div class="b-avatar">🤖</div><div class="b-bubble" style="color:#e60012">抱歉，暂时无法获取回答，请稍后重试。</div></div>', unsafe_allow_html=True)
                     full = "抱歉，暂时无法获取回答，请稍后重试。"
